@@ -1,6 +1,6 @@
 
 import { useState, useEffect, useRef } from 'react';
-import { MessageCircle, X, Send, Bot, User, Minimize2, Maximize2, History, Trash2, Plus } from 'lucide-react';
+import { MessageCircle, X, Send, Bot, User, Minimize2, Maximize2, History, Trash2, Plus, Sparkles } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -28,7 +28,7 @@ const FloatingChatbot = () => {
   const [isMinimized, setIsMinimized] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     {
-      content: "🚀 **Welcome to your AI Career Assistant!**\n\nI'm here to help you excel in your career journey. I can assist with:\n\n✨ **Career guidance & strategic planning**\n🎯 **Interview preparation & techniques**\n📝 **Resume optimization & ATS compliance**\n🔍 **Job search strategies & networking**\n💰 **Salary negotiation & benefits**\n📈 **Professional development & skills**\n\n**What career challenge can I help you solve today?**",
+      content: "👋 **Hi there! I'm your AI Career Coach.**\n\nI can help you with:\n✨ Resume Optimization\n🎯 Interview Prep\n🔍 Job Search Strategy\n\n**How can I support your goals today?**",
       role: 'assistant',
       timestamp: new Date()
     }
@@ -67,10 +67,7 @@ const FloatingChatbot = () => {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (response.status === 401) {
-        localStorage.removeItem('user');
-        localStorage.removeItem('userToken');
-        localStorage.removeItem('token');
-        window.location.reload();
+        // Handle auth error gracefully
         return;
       }
       if (response.ok) {
@@ -90,7 +87,7 @@ const FloatingChatbot = () => {
 
   const startNewChat = () => {
     setMessages([{
-        content: "🚀 **Welcome to your AI Career Assistant!**\n\nI'm here to help you excel in your career journey. I can assist with:\n\n✨ **Career guidance & strategic planning**\n🎯 **Interview preparation & techniques**\n📝 **Resume optimization & ATS compliance**\n🔍 **Job search strategies & networking**\n💰 **Salary negotiation & benefits**\n📈 **Professional development & skills**\n\n**What career challenge can I help you solve today?**",
+        content: "👋 **Hi there! I'm your AI Career Coach.**\n\nI can help you with:\n✨ Resume Optimization\n🎯 Interview Prep\n🔍 Job Search Strategy\n\n**How can I support your goals today?**",
         role: 'assistant',
         timestamp: new Date()
     }]);
@@ -163,21 +160,14 @@ const FloatingChatbot = () => {
             })
           });
 
-          if (createResponse.status === 401) {
-             localStorage.removeItem('user');
-             localStorage.removeItem('userToken');
-             localStorage.removeItem('token');
-             window.location.reload();
-             return;
-          }
           if (createResponse.ok) {
             const newChat = await createResponse.json();
             setCurrentChatId(newChat._id);
             fetchChatHistory(); // Refresh list
           }
         } else {
-          // Update existing chat - send both messages to append
-          const updateResponse = await fetch(`http://localhost:5000/api/chats/${currentChatId}`, {
+          // Update existing chat
+          await fetch(`http://localhost:5000/api/chats/${currentChatId}`, {
             method: 'PUT',
             headers: { 
               'Content-Type': 'application/json',
@@ -185,14 +175,6 @@ const FloatingChatbot = () => {
             },
             body: JSON.stringify({ messages: [userMessage, assistantMessage] })
           });
-          
-          if (updateResponse.status === 401) {
-             localStorage.removeItem('user');
-             localStorage.removeItem('userToken');
-             localStorage.removeItem('token');
-             window.location.reload();
-             return;
-          }
         }
       }
 
@@ -227,226 +209,168 @@ const FloatingChatbot = () => {
   return (
     <>
       <AnimatePresence>
-        {/* Enhanced Floating Chat Button */}
+        {/* Floating Toggle Button */}
         {!isOpen && (
           <motion.div
             initial={{ scale: 0, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0, opacity: 0 }}
             transition={{ type: "spring", stiffness: 260, damping: 20 }}
-            className={`fixed ${
-              isMobile ? 'bottom-4 right-4' : 'bottom-6 right-6'
-            } z-50`}
+            className={`fixed ${isMobile ? 'bottom-4 right-4' : 'bottom-8 right-8'} z-50`}
           >
+             <div className="absolute -inset-1 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full blur opacity-40 animate-pulse"></div>
             <Button
               onClick={toggleChat}
-              className={`rounded-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 hover:from-indigo-600 hover:via-purple-600 hover:to-pink-600 shadow-2xl hover:shadow-purple-500/25 transition-all duration-300 animate-pulse-glow group ${
-                isMobile ? 'w-16 h-16' : 'w-18 h-18'
+              className={`relative rounded-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-xl transition-all duration-300 ${
+                isMobile ? 'w-16 h-16' : 'w-16 h-16'
               }`}
-              size="icon"
             >
-              <div className="relative">
-                <MessageCircle className={`${isMobile ? 'w-6 h-6' : 'w-7 h-7'} text-white transition-transform group-hover:scale-110`} />
-                <div className="absolute -top-1 -right-1 w-3 h-3 bg-gradient-to-r from-orange-400 to-red-500 rounded-full animate-bounce"></div>
+              <div className="flex flex-col items-center justify-center">
+                 <Bot className="w-8 h-8 text-white" />
               </div>
+              <span className="absolute top-0 right-0 flex h-3 w-3">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+              </span>
             </Button>
           </motion.div>
         )}
 
-        {/* Enhanced Chat Window */}
+        {/* Chat Window */}
         {isOpen && (
           <motion.div
-            initial={{ opacity: 0, y: 100, scale: 0.9 }}
+            initial={{ opacity: 0, y: 50, scale: 0.9 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 100, scale: 0.9 }}
+            exit={{ opacity: 0, y: 50, scale: 0.9 }}
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
             className={`fixed ${
               isMobile 
-                ? 'bottom-4 right-4 left-4 top-20' 
-                : 'bottom-6 right-6 w-96'
-            } z-50`}
+                ? 'bottom-2 right-2 left-2 top-20' 
+                : 'bottom-8 right-8 w-[400px] h-[600px]'
+            } z-50 flex flex-col`}
           >
-            <Card className={`bg-gradient-to-br from-gray-800/95 via-slate-800/95 to-gray-900/95 backdrop-blur-xl border border-slate-700/50 shadow-2xl overflow-hidden flex flex-col transition-all duration-300 ${
-              isMinimized ? 'h-16' : isMobile ? 'h-full' : 'h-[600px]'
-            }`}>
-              <CardHeader className={`${isMobile ? 'pb-3 px-4 pt-4' : 'pb-2'} bg-gradient-to-r from-indigo-500/20 via-purple-500/20 to-pink-500/20 border-b border-slate-700/50`}>
-                <div className="flex items-center justify-between">
-                  <CardTitle className={`${isMobile ? 'text-base' : 'text-lg'} font-bold flex items-center gap-3`}>
-                    <div className={`${isMobile ? 'w-8 h-8' : 'w-10 h-10'} rounded-xl bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center shadow-lg`}>
-                      <Bot className={`${isMobile ? 'w-4 h-4' : 'w-5 h-5'} text-white`} />
+            <Card className={`flex flex-col h-full border-0 shadow-2xl overflow-hidden bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl ring-1 ring-black/5 dark:ring-white/10 ${isMinimized ? 'h-auto' : ''}`}>
+              
+              {/* Header */}
+              <div className="flex items-center justify-between p-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white shrink-0">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-white/20 rounded-lg backdrop-blur-sm">
+                    <Sparkles className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-base">Hire-X Assistant</h3>
+                    <div className="flex items-center gap-1.5 opacity-90">
+                       <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></span>
+                       <span className="text-xs font-medium">Online</span>
                     </div>
-                    <div className="flex flex-col">
-                      <span className="bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
-                        Career Assistant
-                      </span>
-                      <span className="text-xs text-gray-400 font-normal">AI-Powered Career Coach</span>
-                    </div>
-                  </CardTitle>
-                  <div className="flex items-center gap-1">
-                    {!isMinimized && (
-                       <>
-                        <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => setShowHistory(!showHistory)}
-                            className="h-8 w-8 p-0 hover:bg-slate-700/50 rounded-lg transition-colors"
-                            title="Chat History"
-                        >
-                            <History className="h-4 w-4 text-indigo-400" />
-                        </Button>
-                        <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={startNewChat}
-                            className="h-8 w-8 p-0 hover:bg-slate-700/50 rounded-lg transition-colors"
-                             title="New Chat"
-                        >
-                            <Plus className="h-4 w-4 text-indigo-400" />
-                        </Button>
-                       </>
-                    )}
-                    {!isMobile && (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={toggleMinimize}
-                        className="h-8 w-8 p-0 hover:bg-slate-700/50 rounded-lg transition-colors"
-                      >
-                        {isMinimized ? (
-                          <Maximize2 className="h-4 w-4 text-indigo-400" />
-                        ) : (
-                          <Minimize2 className="h-4 w-4 text-indigo-400" />
-                        )}
-                      </Button>
-                    )}
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={toggleChat}
-                      className="h-8 w-8 p-0 hover:bg-red-800/50 rounded-lg transition-colors"
-                    >
-                      <X className="h-4 w-4 text-red-400" />
-                    </Button>
                   </div>
                 </div>
-              </CardHeader>
-
-              {!isMinimized && (
-                <CardContent className={`p-4 pt-0 flex flex-col flex-1 min-h-0`}>
-                  {showHistory ? (
-                      <ScrollArea className="flex-1 pr-4 mb-4">
-                          <div className="space-y-2 mt-2">
-                           <h3 className="text-sm font-semibold text-gray-400 mb-3 px-2">Chat History</h3>
-                           {chatHistory.length === 0 && (
-                               <p className="text-center text-gray-500 text-sm py-4">No saved chats found.</p>
-                           )}
-                           {chatHistory.map((chat) => (
-                               <motion.div 
-                                  key={chat._id} 
-                                  initial={{ opacity: 0, x: -20 }}
-                                  animate={{ opacity: 1, x: 0 }}
-                                  className="group flex items-center justify-between p-3 rounded-xl bg-gray-800/50 hover:bg-gray-700/50 transition-colors border border-gray-700/50 cursor-pointer" 
-                                  onClick={() => loadChat(chat)}
-                               >
-                                   <div className="flex items-center gap-3 overflow-hidden">
-                                       <MessageCircle className="h-4 w-4 text-indigo-400 flex-shrink-0"/>
-                                       <div className="flex flex-col overflow-hidden">
-                                           <span className="text-sm font-medium text-gray-200 truncate">{chat.title}</span>
-                                           <span className="text-xs text-gray-500">{new Date(chat.updatedAt).toLocaleDateString()}</span>
-                                       </div>
-                                   </div>
-                                   <Button size="icon" variant="ghost" className="h-8 w-8 text-gray-500 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity" onClick={(e) => deleteChat(e, chat._id)}>
-                                       <Trash2 className="h-4 w-4" />
-                                   </Button>
-                               </motion.div>
-                           ))}
-                          </div>
-                      </ScrollArea>
-                  ) : (
+                <div className="flex items-center gap-1">
+                  {!isMinimized && (
                     <>
-                    <ScrollArea className={`flex-1 ${isMobile ? 'pr-2 mb-3' : 'pr-4 mb-4'}`}>
-                        <div className="space-y-4 pt-2">
-                        {messages.map((message, idx) => (
-                            <motion.div
-                            key={idx}
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.3 }}
-                            className={`flex items-start gap-3 ${
-                                message.role === 'user' ? 'justify-end' : 'justify-start'
-                            }`}
-                            >
-                            {message.role === 'assistant' && (
-                                <div className={`${isMobile ? 'w-7 h-7' : 'w-9 h-9'} rounded-xl bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center flex-shrink-0 shadow-lg`}>
-                                <Bot className={`${isMobile ? 'h-3 w-3' : 'h-4 w-4'} text-white`} />
-                                </div>
-                            )}
-                            <div
-                                className={`${isMobile ? 'max-w-[85%]' : 'max-w-[80%]'} rounded-2xl px-4 py-3 shadow-lg ${
-                                message.role === 'user'
-                                    ? 'bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white shadow-purple-500/25'
-                                    : 'bg-gradient-to-br from-gray-700/90 to-slate-800/90 text-gray-100 border border-slate-600/50'
-                                }`}
-                            >
-                                {message.role === 'assistant' ? (
-                                <div className={`prose prose-sm prose-invert max-w-none ${isMobile ? 'text-xs' : 'text-xs'}`}>
-                                    <ReactMarkdown>{message.content}</ReactMarkdown>
-                                </div>
-                                ) : (
-                                <p className={`${isMobile ? 'text-xs' : 'text-sm'} font-medium`}>{message.content}</p>
-                                )}
-                            </div>
-                            {message.role === 'user' && (
-                                <div className={`${isMobile ? 'w-7 h-7' : 'w-9 h-9'} rounded-xl bg-gradient-to-r from-gray-600 to-gray-700 flex items-center justify-center flex-shrink-0 shadow-lg`}>
-                                <User className={`${isMobile ? 'h-3 w-3' : 'h-4 w-4'} text-white`} />
-                                </div>
-                            )}
-                            </motion.div>
-                        ))}
-                        {isLoading && (
-                            <div className="flex items-start gap-3">
-                            <div className={`${isMobile ? 'w-7 h-7' : 'w-9 h-9'} rounded-xl bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center shadow-lg`}>
-                                <Bot className={`${isMobile ? 'h-3 w-3' : 'h-4 w-4'} text-white`} />
-                            </div>
-                            <div className="bg-gradient-to-br from-gray-700/90 to-slate-800/90 rounded-2xl px-4 py-3 border border-slate-600/50 shadow-lg">
-                                <div className="flex items-center gap-1">
-                                <div className="w-2 h-2 bg-indigo-400 rounded-full animate-bounce"></div>
-                                <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
-                                <div className="w-2 h-2 bg-pink-400 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
-                                </div>
-                            </div>
-                            </div>
-                        )}
-                        <div ref={messagesEndRef} />
-                        </div>
-                    </ScrollArea>
-                    <div className={`flex gap-3 ${isMobile ? 'items-end' : 'items-center'}`}>
-                        <Textarea
-                        value={inputMessage}
-                        onChange={(e) => setInputMessage(e.target.value)}
-                        onKeyPress={handleKeyPress}
-                        placeholder="Ask me about your career journey..."
-                        className={`flex-1 ${
-                            isMobile 
-                            ? 'min-h-[36px] max-h-[60px] text-sm' 
-                            : 'min-h-[40px] max-h-[80px]'
-                        } resize-none border-slate-600 focus:border-indigo-400 focus:ring-indigo-400/20 rounded-xl bg-gray-700/80 text-gray-100 placeholder:text-gray-400`}
-                        rows={1}
-                        disabled={isLoading}
-                        />
-                        <Button
-                        onClick={sendMessage}
-                        disabled={isLoading || !inputMessage.trim()}
-                        size="icon"
-                        className={`bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 hover:from-indigo-600 hover:via-purple-600 hover:to-pink-600 shadow-lg hover:shadow-purple-500/25 transition-all duration-300 rounded-xl ${
-                            isMobile ? 'h-9 w-9' : 'h-10 w-10'
-                        }`}
-                        >
-                        <Send className={`${isMobile ? 'h-3 w-3' : 'h-4 w-4'}`} />
-                        </Button>
-                    </div>
+                       <Button variant="ghost" size="icon" onClick={() => setShowHistory(!showHistory)} className="h-8 w-8 text-white/80 hover:text-white hover:bg-white/20 rounded-full">
+                          <History className="h-4 w-4" />
+                       </Button>
+                       <Button variant="ghost" size="icon" onClick={startNewChat} className="h-8 w-8 text-white/80 hover:text-white hover:bg-white/20 rounded-full">
+                          <Plus className="h-4 w-4" />
+                       </Button>
                     </>
                   )}
+                  {!isMobile && (
+                    <Button variant="ghost" size="icon" onClick={toggleMinimize} className="h-8 w-8 text-white/80 hover:text-white hover:bg-white/20 rounded-full">
+                       {isMinimized ? <Maximize2 className="h-4 w-4" /> : <Minimize2 className="h-4 w-4" />}
+                    </Button>
+                  )}
+                  <Button variant="ghost" size="icon" onClick={toggleChat} className="h-8 w-8 text-white/80 hover:text-white hover:bg-red-500/50 rounded-full">
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+
+              {!isMinimized && (
+                <CardContent className="flex flex-col flex-1 p-0 overflow-hidden relative">
+                   {showHistory ? (
+                      <div className="flex flex-col h-full bg-gray-50/50 dark:bg-black/20">
+                          <div className="p-4 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border-b border-gray-100 dark:border-gray-800 flex justify-between items-center">
+                              <span className="font-semibold text-sm">Previous Chats</span>
+                              <Button variant="ghost" size="sm" onClick={() => setShowHistory(false)} className="text-xs h-7">Back to Chat</Button>
+                          </div>
+                          <ScrollArea className="flex-1 p-4">
+                             {chatHistory.length === 0 ? (
+                                <div className="text-center text-gray-500 py-8 text-sm">No saved chats yet.</div>
+                             ) : (
+                                <div className="space-y-2">
+                                  {chatHistory.map((chat) => (
+                                     <div key={chat._id} className="group flex items-center gap-3 p-3 text-sm rounded-xl hover:bg-white dark:hover:bg-gray-800 border border-transparent hover:border-gray-200 dark:hover:border-gray-700 transition-all cursor-pointer shadow-sm hover:shadow" onClick={() => loadChat(chat)}>
+                                         <MessageCircle className="w-4 h-4 text-blue-500" />
+                                         <div className="flex-1 truncate font-medium text-gray-700 dark:text-gray-200">{chat.title}</div>
+                                         <Button size="icon" variant="ghost" className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity text-red-400 hover:text-red-500 hover:bg-red-50" onClick={(e) => deleteChat(e, chat._id)}>
+                                             <Trash2 className="w-3 h-3" />
+                                         </Button>
+                                     </div>
+                                  ))}
+                                </div>
+                             )}
+                          </ScrollArea>
+                      </div>
+                   ) : (
+                     <div className="flex flex-col h-full">
+                       <ScrollArea className="flex-1 p-4">
+                         <div className="space-y-4">
+                           {messages.map((message, idx) => (
+                             <motion.div
+                               key={idx}
+                               initial={{ opacity: 0, y: 10 }}
+                               animate={{ opacity: 1, y: 0 }}
+                               className={`flex items-start gap-2.5 ${message.role === 'user' ? 'flex-row-reverse' : ''}`}
+                             >
+                                <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${message.role === 'user' ? 'bg-gray-200 dark:bg-gray-700' : 'bg-blue-100 dark:bg-blue-900/50'}`}>
+                                    {message.role === 'user' ? <User className="w-4 h-4 text-gray-600 dark:text-gray-300" /> : <Bot className="w-4 h-4 text-blue-600 dark:text-blue-400" />}
+                                </div>
+                                <div className={`flex flex-col max-w-[80%] rounded-2xl px-4 py-3 text-sm shadow-sm ${
+                                   message.role === 'user' 
+                                   ? 'bg-gradient-to-br from-blue-600 to-blue-700 text-white rounded-tr-sm' 
+                                   : 'bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 text-gray-800 dark:text-gray-100 rounded-tl-sm'
+                                }`}>
+                                   <div className={`prose prose-sm max-w-none ${message.role === 'user' ? 'prose-invert' : 'dark:prose-invert'}`}>
+                                       <ReactMarkdown>{message.content}</ReactMarkdown>
+                                   </div>
+                                </div>
+                             </motion.div>
+                           ))}
+                           {isLoading && (
+                             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex items-start gap-2.5">
+                                <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center shrink-0">
+                                   <Bot className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                                </div>
+                                <div className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-2xl rounded-tl-sm px-4 py-3 shadow-sm flex items-center gap-1.5 h-10">
+                                   <span className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce"></span>
+                                   <span className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce delay-100"></span>
+                                   <span className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce delay-200"></span>
+                                </div>
+                             </motion.div>
+                           )}
+                           <div ref={messagesEndRef} />
+                         </div>
+                       </ScrollArea>
+                       
+                       <div className="p-4 bg-white/50 dark:bg-gray-800/50 backdrop-blur-md border-t border-gray-100 dark:border-gray-700">
+                          <div className="flex gap-2">
+                             <Textarea
+                               value={inputMessage}
+                               onChange={(e) => setInputMessage(e.target.value)}
+                               onKeyPress={handleKeyPress}
+                               placeholder="Type your message..."
+                               className="min-h-[44px] max-h-[100px] bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 focus:ring-blue-500 resize-none rounded-xl"
+                               rows={1}
+                             />
+                             <Button onClick={sendMessage} disabled={isLoading || !inputMessage.trim()} size="icon" className="h-11 w-11 rounded-xl bg-blue-600 hover:bg-blue-700 shrink-0 shadow-lg shadow-blue-500/20">
+                               <Send className="w-5 h-5" />
+                             </Button>
+                          </div>
+                       </div>
+                     </div>
+                   )}
                 </CardContent>
               )}
             </Card>

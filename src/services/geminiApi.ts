@@ -118,6 +118,21 @@ export const generateResume = async (data: ResumeData): Promise<string> => {
     }
 };
 
+export const generateResumeFromImage = async (image: string, data: ResumeData): Promise<string> => {
+    try {
+        const response = await fetch(`${API_URL}/generate-resume-from-image`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ image, data })
+        });
+        const resData = await handleResponse(response, 'generate resume from image');
+        return resData.result;
+    } catch (error) {
+        console.error("generateResumeFromImage error:", error);
+        throw error;
+    }
+};
+
 export const getJobSuggestions = async (resumeText: string, targetRole?: string): Promise<string> => {
     try {
         const response = await fetch(`${API_URL}/job-suggestions`, {

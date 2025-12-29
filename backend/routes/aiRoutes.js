@@ -23,5 +23,6 @@ router.post('/analyze-job', analyzeJobDescription);
 router.post('/job-suggestions', jobSuggestions);
 router.post('/generate-resume', generateResume);
 router.post('/generate-content', generateContent);
+router.post('/generate-resume-from-image', require('../controllers/aiController').generateResumeFromImage);
 
 module.exports = router;

@@ -10,7 +10,7 @@ async function listModels() {
     
     if (data.models) {
         console.log("MODELS_START");
-        data.models.forEach(m => console.log(m.name));
+        data.models.filter(m => m.name.includes('gemini')).forEach(m => console.log(m.name));
         console.log("MODELS_END");
     } else {
         console.log("ERROR:", JSON.stringify(data));
