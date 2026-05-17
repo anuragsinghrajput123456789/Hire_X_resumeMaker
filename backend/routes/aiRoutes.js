@@ -11,18 +11,20 @@ const {
     generateContent
 } = require('../controllers/aiController');
 
+const { protect } = require('../middleware/authMiddleware');
+
 router.get('/test', (req, res) => {
     res.json({ message: 'AI Routes are working', time: new Date().toISOString() });
 });
 
-router.post('/chat', chat);
-router.post('/cold-email', coldEmail);
-router.post('/analyze-resume-realtime', analyzeResumeRealTime);
-router.post('/analyze-resume', analyzeResume);
-router.post('/analyze-job', analyzeJobDescription);
-router.post('/job-suggestions', jobSuggestions);
-router.post('/generate-resume', generateResume);
-router.post('/generate-content', generateContent);
-router.post('/generate-resume-from-image', require('../controllers/aiController').generateResumeFromImage);
+router.post('/chat', protect, chat);
+router.post('/cold-email', protect, coldEmail);
+router.post('/analyze-resume-realtime', protect, analyzeResumeRealTime);
+router.post('/analyze-resume', protect, analyzeResume);
+router.post('/analyze-job', protect, analyzeJobDescription);
+router.post('/job-suggestions', protect, jobSuggestions);
+router.post('/generate-resume', protect, generateResume);
+router.post('/generate-content', protect, generateContent);
+
 
 module.exports = router;
