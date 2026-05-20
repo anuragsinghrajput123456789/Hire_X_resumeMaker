@@ -37,12 +37,16 @@ const handleResponse = async (response: Response, functionName: string) => {
     if (!response.ok) {
         const text = await response.text();
         console.error(`API Error in ${functionName}:`, response.status, response.statusText, text);
+        let errorMessage = `Failed to ${functionName} (Status ${response.status})`;
         try {
             const json = JSON.parse(text);
-            throw new Error(json.error || `Failed to ${functionName} (Status ${response.status})`);
-        } catch (e) {
-            throw new Error(`Failed to ${functionName}: ${text.substring(0, 100)}...`);
+            if (json.error || json.message) {
+                errorMessage = json.error || json.message;
+            }
+        } catch {
+            errorMessage = `Failed to ${functionName}: ${text.substring(0, 100)}...`;
         }
+        throw new Error(errorMessage);
     }
     return await response.json();
 };

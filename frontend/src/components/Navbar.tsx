@@ -14,7 +14,6 @@ import {
   User,
   ChevronRight
 } from 'lucide-react';
-import ThemeToggle from './ThemeToggle';
 import AuthContext from '../context/AuthContext';
 import { Button } from './ui/button';
 import {
@@ -124,12 +123,7 @@ const Navbar = () => {
             })}
           </div>
 
-          {/* Actions */}
           <div className="flex items-center gap-3.5">
-            <div className="hidden sm:block">
-              <ThemeToggle />
-            </div>
-
             {user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>

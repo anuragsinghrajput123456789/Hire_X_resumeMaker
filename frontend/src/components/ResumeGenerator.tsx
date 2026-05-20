@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext, useCallback } from 'react';
+import { useState, useEffect, useContext, useCallback, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -41,7 +41,15 @@ const ResumeGenerator = ({ onResumeGenerated }: { onResumeGenerated: (resume: st
   const [atsOptimizedContent, setAtsOptimizedContent] = useState<string>('');
   const [customSections, setCustomSections] = useState<CustomSection[]>([]);
   const [selectedTemplate, setSelectedTemplate] = useState<TemplateId>('modern');
+  const [activeMobileView, setActiveMobileView] = useState<'edit' | 'preview'>('edit');
   const { toast } = useToast();
+  
+  const containerRef = useRef<HTMLDivElement>(null);
+  const previewRef = useRef<HTMLDivElement>(null);
+  const [scale, setScale] = useState(1);
+  const [previewHeight, setPreviewHeight] = useState(1123);
+
+
   
   const authContext = useContext(AuthContext);
   const user = authContext?.user;
@@ -72,7 +80,7 @@ const ResumeGenerator = ({ onResumeGenerated }: { onResumeGenerated: (resume: st
     }
   }, [fetchResumes, showSavedResumes, user]);
 
-  const { register, control, handleSubmit, formState: { errors }, watch } = useForm<FormData>({
+  const { register, control, handleSubmit, formState: { errors }, watch, reset } = useForm<FormData>({
     defaultValues: {
       skills: '',
       education: [{ degree: '', institution: '', year: '' }],
@@ -184,33 +192,98 @@ const ResumeGenerator = ({ onResumeGenerated }: { onResumeGenerated: (resume: st
     }
   };
 
-  const downloadPDF = () => {
-    const currentData = watchedData.fullName ? {
-      ...watchedData,
-      skills: watchedData.skills.split(',').map(s => s.trim()).filter(s => s.length > 0),
-      certifications: watchedData.certifications.split(',').map(s => s.trim()).filter(s => s.length > 0),
-      languages: watchedData.languages ? watchedData.languages.split(',').map(s => s.trim()).filter(s => s.length > 0) : [],
-      achievements: watchedData.achievements ? watchedData.achievements.split(',').map(s => s.trim()).filter(s => s.length > 0) : []
-    } : generatedData;
+  const loadResume = (resume: SavedResume) => {
+    const formData: FormData = {
+      fullName: resume.fullName || '',
+      email: resume.email || '',
+      phone: resume.phone || '',
+      linkedin: resume.linkedin || '',
+      github: resume.github || '',
+      portfolio: resume.portfolio || '',
+      jobRole: resume.jobRole || '',
+      summary: resume.summary || '',
+      skills: Array.isArray(resume.skills) ? resume.skills.join(', ') : '',
+      certifications: Array.isArray(resume.certifications) ? resume.certifications.join(', ') : '',
+      languages: Array.isArray(resume.languages) ? resume.languages.join(', ') : '',
+      achievements: Array.isArray(resume.achievements) ? resume.achievements.join(', ') : '',
+      education: resume.education || [{ degree: '', institution: '', year: '' }],
+      experience: resume.experience || [{ company: '', role: '', duration: '', description: '' }],
+      projects: resume.projects || [{ name: '', description: '', technologies: '' }]
+    };
 
-    if (!currentData) return;
+    reset(formData);
+
+    if (resume.templateId) {
+      setSelectedTemplate(resume.templateId as TemplateId);
+    }
+    if (resume.customSections) {
+      setCustomSections(resume.customSections);
+    } else {
+      setCustomSections([]);
+    }
+
+    setGeneratedData({
+      ...resume,
+      skills: Array.isArray(resume.skills) ? resume.skills : [],
+      certifications: Array.isArray(resume.certifications) ? resume.certifications : [],
+      languages: Array.isArray(resume.languages) ? resume.languages : [],
+      achievements: Array.isArray(resume.achievements) ? resume.achievements : []
+    });
+
+    toast({
+      title: "✅ Blueprint Loaded",
+      description: `Successfully loaded ${resume.fullName || 'Untitled'}'s resume blueprint.`,
+    });
+  };
+
+
+  const downloadPDF = () => {
+    if (!previewData) return;
 
     const resumeElement = document.getElementById('resume-preview');
     if (!resumeElement) return;
 
+    // Temporarily reset styles for clean high-fidelity PDF capture
+    const originalTransform = resumeElement.style.transform;
+    const originalPosition = resumeElement.style.position;
+    const originalTop = resumeElement.style.top;
+    const originalLeft = resumeElement.style.left;
+    const originalBoxShadow = resumeElement.style.boxShadow;
+
+    resumeElement.style.transform = 'none';
+    resumeElement.style.position = 'relative';
+    resumeElement.style.top = 'auto';
+    resumeElement.style.left = 'auto';
+    resumeElement.style.boxShadow = 'none';
+
     const opt = {
       margin: [0, 0, 0, 0],
-      filename: `${currentData.fullName.replace(/\s+/g, '_')}_Resume.pdf`,
-      image: { type: 'jpeg', quality: 1 },
-      html2canvas: { scale: 3, useCORS: true, logging: false },
+      filename: `${(previewData.fullName || 'Resume').trim().replace(/\s+/g, '_')}_Resume.pdf`,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2.5, useCORS: true, logging: false },
       jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
     };
 
     html2pdf().set(opt).from(resumeElement).save().then(() => {
+      // Restore original styling
+      resumeElement.style.transform = originalTransform;
+      resumeElement.style.position = originalPosition;
+      resumeElement.style.top = originalTop;
+      resumeElement.style.left = originalLeft;
+      resumeElement.style.boxShadow = originalBoxShadow;
+
       toast({
         title: "📄 PDF Exported!",
         description: "Your professional resume has been downloaded.",
       });
+    }).catch((err) => {
+      // Safety recovery callback
+      resumeElement.style.transform = originalTransform;
+      resumeElement.style.position = originalPosition;
+      resumeElement.style.top = originalTop;
+      resumeElement.style.left = originalLeft;
+      resumeElement.style.boxShadow = originalBoxShadow;
+      console.error('PDF generation error:', err);
     });
   };
 
@@ -224,13 +297,133 @@ const ResumeGenerator = ({ onResumeGenerated }: { onResumeGenerated: (resume: st
     }
   };
 
-  const previewData = watchedData.fullName ? {
-    ...watchedData,
-    skills: watchedData.skills ? watchedData.skills.split(',').map(s => s.trim()).filter(s => s.length > 0) : [],
-    certifications: watchedData.certifications ? watchedData.certifications.split(',').map(s => s.trim()).filter(s => s.length > 0) : [],
-    languages: watchedData.languages ? watchedData.languages.split(',').map(s => s.trim()).filter(s => s.length > 0) : [],
-    achievements: watchedData.achievements ? watchedData.achievements.split(',').map(s => s.trim()).filter(s => s.length > 0) : []
-  } : generatedData;
+  const hasAnyInput = !!(
+    watchedData.fullName?.trim() ||
+    watchedData.email?.trim() ||
+    watchedData.phone?.trim() ||
+    watchedData.jobRole?.trim() ||
+    watchedData.summary?.trim() ||
+    watchedData.skills?.trim()
+  );
+
+  const mockFallbackData: ResumeData = {
+    fullName: 'Johnathan Doe',
+    jobRole: 'Senior Full Stack Engineer',
+    email: 'john.doe@techcorp.com',
+    phone: '+1 (555) 019-2834',
+    linkedin: 'linkedin.com/in/johndoe',
+    github: 'github.com/johndoe',
+    portfolio: 'johndoe.dev',
+    summary: 'Innovative Senior Full Stack Engineer with 8+ years of expertise in designing, building, and deploying highly scalable web solutions. Passionate about system architecture, performance optimization, and mentoring high-performing engineering teams.',
+    skills: ['TypeScript', 'React.js', 'Node.js', 'Next.js', 'Go', 'GraphQL', 'PostgreSQL', 'Docker', 'AWS', 'System Design'],
+    education: [
+      {
+        degree: 'Master of Science in Computer Science',
+        institution: 'Stanford University',
+        year: '2016 - 2018',
+        gpa: '3.9'
+      },
+      {
+        degree: 'Bachelor of Science in Software Engineering',
+        institution: 'University of California, Berkeley',
+        year: '2012 - 2016',
+        gpa: '3.8'
+      }
+    ],
+    experience: [
+      {
+        company: 'InnovateTech Solutions',
+        role: 'Lead Software Architect',
+        duration: '2021 - Present',
+        description: 'Designed and implemented a high-performance distributed microservices platform using Node.js and Go, boosting API throughput by 140%.\nLed an agile engineering squad of 8 developers, deploying daily features with zero-downtime CI/CD workflows.\nArchitected a real-time analytics streaming engine processing over 50M daily events.'
+      },
+      {
+        company: 'Apex Code Systems',
+        role: 'Senior Full Stack Engineer',
+        duration: '2018 - 2021',
+        description: 'Spearheaded migration of legacy enterprise systems to a modern Next.js + React micro-frontend framework, improving Lighthouse scores by 45 points.\nOptimized SQL queries and indexes on PostgreSQL databases, yielding a 3.5x acceleration in reporting times.\nMentored junior developers and instituted code review best practices.'
+      }
+    ],
+    projects: [
+      {
+        name: 'Enterprise Cloud Orchestrator',
+        description: 'Developed an open-source cloud resource deployment tool that streamlines AWS containerization workflows.\nEnabled developer sandboxes to compile in under 3 minutes, cutting AWS overhead by 30%.',
+        technologies: 'TypeScript, React, Docker, AWS API'
+      },
+      {
+        name: 'Distributed Event Broker',
+        description: 'Engineered a light-weight event messaging broker achieving sub-millisecond end-to-end messaging latency.\nAuthored detailed technical whitepapers and documentation for client developers.',
+        technologies: 'Go, WebSockets, Redis'
+      }
+    ],
+    certifications: ['AWS Certified Solutions Architect', 'Google Professional Cloud Developer'],
+    languages: ['English (Native)', 'Spanish (Conversational)'],
+    achievements: ['Speaker at NodeConf 2023', 'Winner of Tech Innovator Hackathon 2022']
+  };
+
+  const previewData: ResumeData = (hasAnyInput || generatedData) ? {
+    fullName: watchedData.fullName || generatedData?.fullName || '',
+    email: watchedData.email || generatedData?.email || '',
+    phone: watchedData.phone || generatedData?.phone || '',
+    linkedin: watchedData.linkedin || generatedData?.linkedin || '',
+    github: watchedData.github || generatedData?.github || '',
+    portfolio: watchedData.portfolio || generatedData?.portfolio || '',
+    jobRole: watchedData.jobRole || generatedData?.jobRole || '',
+    summary: watchedData.summary || generatedData?.summary || '',
+    skills: watchedData.skills 
+      ? watchedData.skills.split(',').map(s => s.trim()).filter(s => s.length > 0) 
+      : (generatedData?.skills || []),
+    certifications: watchedData.certifications 
+      ? watchedData.certifications.split(',').map(s => s.trim()).filter(s => s.length > 0) 
+      : (generatedData?.certifications || []),
+    languages: watchedData.languages 
+      ? watchedData.languages.split(',').map(s => s.trim()).filter(s => s.length > 0) 
+      : (generatedData?.languages || []),
+    achievements: watchedData.achievements 
+      ? watchedData.achievements.split(',').map(s => s.trim()).filter(s => s.length > 0) 
+      : (generatedData?.achievements || []),
+    education: (watchedData.education && watchedData.education.some(edu => edu.institution?.trim() || edu.degree?.trim()))
+      ? watchedData.education
+      : (generatedData?.education || []),
+    experience: (watchedData.experience && watchedData.experience.some(exp => exp.company?.trim() || exp.role?.trim()))
+      ? watchedData.experience
+      : (generatedData?.experience || []),
+    projects: (watchedData.projects && watchedData.projects.some(proj => proj.name?.trim()))
+      ? watchedData.projects
+      : (generatedData?.projects || [])
+  } : mockFallbackData;
+
+  useEffect(() => {
+    const container = containerRef.current;
+    const preview = previewRef.current;
+    if (!container || !preview) return;
+
+    const observer = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        if (entry.target === preview) {
+          setPreviewHeight(preview.scrollHeight);
+        } else if (entry.target === container) {
+          const containerWidth = entry.contentRect.width;
+          const padding = 32;
+          const availableWidth = containerWidth - padding;
+          setScale(Math.max(0.2, Math.min(1, availableWidth / 794)));
+        }
+      }
+    });
+
+    observer.observe(container);
+    observer.observe(preview);
+
+    // Initial measurement triggers
+    setPreviewHeight(preview.scrollHeight);
+    const initialWidth = container.getBoundingClientRect().width;
+    const initialAvailable = initialWidth - 32;
+    setScale(Math.max(0.2, Math.min(1, initialAvailable / 794)));
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [previewData, selectedTemplate, customSections]);
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 relative pb-20">
@@ -285,7 +478,7 @@ const ResumeGenerator = ({ onResumeGenerated }: { onResumeGenerated: (resume: st
       </AnimatePresence>
 
       {/* Form Section */}
-      <div className="lg:col-span-5 space-y-6">
+      <div className={`lg:col-span-5 space-y-6 ${activeMobileView === 'edit' ? 'block' : 'hidden lg:block'}`}>
         <Card className="glass-card border-indigo-500/10 shadow-2xl overflow-hidden group">
           <CardHeader className="bg-indigo-500/5 border-b border-indigo-500/10 p-6">
             <div className="flex items-center justify-between">
@@ -336,18 +529,30 @@ const ResumeGenerator = ({ onResumeGenerated }: { onResumeGenerated: (resume: st
                   ) : (
                     <div className="grid grid-cols-1 gap-2">
                       {savedResumes.map(resume => (
-                        <div key={resume._id} className="flex items-center justify-between p-3 bg-white dark:bg-gray-900 rounded-xl border border-indigo-500/10 hover:border-indigo-500/30 transition-all cursor-pointer group/item">
+                        <div 
+                          key={resume._id} 
+                          onClick={() => loadResume(resume)}
+                          className="flex items-center justify-between p-3 bg-white dark:bg-gray-900 rounded-xl border border-indigo-500/10 hover:border-indigo-500/30 transition-all cursor-pointer group/item"
+                        >
                           <div className="flex items-center gap-3">
                             <div className="w-8 h-8 rounded-lg bg-indigo-500/10 flex items-center justify-center text-indigo-600">
                               <FileText className="w-4 h-4" />
                             </div>
                             <div className="truncate max-w-[150px]">
                               <p className="text-sm font-bold truncate">{resume.fullName || 'Untitled'}</p>
-                              <p className="text-[10px] text-muted-foreground">{new Date(resume.updatedAt).toLocaleDateString()}</p>
+                              <p className="text-[10px] text-muted-foreground">{resume.updatedAt ? new Date(resume.updatedAt).toLocaleDateString() : 'Recent'}</p>
                             </div>
                           </div>
                           <div className="flex gap-1 opacity-0 group-hover/item:opacity-100 transition-opacity">
-                            <Button size="icon" variant="ghost" className="w-8 h-8 rounded-lg text-rose-500 hover:bg-rose-500/10" onClick={() => deleteResume(resume._id)}>
+                            <Button 
+                              size="icon" 
+                              variant="ghost" 
+                              className="w-8 h-8 rounded-lg text-rose-500 hover:bg-rose-500/10" 
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                deleteResume(resume._id);
+                              }}
+                            >
                               <Trash2 className="w-4 h-4" />
                             </Button>
                           </div>
@@ -391,10 +596,10 @@ const ResumeGenerator = ({ onResumeGenerated }: { onResumeGenerated: (resume: st
       </div>
 
       {/* Preview Section */}
-      <div className="lg:col-span-7 flex flex-col h-[calc(100vh-140px)] sticky top-28">
+      <div className={`lg:col-span-7 flex flex-col lg:h-[calc(100vh-140px)] lg:sticky lg:top-28 h-auto ${activeMobileView === 'preview' ? 'block' : 'hidden lg:block'}`}>
         <Card className="glass-card border-indigo-500/10 shadow-2xl overflow-hidden flex flex-col h-full">
           <CardHeader className="bg-indigo-500/5 border-b border-indigo-500/10 p-4 shrink-0">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-indigo-500/10 rounded-xl flex items-center justify-center text-indigo-600">
                   <Eye className="w-5 h-5" />
@@ -402,13 +607,13 @@ const ResumeGenerator = ({ onResumeGenerated }: { onResumeGenerated: (resume: st
                 <CardTitle className="text-lg font-black tracking-tight">LIVE CANVAS</CardTitle>
               </div>
 
-              <div className="flex items-center gap-3">
-                <div className="flex items-center bg-white/[0.02] border border-white/[0.04] p-1 rounded-xl">
+              <div className="flex flex-wrap items-center gap-2.5 sm:gap-3">
+                <div className="flex flex-wrap items-center bg-white/[0.02] border border-white/[0.04] p-1 rounded-xl gap-0.5 sm:gap-1">
                   {templateIds.map((temp) => (
                     <button
                       key={temp}
                       onClick={() => setSelectedTemplate(temp)}
-                      className={`px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all duration-300 ${
+                      className={`px-2 py-1.5 sm:px-3 sm:py-1.5 rounded-lg text-[9px] sm:text-[10px] font-bold uppercase tracking-wider transition-all duration-300 ${
                         selectedTemplate === temp ? 'bg-white/[0.06] border border-white/[0.08] text-indigo-400 shadow-md' : 'text-slate-400 hover:text-slate-200 border border-transparent'
                       }`}
                     >
@@ -416,13 +621,15 @@ const ResumeGenerator = ({ onResumeGenerated }: { onResumeGenerated: (resume: st
                     </button>
                   ))}
                 </div>
-                <div className="w-px h-6 bg-white/[0.05]" />
-                <Button size="icon" variant="ghost" className="w-10 h-10 rounded-xl text-indigo-400 hover:bg-white/5 hover:text-indigo-300 transition-colors" onClick={copyToClipboard}>
-                  <Copy className="w-5 h-5" />
-                </Button>
-                <Button size="icon" className="w-10 h-10 rounded-xl btn-gradient shadow-md" onClick={downloadPDF}>
-                  <Download className="w-5 h-5" />
-                </Button>
+                <div className="hidden sm:block w-px h-6 bg-white/[0.05]" />
+                <div className="flex items-center gap-2">
+                  <Button size="icon" variant="ghost" className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl text-indigo-400 hover:bg-white/5 hover:text-indigo-300 transition-colors" onClick={copyToClipboard}>
+                    <Copy className="w-4 h-4 sm:w-5 sm:h-5" />
+                  </Button>
+                  <Button size="icon" className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl btn-gradient shadow-md" onClick={downloadPDF}>
+                    <Download className="w-4 h-4 sm:w-5 sm:h-5" />
+                  </Button>
+                </div>
               </div>
             </div>
           </CardHeader>
@@ -435,28 +642,38 @@ const ResumeGenerator = ({ onResumeGenerated }: { onResumeGenerated: (resume: st
                   initial={{ opacity: 0, scale: 0.98 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 1.02 }}
-                  className="flex-1 overflow-y-auto p-8 scrollbar-thin scrollbar-thumb-indigo-500/20"
+                  ref={containerRef}
+                  id="preview-container"
+                  className="flex-1 w-full max-w-full overflow-x-hidden overflow-y-auto p-4 flex justify-center items-start scrollbar-thin scrollbar-thumb-indigo-500/20"
                 >
-                  <div className="max-w-[210mm] mx-auto bg-white shadow-2xl relative" id="resume-preview">
-                    {selectedTemplate === 'modern' && <ModernTemplate data={previewData} />}
-                    {selectedTemplate === 'classic' && <ClassicTemplate data={previewData} />}
-                    {selectedTemplate === 'creative' && <CreativeTemplate data={previewData} />}
-                    {selectedTemplate === 'professional' && <ProfessionalTemplate data={previewData} />}
-                    
-                    {customSections.length > 0 && (
-                      <div className="bg-white p-8">
-                         {customSections.map((section) => (
-                          <div key={section.id} className="mb-6">
-                            <h2 className="text-lg font-bold text-black mb-3 uppercase tracking-wide border-b-2 border-gray-800 pb-1">
-                              {section.title}
-                            </h2>
-                            <div className="text-sm text-gray-900 leading-relaxed whitespace-pre-wrap">
-                               {section.content}
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
+                  <div 
+                    style={{ 
+                      width: `${794 * scale}px`, 
+                      height: `${previewHeight * scale}px`, 
+                      overflow: 'hidden',
+                      position: 'relative',
+                      transition: 'all 0.15s ease-out'
+                    }}
+                  >
+                    <div 
+                      ref={previewRef}
+                      id="resume-preview"
+                      style={{ 
+                        width: '794px', 
+                        transform: `scale(${scale})`, 
+                        transformOrigin: 'top left',
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        backgroundColor: '#ffffff',
+                        boxShadow: '0 25px 50px -12px rgb(0 0 0 / 0.25)'
+                      }}
+                    >
+                      {selectedTemplate === 'modern' && <ModernTemplate data={previewData} customSections={customSections} />}
+                      {selectedTemplate === 'classic' && <ClassicTemplate data={previewData} customSections={customSections} />}
+                      {selectedTemplate === 'creative' && <CreativeTemplate data={previewData} customSections={customSections} />}
+                      {selectedTemplate === 'professional' && <ProfessionalTemplate data={previewData} customSections={customSections} />}
+                    </div>
                   </div>
                 </motion.div>
               ) : (
@@ -501,6 +718,34 @@ const ResumeGenerator = ({ onResumeGenerated }: { onResumeGenerated: (resume: st
             </AnimatePresence>
           </CardContent>
         </Card>
+      </div>
+
+      {/* Mobile Floating Toggle Bar */}
+      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 lg:hidden">
+        <div className="flex items-center gap-1.5 bg-slate-900/90 dark:bg-black/90 backdrop-blur-md border border-white/10 p-1.5 rounded-full shadow-2xl">
+          <button
+            onClick={() => setActiveMobileView('edit')}
+            className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all duration-300 ${
+              activeMobileView === 'edit'
+                ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/20'
+                : 'text-slate-400 hover:text-slate-200'
+            }`}
+          >
+            <FileText className="w-4 h-4" />
+            <span>Edit Form</span>
+          </button>
+          <button
+            onClick={() => setActiveMobileView('preview')}
+            className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all duration-300 ${
+              activeMobileView === 'preview'
+                ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/20'
+                : 'text-slate-400 hover:text-slate-200'
+            }`}
+          >
+            <Eye className="w-4 h-4" />
+            <span>Live Preview</span>
+          </button>
+        </div>
       </div>
     </div>
   );

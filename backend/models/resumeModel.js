@@ -8,7 +8,7 @@ const resumeSchema = new mongoose.Schema({
   },
   templateId: {
     type: String,
-    enum: ['modern', 'classic', 'creative'],
+    enum: ['modern', 'classic', 'creative', 'professional'],
     default: 'modern'
   },
   fullName: { type: String, required: true },
@@ -16,6 +16,8 @@ const resumeSchema = new mongoose.Schema({
   phone: String,
   linkedin: String,
   github: String,
+  portfolio: String,
+  jobRole: String,
   summary: String,
   skills: [String],
   experience: [{

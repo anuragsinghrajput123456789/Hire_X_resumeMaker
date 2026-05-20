@@ -26,8 +26,6 @@ const protect = asyncHandler(async (req, res, next) => {
 
       next();
     } catch (error) {
-      // console.error(error); // Don't spam stack trace for auth errors
-      console.log(`Auth Failed: ${error.message}`);
       res.status(401);
       throw new Error('Not authorized, token failed');
     }

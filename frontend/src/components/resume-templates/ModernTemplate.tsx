@@ -1,118 +1,256 @@
 import { ResumeData } from '../../types/resumeTypes';
-import { Mail, Phone, Linkedin, Github, Globe, MapPin, Briefcase, Award, GraduationCap, Code2, Rocket, ExternalLink } from 'lucide-react';
+import { 
+  Mail, 
+  Phone, 
+  Linkedin, 
+  Github, 
+  Globe, 
+  Briefcase, 
+  GraduationCap, 
+  Award, 
+  Code2, 
+  Languages, 
+  Milestone
+} from 'lucide-react';
+import { parseBulletPoints, cleanLinkedin, cleanGithub, cleanPortfolio, filterExperience, filterEducation, filterProjects } from '../../lib/resumeHelper';
 
 interface TemplateProps {
   data: ResumeData;
+  customSections?: Array<{
+    id: string;
+    title: string;
+    content: string;
+  }>;
 }
 
-const ModernTemplate = ({ data }: TemplateProps) => {
+const ModernTemplate = ({ data, customSections }: TemplateProps) => {
+  const cleanExp = filterExperience(data.experience);
+  const cleanEdu = filterEducation(data.education);
+  const cleanProj = filterProjects(data.projects);
+
   return (
-    <div className="bg-white text-black p-10 font-sans min-h-[1123px] w-full max-w-[210mm] mx-auto box-border leading-tight selection:bg-blue-100" style={{ fontFamily: '"Inter", "Segoe UI", Roboto, sans-serif' }}>
-      
+    <div 
+      className="bg-white text-[#1e293b] p-8 sm:p-10 font-sans min-h-[297mm] w-full max-w-[210mm] mx-auto box-border leading-normal selection:bg-indigo-100 break-words [overflow-wrap:anywhere]"
+      style={{ fontFamily: '"Inter", "Segoe UI", Roboto, sans-serif', fontSize: '11.5px' }}
+    >
       {/* Header Section */}
-      <div className="text-center mb-8">
-        <h1 className="text-4xl font-bold text-black mb-4 tracking-tight">
-          {data.fullName}
-        </h1>
-        
-        <div className="flex justify-center items-center flex-wrap gap-y-2 gap-x-6 text-[11px] text-gray-800 font-medium">
-           {data.email && (
-             <div className="flex items-center gap-1.5 group">
-               <div className="p-1 bg-gray-100 rounded-md group-hover:bg-blue-50 transition-colors">
-                <Mail size={12} className="text-blue-600" />
-               </div>
-               <a href={`mailto:${data.email}`} className="hover:text-blue-600 transition-colors">{data.email}</a>
-             </div>
-           )}
-           {data.phone && (
-             <div className="flex items-center gap-1.5 group">
-               <div className="p-1 bg-gray-100 rounded-md group-hover:bg-blue-50 transition-colors">
-                <Phone size={12} className="text-blue-600" />
-               </div>
-               <span>{data.phone}</span>
-             </div>
-           )}
-           {data.linkedin && (
-             <div className="flex items-center gap-1.5 group">
-               <div className="p-1 bg-gray-100 rounded-md group-hover:bg-blue-50 transition-colors">
-                <Linkedin size={12} className="text-blue-600" />
-               </div>
-               <a href={data.linkedin} target="_blank" rel="noopener noreferrer" className="hover:text-blue-600 transition-colors">{data.linkedin.replace(/^https?:\/\/(www\.)?linkedin\.com\/in\//, '')}</a>
-             </div>
-           )}
-           {data.github && (
-             <div className="flex items-center gap-1.5 group">
-               <div className="p-1 bg-gray-100 rounded-md group-hover:bg-blue-50 transition-colors">
-                <Github size={12} className="text-blue-600" />
-               </div>
-               <a href={data.github} target="_blank" rel="noopener noreferrer" className="hover:text-blue-600 transition-colors">{data.github.replace(/^https?:\/\/(www\.)?github\.com\//, '')}</a>
-             </div>
-           )}
-        </div>
-        
-        <div className="flex justify-center items-center gap-6 mt-3 text-[11px] text-gray-700 font-bold uppercase tracking-widest">
-           <div className="flex items-center gap-1.5"><Globe size={12} className="text-gray-400" /> PROJECTS</div>
-           <div className="flex items-center gap-1.5"><Code2 size={12} className="text-gray-400" /> RESEARCH</div>
-           <div className="flex items-center gap-1.5"><Rocket size={12} className="text-gray-400" /> PORTFOLIO</div>
+      <div className="border-b border-slate-100 pb-6 mb-6">
+        <div className="flex flex-wrap justify-between items-center gap-4">
+          <div className="min-w-0 flex-1">
+            <h1 className="text-3xl font-extrabold text-[#0f172a] tracking-tight leading-tight mb-1">
+              {data.fullName}
+            </h1>
+            {data.jobRole && (
+              <p className="text-sm font-semibold text-indigo-600 uppercase tracking-wider leading-tight">
+                {data.jobRole}
+              </p>
+            )}
+          </div>
+
+          {/* Contact Details Grid */}
+          <div className="grid min-w-[220px] max-w-full grid-cols-1 gap-x-4 gap-y-1.5 text-[10.5px] text-[#475569] font-medium sm:grid-cols-2">
+            {data.email && (
+              <div className="flex min-w-0 items-center gap-1.5 hover:text-indigo-600 transition-colors">
+                <Mail size={12} className="text-indigo-500 shrink-0" />
+                <a href={`mailto:${data.email}`} className="min-w-0 break-all">{data.email}</a>
+              </div>
+            )}
+            {data.phone && (
+              <div className="flex min-w-0 items-center gap-1.5">
+                <Phone size={12} className="text-indigo-500 shrink-0" />
+                <span className="min-w-0 break-words">{data.phone}</span>
+              </div>
+            )}
+            {data.linkedin && (
+              <div className="flex min-w-0 items-center gap-1.5 hover:text-indigo-600 transition-colors">
+                <Linkedin size={12} className="text-indigo-500 shrink-0" />
+                <a href={data.linkedin} target="_blank" rel="noopener noreferrer" className="min-w-0 break-all">
+                  {cleanLinkedin(data.linkedin)}
+                </a>
+              </div>
+            )}
+            {data.github && (
+              <div className="flex min-w-0 items-center gap-1.5 hover:text-indigo-600 transition-colors">
+                <Github size={12} className="text-indigo-500 shrink-0" />
+                <a href={data.github} target="_blank" rel="noopener noreferrer" className="min-w-0 break-all">
+                  {cleanGithub(data.github)}
+                </a>
+              </div>
+            )}
+            {data.portfolio && (
+              <div className="flex min-w-0 items-center gap-1.5 hover:text-indigo-600 transition-colors sm:col-span-2">
+                <Globe size={12} className="text-indigo-500 shrink-0" />
+                <a href={data.portfolio} target="_blank" rel="noopener noreferrer" className="min-w-0 break-all">
+                  {cleanPortfolio(data.portfolio)}
+                </a>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
-      {/* Summary */}
+      {/* Summary Section */}
       {data.summary && (
         <section className="mb-6">
-          <h2 className="text-sm font-bold border-b-2 border-black text-black uppercase mb-3 pb-1 tracking-[0.1em]">Summary</h2>
-          <p className="text-[11.5px] text-gray-900 leading-relaxed text-justify">
+          <div className="flex items-center gap-2 border-l-4 border-indigo-600 pl-3 mb-3">
+            <h2 className="text-xs font-bold text-[#0f172a] uppercase tracking-wider">
+              Professional Summary
+            </h2>
+          </div>
+          <p className="text-[#334155] leading-relaxed text-justify">
             {data.summary}
           </p>
         </section>
       )}
 
-      {/* Education */}
-      {data.education && data.education.length > 0 && (
-        <section className="mb-6">
-           <h2 className="text-sm font-bold border-b-2 border-black text-black uppercase mb-3 pb-1 tracking-[0.1em]">Education</h2>
-           <div className="space-y-4">
-             {data.education.map((edu, index) => (
-               <div key={index} className="relative">
-                 <div className="flex justify-between items-baseline mb-1">
-                   <h3 className="font-bold text-[12px] text-black">
-                     <span className="text-blue-700">•</span> {edu.degree} | <span className="font-semibold">{edu.institution}</span>
-                   </h3>
-                   <span className="text-[11px] font-bold text-gray-700">{edu.year}</span>
-                 </div>
-                 {edu.gpa && (
-                   <p className="text-[11px] text-gray-800 ml-3 italic">
-                     GPA: <span className="font-bold text-black">{edu.gpa}</span>
-                   </p>
-                 )}
-               </div>
-             ))}
-           </div>
-        </section>
-      )}
+      {/* Grid Layout for Skills, Education, Achievements */}
+      <div className="grid grid-cols-12 gap-6 mb-6">
+        
+        {/* Left Side: Skills & Certifications & Languages */}
+        <div className="col-span-4 min-w-0 space-y-6">
+          {/* Tech Stack */}
+          {data.skills && data.skills.length > 0 && (
+            <div>
+              <div className="flex items-center gap-2 border-l-4 border-indigo-600 pl-2.5 mb-3">
+                <h2 className="text-[11px] font-bold text-[#0f172a] uppercase tracking-wider flex items-center gap-1">
+                  <Code2 size={12} className="text-indigo-600" /> Skills
+                </h2>
+              </div>
+              <div className="flex flex-wrap gap-1">
+                {data.skills.map((skill, index) => (
+                  <span 
+                    key={index} 
+                    className="max-w-full bg-indigo-50/70 border border-indigo-100 text-indigo-700 px-2 py-0.5 rounded text-[9.5px] font-medium leading-tight"
+                  >
+                    {skill}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
 
-      {/* Experience */}
-      {data.experience && data.experience.length > 0 && (
-        <section className="mb-6">
-          <h2 className="text-sm font-bold border-b-2 border-black text-black uppercase mb-3 pb-1 tracking-[0.1em]">Experience</h2>
-          <div className="space-y-5">
-            {data.experience.map((exp, index) => (
-              <div key={index}>
-                <div className="flex justify-between items-baseline mb-1">
-                  <h3 className="font-bold text-[12px] text-black">
-                    {exp.role} | <span className="font-semibold text-blue-700">{exp.company}</span>
-                  </h3>
-                  <div className="text-[11px] font-bold text-gray-700">
-                    {exp.duration}
+          {/* Certifications */}
+          {data.certifications && data.certifications.length > 0 && (
+            <div>
+              <div className="flex items-center gap-2 border-l-4 border-indigo-600 pl-2.5 mb-3">
+                <h2 className="text-[11px] font-bold text-[#0f172a] uppercase tracking-wider flex items-center gap-1">
+                  <Award size={12} className="text-indigo-600" /> Certifications
+                </h2>
+              </div>
+              <ul className="space-y-1.5 text-[10.5px] text-[#475569]">
+                {data.certifications.map((cert, i) => (
+                  <li key={i} className="flex items-start gap-1.5 leading-tight">
+                    <span className="mt-0.5 h-1.5 w-1.5 shrink-0 rounded-full bg-indigo-500" />
+                    <span className="min-w-0">{cert}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {/* Languages */}
+          {data.languages && data.languages.length > 0 && (
+            <div>
+              <div className="flex items-center gap-2 border-l-4 border-indigo-600 pl-2.5 mb-3">
+                <h2 className="text-[11px] font-bold text-[#0f172a] uppercase tracking-wider flex items-center gap-1">
+                  <Languages size={12} className="text-indigo-600" /> Languages
+                </h2>
+              </div>
+              <div className="flex flex-wrap gap-1.5">
+                {data.languages.map((lang, index) => (
+                  <span 
+                    key={index} 
+                    className="max-w-full bg-slate-100 border border-slate-200 text-slate-700 px-2 py-0.5 rounded text-[9.5px] font-medium leading-tight"
+                  >
+                    {lang}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Right Side: Education & Achievements */}
+        <div className="col-span-8 min-w-0 space-y-6">
+          {/* Education */}
+          {cleanEdu && cleanEdu.length > 0 && (
+            <div>
+              <div className="flex items-center gap-2 border-l-4 border-indigo-600 pl-2.5 mb-3">
+                <h2 className="text-[11px] font-bold text-[#0f172a] uppercase tracking-wider flex items-center gap-1">
+                  <GraduationCap size={13} className="text-indigo-600" /> Education
+                </h2>
+              </div>
+              <div className="space-y-3">
+                {cleanEdu.map((edu, index) => (
+                  <div key={index} className="group">
+                    <div className="flex flex-wrap justify-between items-baseline gap-x-3 gap-y-1 mb-0.5">
+                      <h3 className="min-w-0 font-bold text-slate-800 text-[11.5px]">
+                        {edu.degree}
+                      </h3>
+                      <span className="shrink-0 text-[10px] font-bold text-slate-500">{edu.year}</span>
+                    </div>
+                    <div className="flex flex-wrap justify-between gap-x-3 gap-y-1 text-[10.5px] text-[#475569]">
+                      <span className="min-w-0 font-medium italic">{edu.institution}</span>
+                      {edu.gpa && (
+                        <span className="text-indigo-600 font-semibold bg-indigo-50 px-1.5 rounded text-[9.5px]">
+                          GPA: {edu.gpa}
+                        </span>
+                      )}
+                    </div>
                   </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Achievements */}
+          {data.achievements && data.achievements.length > 0 && (
+            <div>
+              <div className="flex items-center gap-2 border-l-4 border-indigo-600 pl-2.5 mb-3">
+                <h2 className="text-[11px] font-bold text-[#0f172a] uppercase tracking-wider flex items-center gap-1">
+                  <Milestone size={12} className="text-indigo-600" /> Key Achievements
+                </h2>
+              </div>
+              <ul className="space-y-1.5 text-[10.5px] text-[#475569]">
+                {data.achievements.map((ach, i) => (
+                  <li key={i} className="flex items-start gap-2 leading-relaxed">
+                    <div className="w-1.5 h-1.5 rounded-full bg-indigo-500 mt-1 shrink-0" />
+                    <span>{ach}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+
+      </div>
+
+      {/* Professional Experience Section */}
+      {cleanExp && cleanExp.length > 0 && (
+        <section className="mb-6 border-t border-slate-100 pt-6">
+          <div className="flex items-center gap-2 border-l-4 border-indigo-600 pl-3 mb-4">
+            <h2 className="text-xs font-bold text-[#0f172a] uppercase tracking-wider flex items-center gap-1.5">
+              <Briefcase size={13} className="text-indigo-600" /> Professional Experience
+            </h2>
+          </div>
+          <div className="space-y-4">
+            {cleanExp.map((exp, index) => (
+              <div key={index} className="relative">
+                <div className="flex flex-wrap justify-between items-baseline gap-x-3 gap-y-1 mb-1">
+                  <h3 className="min-w-0 font-extrabold text-[12px] text-slate-800">
+                    {exp.role} <span className="font-normal text-[#64748b]">at</span> <span className="text-indigo-600 font-semibold">{exp.company}</span>
+                  </h3>
+                  <span className="shrink-0 text-[10px] font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded">
+                    {exp.duration}
+                  </span>
                 </div>
-                <ul className="space-y-1.5 mt-2">
-                   {exp.description.split(/[•\n]/).filter((item: string) => item.trim().length > 0).map((item: string, i: number) => (
-                      <li key={i} className="text-[11px] text-gray-900 leading-relaxed flex items-start gap-2">
-                         <div className="w-1.5 h-1.5 rounded-full bg-blue-600 mt-1 shrink-0" />
-                         <span>{item.trim()}</span>
-                      </li>
-                   ))}
+                <ul className="space-y-1.5 mt-2 ml-1">
+                  {parseBulletPoints(exp.description).map((bullet, i) => (
+                    <li key={i} className="text-[#334155] leading-relaxed flex items-start gap-2">
+                      <div className="w-1.5 h-1.5 rounded-full bg-indigo-500 mt-1.5 shrink-0" />
+                      <span className="flex-1">{bullet}</span>
+                    </li>
+                  ))}
                 </ul>
               </div>
             ))}
@@ -120,76 +258,59 @@ const ModernTemplate = ({ data }: TemplateProps) => {
         </section>
       )}
 
-      {/* Technical Skills */}
-      {data.skills && data.skills.length > 0 && (
-        <section className="mb-6">
-          <h2 className="text-sm font-bold border-b-2 border-black text-black uppercase mb-3 pb-1 tracking-[0.1em]">Technical Skills</h2>
-          <div className="space-y-2">
-             <div className="text-[11px] leading-relaxed">
-               <span className="font-black text-black mr-2">• CORE STACK:</span>
-               <span className="text-gray-900">{data.skills.join(', ')}</span>
-             </div>
-             {/* If we had grouped skills in the data, we could show them here */}
-             <div className="text-[11px] leading-relaxed">
-               <span className="font-black text-black mr-2">• TOOLS & ENV:</span>
-               <span className="text-gray-900">Git, Docker, Linux, CI/CD, VS Code, Postman</span>
-             </div>
+      {/* Key Projects Section */}
+      {cleanProj && cleanProj.length > 0 && (
+        <section className="mb-6 border-t border-slate-100 pt-6">
+          <div className="flex items-center gap-2 border-l-4 border-indigo-600 pl-3 mb-4">
+            <h2 className="text-xs font-bold text-[#0f172a] uppercase tracking-wider flex items-center gap-1.5">
+              <Code2 size={13} className="text-indigo-600" /> Selected Projects
+            </h2>
           </div>
-        </section>
-      )}
-
-      {/* Achievements */}
-      {(data.achievements?.length > 0 || data.certifications?.length > 0) && (
-        <section className="mb-6">
-          <h2 className="text-sm font-bold border-b-2 border-black text-black uppercase mb-3 pb-1 tracking-[0.1em]">Achievements & Activities</h2>
-          <ul className="space-y-2">
-             {data.achievements?.map((ach, i) => (
-                <li key={i} className="text-[11px] text-gray-900 leading-relaxed flex items-start gap-2">
-                   <div className="w-1.5 h-1.5 rounded-full bg-blue-600 mt-1 shrink-0" />
-                   <span>{ach}</span>
-                </li>
-             ))}
-             {data.certifications?.map((cert, i) => (
-                <li key={i} className="text-[11px] text-gray-900 leading-relaxed flex items-start gap-2">
-                   <div className="w-1.5 h-1.5 rounded-full bg-blue-600 mt-1 shrink-0" />
-                   <span className="font-bold">Certification:</span> {cert}
-                </li>
-             ))}
-          </ul>
-        </section>
-      )}
-
-      {/* Projects */}
-      {data.projects && data.projects.length > 0 && (
-        <section className="mb-6">
-          <h2 className="text-sm font-bold border-b-2 border-black text-black uppercase mb-3 pb-1 tracking-[0.1em]">Projects</h2>
-          <div className="space-y-5">
-            {data.projects.map((project, index) => (
+          <div className="space-y-4">
+            {cleanProj.map((project, index) => (
               <div key={index}>
-                <div className="flex justify-between items-baseline mb-2">
-                  <div className="flex items-center gap-2">
-                    <h3 className="font-bold text-[12px] text-black uppercase tracking-tight">{project.name}</h3>
+                <div className="flex flex-wrap justify-between items-baseline gap-x-3 gap-y-1 mb-1">
+                  <div className="flex min-w-0 items-center gap-2 flex-wrap">
+                    <h3 className="font-extrabold text-[12px] text-slate-800">
+                      {project.name}
+                    </h3>
                     {project.technologies && (
-                      <span className="text-[10px] text-gray-600 font-medium">| {project.technologies}</span>
+                      <span className="max-w-full text-[9.5px] text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded font-semibold border border-indigo-100">
+                        {project.technologies}
+                      </span>
                     )}
                   </div>
-                  <div className="flex gap-3 text-[10px] font-black text-blue-700">
-                     <span className="flex items-center gap-1 cursor-pointer hover:underline">GITHUB <ExternalLink size={10} /></span>
-                     <span className="flex items-center gap-1 cursor-pointer hover:underline">LIVE <ExternalLink size={10} /></span>
-                  </div>
                 </div>
-                <ul className="space-y-1.5">
-                   {project.description.split(/[•\n]/).filter((item: string) => item.trim().length > 0).map((item: string, i: number) => (
-                      <li key={i} className="text-[11px] text-gray-900 leading-relaxed flex items-start gap-2">
-                         <div className="w-1.5 h-1.5 rounded-full bg-blue-600 mt-1 shrink-0" />
-                         <span>{item.trim()}</span>
-                      </li>
-                   ))}
+                <ul className="space-y-1 mt-1.5 ml-1">
+                  {parseBulletPoints(project.description).map((bullet, i) => (
+                    <li key={i} className="text-[#334155] leading-relaxed flex items-start gap-2">
+                      <div className="w-1.5 h-1.5 rounded-full bg-indigo-400 mt-1.5 shrink-0" />
+                      <span className="flex-1">{bullet}</span>
+                    </li>
+                  ))}
                 </ul>
               </div>
             ))}
           </div>
         </section>
+      )}
+
+      {/* Inline Custom Sections */}
+      {customSections && customSections.length > 0 && (
+        <div className="border-t border-slate-100 pt-6">
+          {customSections.map((section) => (
+            <section key={section.id} className="mb-6">
+              <div className="flex items-center gap-2 border-l-4 border-indigo-600 pl-3 mb-3">
+                <h2 className="text-xs font-bold text-[#0f172a] uppercase tracking-wider">
+                  {section.title}
+                </h2>
+              </div>
+              <p className="text-[#334155] leading-relaxed whitespace-pre-wrap text-justify">
+                {section.content}
+              </p>
+            </section>
+          ))}
+        </div>
       )}
 
     </div>
@@ -197,3 +318,4 @@ const ModernTemplate = ({ data }: TemplateProps) => {
 };
 
 export default ModernTemplate;
+

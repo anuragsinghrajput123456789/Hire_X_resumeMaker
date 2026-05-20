@@ -18,12 +18,16 @@ export interface JobApplication {
     createdAt: string;
 }
 
+
 export const getApplications = async () => {
     try {
         const response = await fetch(API_URL, {
             headers: getAuthHeaders()
         });
-        if (!response.ok) throw new Error('Failed to fetch applications');
+        if (!response.ok) {
+            const errJson = await response.json().catch(() => ({}));
+            throw new Error(errJson.message || errJson.error || 'Failed to fetch applications');
+        }
         return await response.json();
     } catch (error) {
         console.error('Error fetching applications:', error);
@@ -38,7 +42,10 @@ export const saveApplication = async (data: Omit<JobApplication, '_id' | 'create
             headers: getAuthHeaders(),
             body: JSON.stringify(data)
         });
-        if (!response.ok) throw new Error('Failed to save application');
+        if (!response.ok) {
+            const errJson = await response.json().catch(() => ({}));
+            throw new Error(errJson.message || errJson.error || 'Failed to save application');
+        }
         return await response.json();
     } catch (error) {
         console.error('Error saving application:', error);
@@ -53,7 +60,10 @@ export const updateApplication = async (id: string, data: Partial<JobApplication
             headers: getAuthHeaders(),
             body: JSON.stringify(data)
         });
-        if (!response.ok) throw new Error('Failed to update application');
+        if (!response.ok) {
+            const errJson = await response.json().catch(() => ({}));
+            throw new Error(errJson.message || errJson.error || 'Failed to update application');
+        }
         return await response.json();
     } catch (error) {
         console.error('Error updating application:', error);
@@ -67,7 +77,10 @@ export const deleteApplication = async (id: string) => {
             method: 'DELETE',
             headers: getAuthHeaders()
         });
-        if (!response.ok) throw new Error('Failed to delete application');
+        if (!response.ok) {
+            const errJson = await response.json().catch(() => ({}));
+            throw new Error(errJson.message || errJson.error || 'Failed to delete application');
+        }
         return await response.json();
     } catch (error) {
         console.error('Error deleting application:', error);

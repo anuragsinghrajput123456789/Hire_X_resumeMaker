@@ -1,84 +1,77 @@
 const express = require('express');
 const router = express.Router();
+const asyncHandler = require('express-async-handler');
 const JobApplication = require('../models/JobApplication');
 const { protect } = require('../middleware/authMiddleware');
 
 // Get all applications for the user
-router.get('/', protect, async (req, res) => {
-  try {
-    const applications = await JobApplication.find({ userId: req.user.id }).sort({ dateApplied: -1 });
-    res.json(applications);
-  } catch (error) {
-    res.status(500).json({ message: 'Error fetching applications', error: error.message });
-  }
-});
+router.get('/', protect, asyncHandler(async (req, res) => {
+  const applications = await JobApplication.find({ userId: req.user.id }).sort({ dateApplied: -1 });
+  res.json(applications);
+}));
 
 // Add a new application
-router.post('/save', protect, async (req, res) => {
-  try {
-    const { company, role, status, salary, jobLink, notes, dateApplied } = req.body;
-    
-    const newApplication = new JobApplication({
-      userId: req.user.id,
-      company,
-      role,
-      status,
-      salary,
-      jobLink,
-      notes,
-      dateApplied: dateApplied || Date.now()
-    });
+router.post('/save', protect, asyncHandler(async (req, res) => {
+  const { company, role, status, salary, jobLink, notes, dateApplied } = req.body;
 
-    const savedApplication = await newApplication.save();
-    res.status(201).json(savedApplication);
-  } catch (error) {
-    res.status(500).json({ message: 'Error saving application', error: error.message });
+  if (!company?.trim() || !role?.trim()) {
+    res.status(400);
+    throw new Error('Company and role are required');
   }
-});
+
+  const savedApplication = await JobApplication.create({
+    userId: req.user.id,
+    company,
+    role,
+    status,
+    salary,
+    jobLink,
+    notes,
+    dateApplied: dateApplied || Date.now()
+  });
+
+  res.status(201).json(savedApplication);
+}));
 
 // Update an application
-router.put('/:id', protect, async (req, res) => {
-  try {
-    const application = await JobApplication.findById(req.params.id);
+router.put('/:id', protect, asyncHandler(async (req, res) => {
+  const application = await JobApplication.findById(req.params.id);
 
-    if (!application) {
-      return res.status(404).json({ message: 'Application not found' });
-    }
-
-    if (application.userId.toString() !== req.user.id) {
-      return res.status(401).json({ message: 'Not authorized' });
-    }
-
-    const updatedApplication = await JobApplication.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true }
-    );
-
-    res.json(updatedApplication);
-  } catch (error) {
-    res.status(500).json({ message: 'Error updating application', error: error.message });
+  if (!application) {
+    res.status(404);
+    throw new Error('Application not found');
   }
-});
+
+  if (application.userId.toString() !== req.user.id) {
+    res.status(401);
+    throw new Error('Not authorized');
+  }
+
+  const updatedApplication = await JobApplication.findByIdAndUpdate(
+    req.params.id,
+    req.body,
+    { new: true, runValidators: true }
+  );
+
+  res.json(updatedApplication);
+}));
 
 // Delete an application
-router.delete('/:id', protect, async (req, res) => {
-  try {
-    const application = await JobApplication.findById(req.params.id);
+router.delete('/:id', protect, asyncHandler(async (req, res) => {
+  const application = await JobApplication.findById(req.params.id);
 
-    if (!application) {
-      return res.status(404).json({ message: 'Application not found' });
-    }
-
-    if (application.userId.toString() !== req.user.id) {
-      return res.status(401).json({ message: 'Not authorized' });
-    }
-
-    await application.deleteOne();
-    res.json({ message: 'Application removed' });
-  } catch (error) {
-    res.status(500).json({ message: 'Error deleting application', error: error.message });
+  if (!application) {
+    res.status(404);
+    throw new Error('Application not found');
   }
-});
+
+  if (application.userId.toString() !== req.user.id) {
+    res.status(401);
+    throw new Error('Not authorized');
+  }
+
+  await application.deleteOne();
+  res.json({ message: 'Application removed' });
+}));
 
 module.exports = router;
