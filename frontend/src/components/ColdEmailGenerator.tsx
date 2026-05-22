@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,6 +13,7 @@ import { toast } from 'sonner';
 import { generateColdEmail } from '../services/aiService';
 import { saveColdEmail, getColdEmailHistory, deleteColdEmail } from '../services/coldEmailService';
 import { isAuthenticated } from '../services/authService';
+import { getStoredToken, clearAuthStorage } from '../services/apiClient';
 
 interface EmailFormData {
   recipientName: string;
@@ -33,6 +35,9 @@ interface SavedEmail extends EmailFormData {
 }
 
 const ColdEmailGenerator = () => {
+  const navigate = useNavigate();
+  const token = getStoredToken();
+
   const [generatedEmail, setGeneratedEmail] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [isSending, setIsSending] = useState(false);
@@ -40,6 +45,45 @@ const ColdEmailGenerator = () => {
   const [savedEmails, setSavedEmails] = useState<SavedEmail[]>([]);
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
+
+  if (!token) {
+    return (
+      <div className="max-w-md mx-auto py-12 px-4 select-none">
+        <Card className="glass-card bg-[#0F1424]/85 border border-white/5 shadow-2xl overflow-hidden rounded-3xl relative text-center p-8">
+          <div className="absolute inset-0 bg-grid-soft opacity-10 pointer-events-none" />
+          <div className="relative z-10 flex flex-col items-center">
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#00F2FE] via-[#8B5CF6] to-[#EC4899] p-[1.5px] mb-6 shadow-xl shadow-cyan-500/10">
+              <div className="w-full h-full bg-[#0F1424] rounded-2xl flex items-center justify-center">
+                <Mail className="h-8 w-8 text-[#00F2FE]" />
+              </div>
+            </div>
+            
+            <h2 className="text-2xl font-black bg-clip-text text-transparent bg-gradient-to-r from-[#00F2FE] via-[#8B5CF6] to-[#EC4899] mb-3">
+              AI Outreach Engine
+            </h2>
+            <p className="text-sm text-gray-400 font-medium leading-relaxed mb-8 max-w-sm">
+              Unlock personalized hyper-tailored cold emails, direct founder routing blueprints, custom follow-up sequences, and deep company hook intelligence.
+            </p>
+            
+            <div className="flex flex-col sm:flex-row gap-4 w-full justify-center">
+              <Button 
+                onClick={() => navigate('/login')}
+                className="rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 text-white font-extrabold px-6 h-11 transition-all"
+              >
+                Sign In
+              </Button>
+              <Button 
+                onClick={() => navigate('/register')}
+                className="rounded-xl bg-gradient-to-r from-[#8B5CF6] to-[#EC4899] hover:from-[#7C3AED] hover:to-[#DB2777] text-white font-black px-6 h-11 shadow-lg shadow-pink-500/15 transition-all"
+              >
+                Create Account
+              </Button>
+            </div>
+          </div>
+        </Card>
+      </div>
+    );
+  }
 
   const { register, handleSubmit, watch, formState: { errors }, setValue, reset } = useForm<EmailFormData>({
     defaultValues: {
@@ -110,6 +154,15 @@ const ColdEmailGenerator = () => {
       toast.success('Email generated successfully!');
     } catch (error) {
       console.error('Error generating email:', error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      if (errorMessage.includes('401') || errorMessage.toLowerCase().includes('not authorized') || errorMessage.toLowerCase().includes('no token')) {
+        clearAuthStorage();
+        toast.error('Session expired. Please log in again.');
+        setTimeout(() => {
+          window.location.reload();
+        }, 1500);
+        return;
+      }
       toast.error('Failed to generate email. Please try again.');
     } finally {
       setIsGenerating(false);

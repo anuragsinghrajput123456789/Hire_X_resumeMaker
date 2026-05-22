@@ -1,5 +1,6 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { MessageCircle, X, Send, Bot, User, Minimize2, Maximize2, History, Trash2, Plus, Sparkles } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -10,7 +11,7 @@ import ReactMarkdown from 'react-markdown';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { motion, AnimatePresence } from 'framer-motion';
 import { generateChatResponse } from '@/services/aiService';
-import { apiUrl, authHeaders, getStoredToken } from '@/services/apiClient';
+import { apiUrl, authHeaders, getStoredToken, clearAuthStorage } from '@/services/apiClient';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -26,6 +27,7 @@ interface ChatSession {
 }
 
 const FloatingChatbot = () => {
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
@@ -63,7 +65,8 @@ const FloatingChatbot = () => {
         headers: authHeaders(false)
       });
       if (response.status === 401) {
-        // Handle auth error gracefully
+        clearAuthStorage();
+        window.location.reload();
         return;
       }
       if (response.ok) {
@@ -175,6 +178,19 @@ const FloatingChatbot = () => {
 
     } catch (error) {
       console.error('Error sending message:', error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      if (errorMessage.includes('401') || errorMessage.toLowerCase().includes('not authorized') || errorMessage.toLowerCase().includes('no token')) {
+        clearAuthStorage();
+        toast({
+          title: "Session Expired",
+          description: "Your session has expired. Please log in again.",
+          variant: "destructive",
+        });
+        setTimeout(() => {
+          window.location.reload();
+        }, 1500);
+        return;
+      }
       toast({
         title: "Error",
         description: "Failed to send message. Please try again.",
@@ -283,8 +299,43 @@ const FloatingChatbot = () => {
               </div>
 
               {!isMinimized && (
-                <CardContent className="flex flex-col flex-1 p-0 overflow-hidden relative">
-                   {showHistory ? (
+                <CardContent className="flex flex-col flex-1 p-0 overflow-hidden relative animate-in fade-in duration-300">
+                  {!token ? (
+                    <div className="flex flex-col items-center justify-center text-center p-6 flex-1 bg-[#0F1424]/95 select-none relative">
+                      <div className="absolute inset-0 bg-grid-soft opacity-5 pointer-events-none" />
+                      <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-teal-400 to-sky-500 p-[1.5px] mb-4 shadow-lg shadow-teal-500/10 relative z-10">
+                        <div className="w-full h-full bg-[#0F1424] rounded-2xl flex items-center justify-center">
+                          <Bot className="h-5 w-5 text-teal-400 animate-pulse" />
+                        </div>
+                      </div>
+                      <h4 className="text-sm font-black bg-clip-text text-transparent bg-gradient-to-r from-teal-400 to-sky-500 mb-2 relative z-10">
+                        AI Coach Locked
+                      </h4>
+                      <p className="text-xs text-gray-400 font-semibold mb-6 max-w-[240px] leading-relaxed relative z-10 text-center">
+                        Unlock resume coaching, mock interview training, and custom recruiter outreach blueprints today.
+                      </p>
+                      <div className="flex flex-col gap-2.5 w-full max-w-[200px] relative z-10">
+                        <Button 
+                          onClick={() => {
+                            setIsOpen(false);
+                            navigate('/login');
+                          }}
+                          className="w-full h-9 rounded-xl bg-gradient-to-r from-teal-600 to-sky-600 hover:from-teal-500 hover:to-sky-500 text-white text-xs font-black shadow-md shadow-teal-500/10 transition-all"
+                        >
+                          Sign In
+                        </Button>
+                        <Button 
+                          onClick={() => {
+                            setIsOpen(false);
+                            navigate('/register');
+                          }}
+                          className="w-full h-9 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 text-white text-xs font-bold transition-all"
+                        >
+                          Create Account
+                        </Button>
+                      </div>
+                    </div>
+                  ) : showHistory ? (
                       <div className="flex flex-col h-full bg-gray-50/50 dark:bg-black/20">
                           <div className="p-4 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border-b border-gray-100 dark:border-gray-800 flex justify-between items-center">
                               <span className="font-semibold text-sm">Previous Chats</span>

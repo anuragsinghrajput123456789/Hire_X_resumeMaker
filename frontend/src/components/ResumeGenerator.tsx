@@ -19,7 +19,8 @@ import CreativeTemplate from './resume-templates/CreativeTemplate';
 import ProfessionalTemplate from './resume-templates/ProfessionalTemplate';
 import AuthContext from '../context/AuthContext';
 import resumeService, { type SavedResume } from '../services/resumeService';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { getStoredToken, clearAuthStorage } from '../services/apiClient';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface CustomSection {
@@ -36,6 +37,9 @@ const getErrorMessage = (error: unknown) =>
   error instanceof Error ? error.message : 'Something went wrong';
 
 const ResumeGenerator = ({ onResumeGenerated }: { onResumeGenerated: (resume: string) => void }) => {
+  const navigate = useNavigate();
+  const token = getStoredToken();
+
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedData, setGeneratedData] = useState<ResumeData | null>(null);
   const [atsOptimizedContent, setAtsOptimizedContent] = useState<string>('');
@@ -49,10 +53,47 @@ const ResumeGenerator = ({ onResumeGenerated }: { onResumeGenerated: (resume: st
   const [scale, setScale] = useState(1);
   const [previewHeight, setPreviewHeight] = useState(1123);
 
-
-  
   const authContext = useContext(AuthContext);
   const user = authContext?.user;
+
+  if (!token) {
+    return (
+      <div className="max-w-md mx-auto py-12 px-4 select-none">
+        <Card className="glass-card bg-[#0F1424]/85 border border-white/5 shadow-2xl overflow-hidden rounded-3xl relative text-center p-8">
+          <div className="absolute inset-0 bg-grid-soft opacity-10 pointer-events-none" />
+          <div className="relative z-10 flex flex-col items-center">
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 p-[1.5px] mb-6 shadow-xl shadow-indigo-500/10">
+              <div className="w-full h-full bg-[#0F1424] rounded-2xl flex items-center justify-center">
+                <Sparkles className="h-8 w-8 text-indigo-400 animate-pulse" />
+              </div>
+            </div>
+            
+            <h2 className="text-2xl font-black bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-500 mb-3">
+              AI Resume Builder
+            </h2>
+            <p className="text-sm text-gray-400 font-medium leading-relaxed mb-8 max-w-sm">
+              Unlock premium interactive resume templates, instant ATS formatting engine, intelligent AI bullet point enhancer, and multi-version history storage.
+            </p>
+            
+            <div className="flex flex-col sm:flex-row gap-4 w-full justify-center">
+              <Button 
+                onClick={() => navigate('/login')}
+                className="rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 text-white font-extrabold px-6 h-11 transition-all"
+              >
+                Sign In
+              </Button>
+              <Button 
+                onClick={() => navigate('/register')}
+                className="rounded-xl bg-gradient-to-r from-indigo-500 to-pink-500 hover:from-indigo-600 hover:to-pink-600 text-white font-black px-6 h-11 shadow-lg shadow-indigo-500/15 transition-all"
+              >
+                Create Account
+              </Button>
+            </div>
+          </div>
+        </Card>
+      </div>
+    );
+  }
 
   const [showSavedResumes, setShowSavedResumes] = useState(false);
   const [savedResumes, setSavedResumes] = useState<SavedResume[]>([]);
@@ -64,9 +105,22 @@ const ResumeGenerator = ({ onResumeGenerated }: { onResumeGenerated: (resume: st
       const resumes = await resumeService.getResumes();
       setSavedResumes(resumes);
     } catch (error: unknown) {
+      const errorMessage = getErrorMessage(error);
+      if (errorMessage.includes('401') || errorMessage.toLowerCase().includes('not authorized') || errorMessage.toLowerCase().includes('no token')) {
+        clearAuthStorage();
+        toast({
+          title: "Session Expired",
+          description: "Please log in again.",
+          variant: "destructive"
+        });
+        setTimeout(() => {
+          window.location.reload();
+        }, 1500);
+        return;
+      }
       toast({
         title: "Error fetching resumes",
-        description: getErrorMessage(error),
+        description: errorMessage,
         variant: "destructive"
       });
     } finally {
@@ -115,6 +169,19 @@ const ResumeGenerator = ({ onResumeGenerated }: { onResumeGenerated: (resume: st
         description: "Your professional resume is ready with enhanced formatting and keyword optimization.",
       });
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      if (errorMessage.includes('401') || errorMessage.toLowerCase().includes('not authorized') || errorMessage.toLowerCase().includes('no token')) {
+        clearAuthStorage();
+        toast({
+          title: "Session Expired",
+          description: "Please log in again.",
+          variant: "destructive"
+        });
+        setTimeout(() => {
+          window.location.reload();
+        }, 1500);
+        return;
+      }
       toast({
         title: "❌ Generation Failed",
         description: "Please check your information and try again.",
@@ -166,9 +233,22 @@ const ResumeGenerator = ({ onResumeGenerated }: { onResumeGenerated: (resume: st
       });
       fetchResumes(); 
     } catch (error: unknown) {
+      const errorMessage = getErrorMessage(error);
+      if (errorMessage.includes('401') || errorMessage.toLowerCase().includes('not authorized') || errorMessage.toLowerCase().includes('no token')) {
+        clearAuthStorage();
+        toast({
+          title: "Session Expired",
+          description: "Please log in again.",
+          variant: "destructive"
+        });
+        setTimeout(() => {
+          window.location.reload();
+        }, 1500);
+        return;
+      }
       toast({
         title: "Error saving resume",
-        description: getErrorMessage(error),
+        description: errorMessage,
         variant: "destructive"
       });
     }
@@ -184,9 +264,22 @@ const ResumeGenerator = ({ onResumeGenerated }: { onResumeGenerated: (resume: st
         description: "Resume deleted successfully.",
       });
     } catch (error: unknown) {
+      const errorMessage = getErrorMessage(error);
+      if (errorMessage.includes('401') || errorMessage.toLowerCase().includes('not authorized') || errorMessage.toLowerCase().includes('no token')) {
+        clearAuthStorage();
+        toast({
+          title: "Session Expired",
+          description: "Please log in again.",
+          variant: "destructive"
+        });
+        setTimeout(() => {
+          window.location.reload();
+        }, 1500);
+        return;
+      }
       toast({
          title: "Error deleting resume",
-         description: getErrorMessage(error),
+         description: errorMessage,
          variant: "destructive"
       });
     }
@@ -243,47 +336,134 @@ const ResumeGenerator = ({ onResumeGenerated }: { onResumeGenerated: (resume: st
     const resumeElement = document.getElementById('resume-preview');
     if (!resumeElement) return;
 
-    // Temporarily reset styles for clean high-fidelity PDF capture
+    // Save the original inline styles
     const originalTransform = resumeElement.style.transform;
+    const originalBoxShadow = resumeElement.style.boxShadow;
     const originalPosition = resumeElement.style.position;
     const originalTop = resumeElement.style.top;
     const originalLeft = resumeElement.style.left;
-    const originalBoxShadow = resumeElement.style.boxShadow;
+    const originalWidth = resumeElement.style.width;
 
+    // Save the parent element's styles
+    const parentElement = resumeElement.parentElement;
+    let originalParentWidth = '';
+    let originalParentHeight = '';
+    let originalParentOverflow = '';
+    let originalParentPosition = '';
+
+    if (parentElement) {
+      originalParentWidth = parentElement.style.width;
+      originalParentHeight = parentElement.style.height;
+      originalParentOverflow = parentElement.style.overflow;
+      originalParentPosition = parentElement.style.position;
+    }
+
+    // Save the scroll container styles
+    const previewContainer = document.getElementById('preview-container');
+    let originalContainerOverflowX = '';
+    let originalContainerOverflowY = '';
+    let originalContainerScrollTop = 0;
+    let originalContainerScrollLeft = 0;
+
+    if (previewContainer) {
+      originalContainerOverflowX = previewContainer.style.overflowX;
+      originalContainerOverflowY = previewContainer.style.overflowY;
+      originalContainerScrollTop = previewContainer.scrollTop;
+      originalContainerScrollLeft = previewContainer.scrollLeft;
+    }
+
+    // Save window scroll
+    const originalWindowScrollX = window.scrollX;
+    const originalWindowScrollY = window.scrollY;
+
+    // --- APPLY PDF CAPTURE STYLES ---
+    // 1. Reset resume preview styling to standard relative box
     resumeElement.style.transform = 'none';
-    resumeElement.style.position = 'relative';
-    resumeElement.style.top = 'auto';
-    resumeElement.style.left = 'auto';
     resumeElement.style.boxShadow = 'none';
+    resumeElement.style.position = 'relative';
+    resumeElement.style.top = '0';
+    resumeElement.style.left = '0';
+    resumeElement.style.width = '794px';
+
+    // 2. Expand parent element to fit the full resume preview size
+    if (parentElement) {
+      parentElement.style.width = '794px';
+      parentElement.style.height = 'auto';
+      parentElement.style.overflow = 'visible';
+      parentElement.style.position = 'relative';
+    }
+
+    // 3. Scroll container to the very top and remove overflow clipping
+    if (previewContainer) {
+      previewContainer.scrollTop = 0;
+      previewContainer.scrollLeft = 0;
+      previewContainer.style.overflowX = 'visible';
+      previewContainer.style.overflowY = 'visible';
+    }
+
+    // 4. Scroll main window to 0,0 to prevent any page scroll coordinate conflicts
+    window.scrollTo(0, 0);
 
     const opt = {
       margin: [0, 0, 0, 0],
       filename: `${(previewData.fullName || 'Resume').trim().replace(/\s+/g, '_')}_Resume.pdf`,
       image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { scale: 2.5, useCORS: true, logging: false },
-      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      html2canvas: { 
+        scale: 2.0, // Scale 2.0 is extremely crisp and prevents canvas allocation crashes on mobile devices
+        useCORS: true, 
+        logging: false,
+        letterRendering: true,
+        scrollX: 0,
+        scrollY: 0
+      },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+      pagebreak: { mode: ['css', 'legacy'] }
     };
 
-    html2pdf().set(opt).from(resumeElement).save().then(() => {
-      // Restore original styling
+    const restoreStyles = () => {
+      // Restore resume preview styles
       resumeElement.style.transform = originalTransform;
+      resumeElement.style.boxShadow = originalBoxShadow;
       resumeElement.style.position = originalPosition;
       resumeElement.style.top = originalTop;
       resumeElement.style.left = originalLeft;
-      resumeElement.style.boxShadow = originalBoxShadow;
+      resumeElement.style.width = originalWidth;
 
+      // Restore parent styles
+      if (parentElement) {
+        parentElement.style.width = originalParentWidth;
+        parentElement.style.height = originalParentHeight;
+        parentElement.style.overflow = originalParentOverflow;
+        parentElement.style.position = originalParentPosition;
+      }
+
+      // Restore container styles and scroll
+      if (previewContainer) {
+        previewContainer.style.overflowX = originalContainerOverflowX;
+        previewContainer.style.overflowY = originalContainerOverflowY;
+        previewContainer.scrollTop = originalContainerScrollTop;
+        previewContainer.scrollLeft = originalContainerScrollLeft;
+      }
+
+      // Restore window scroll
+      window.scrollTo(originalWindowScrollX, originalWindowScrollY);
+    };
+
+    // Use html2pdf to generate and save
+    html2pdf().set(opt).from(resumeElement).save().then(() => {
+      restoreStyles();
       toast({
         title: "📄 PDF Exported!",
         description: "Your professional resume has been downloaded.",
       });
     }).catch((err) => {
-      // Safety recovery callback
-      resumeElement.style.transform = originalTransform;
-      resumeElement.style.position = originalPosition;
-      resumeElement.style.top = originalTop;
-      resumeElement.style.left = originalLeft;
-      resumeElement.style.boxShadow = originalBoxShadow;
+      restoreStyles();
       console.error('PDF generation error:', err);
+      toast({
+        title: "❌ PDF Export Failed",
+        description: "There was an error generating your PDF. Please try again.",
+        variant: "destructive"
+      });
     });
   };
 

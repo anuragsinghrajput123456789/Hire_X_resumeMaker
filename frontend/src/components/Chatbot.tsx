@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -25,6 +26,7 @@ interface ChatSession {
 }
 
 const Chatbot = () => {
+  const navigate = useNavigate();
   const [messages, setMessages] = useState<Message[]>([
     {
       content: "**Welcome to your AI Career Assistant.**\n\nI can help with resume optimization, interview prep, job search strategy, career planning, salary negotiation, and professional development.\n\n**What career challenge would you like to tackle today?**",
@@ -54,6 +56,45 @@ const Chatbot = () => {
   }, [messages, isLoading]);
 
   const token = getStoredToken();
+
+  if (!token) {
+    return (
+      <div className="max-w-md mx-auto py-12 px-4">
+        <Card className="glass-card bg-[#0F1424]/85 border border-white/5 shadow-2xl overflow-hidden rounded-3xl relative text-center p-8">
+          <div className="absolute inset-0 bg-grid-soft opacity-10 pointer-events-none" />
+          <div className="relative z-10 flex flex-col items-center">
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#00F2FE] via-[#8B5CF6] to-[#EC4899] p-[1.5px] mb-6 shadow-xl shadow-cyan-500/10">
+              <div className="w-full h-full bg-[#0F1424] rounded-2xl flex items-center justify-center">
+                <Bot className="h-8 w-8 text-[#00F2FE]" />
+              </div>
+            </div>
+            
+            <h2 className="text-2xl font-black bg-clip-text text-transparent bg-gradient-to-r from-[#00F2FE] to-[#8B5CF6] mb-3">
+              AI Career Assistant
+            </h2>
+            <p className="text-sm text-gray-400 font-medium leading-relaxed mb-8 max-w-sm">
+              Unlock tailormade resume optimization, direct recruiter outreach, mock system design simulations, and expert career coaching by creating an account or logging in.
+            </p>
+            
+            <div className="flex flex-col sm:flex-row gap-4 w-full justify-center">
+              <Button 
+                onClick={() => navigate('/login')}
+                className="rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 text-white font-extrabold px-6 h-11 transition-all"
+              >
+                Sign In
+              </Button>
+              <Button 
+                onClick={() => navigate('/register')}
+                className="rounded-xl bg-gradient-to-r from-[#8B5CF6] to-[#EC4899] hover:from-[#7C3AED] hover:to-[#DB2777] text-white font-black px-6 h-11 shadow-lg shadow-pink-500/15 transition-all"
+              >
+                Create Account
+              </Button>
+            </div>
+          </div>
+        </Card>
+      </div>
+    );
+  }
 
   const fetchChatHistory = useCallback(async () => {
     if (!token) return;
@@ -184,6 +225,19 @@ const Chatbot = () => {
 
     } catch (error) {
       console.error('Error sending message:', error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      if (errorMessage.includes('401') || errorMessage.toLowerCase().includes('not authorized') || errorMessage.toLowerCase().includes('no token')) {
+        clearAuthStorage();
+        toast({
+          title: "Session Expired",
+          description: "Your session has expired. Please log in again.",
+          variant: "destructive",
+        });
+        setTimeout(() => {
+          window.location.reload();
+        }, 1500);
+        return;
+      }
       toast({
         title: "Error",
         description: "Failed to send message. Please try again.",

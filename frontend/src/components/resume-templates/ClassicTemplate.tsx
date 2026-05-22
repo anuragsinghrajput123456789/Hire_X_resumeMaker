@@ -15,7 +15,30 @@ const ClassicTemplate = ({ data, customSections }: TemplateProps) => {
   const cleanExp = filterExperience(data.experience);
   const cleanEdu = filterEducation(data.education);
   const cleanProj = filterProjects(data.projects);
-  // Construct dynamic inline contact info to match the clean sans-serif layout without icons
+
+  // Dynamic Content Density Calculator to adjust font sizes and layouts automatically
+  const totalItemsCount = 
+    (data.summary ? 1.5 : 0) + 
+    cleanExp.length * 2.5 + 
+    cleanEdu.length * 1.5 + 
+    cleanProj.length * 2.0 + 
+    (data.skills && data.skills.length > 0 ? data.skills.length * 0.15 : 0) +
+    (data.certifications && data.certifications.length > 0 ? data.certifications.length * 0.15 : 0) +
+    (data.languages && data.languages.length > 0 ? data.languages.length * 0.15 : 0) +
+    (customSections && customSections.length > 0 ? customSections.length * 2.0 : 0);
+
+  const isLowDensity = totalItemsCount < 9;
+  const isHighDensity = totalItemsCount > 16;
+
+  // Spacing and sizing tokens
+  const baseFontSize = isLowDensity ? '13px' : isHighDensity ? '11px' : '12px';
+  const headingFontSize = isLowDensity ? '13px' : isHighDensity ? '11px' : '12px';
+  const contactFontSize = isLowDensity ? '11px' : isHighDensity ? '9.5px' : '10px';
+  const sectionSpacing = isLowDensity ? 'mb-6' : isHighDensity ? 'mb-2.5' : 'mb-4';
+  const itemSpacing = isLowDensity ? 'space-y-4' : isHighDensity ? 'space-y-2' : 'space-y-3';
+  const listSpacing = isLowDensity ? 'space-y-1.5' : isHighDensity ? 'space-y-0.5' : 'space-y-1';
+
+  // Construct dynamic inline contact info
   const contactItems: React.ReactNode[] = [];
   
   if (data.phone) {
@@ -59,23 +82,23 @@ const ClassicTemplate = ({ data, customSections }: TemplateProps) => {
       className="bg-white text-black p-8 sm:p-10 font-sans min-h-[297mm] w-full max-w-[210mm] mx-auto box-border leading-normal selection:bg-slate-100 break-words [overflow-wrap:anywhere]"
       style={{ 
         fontFamily: '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif', 
-        fontSize: '11.5px',
+        fontSize: baseFontSize,
         lineHeight: '1.4'
       }}
     >
       {/* Centered Minimalist Header */}
       <div className="w-full flex flex-col items-center justify-center text-center mb-5">
-        <h1 className="max-w-full text-2xl font-bold text-gray-950 tracking-tight mb-1 text-center font-sans leading-tight">
+        <h1 className="max-w-full font-bold text-gray-950 tracking-tight mb-1 text-center font-sans leading-tight" style={{ fontSize: isLowDensity ? '26px' : isHighDensity ? '20px' : '22px' }}>
           {data.fullName}
         </h1>
         {data.jobRole && (
-          <p className="max-w-full text-xs font-semibold text-gray-600 uppercase tracking-wider mb-1 text-center leading-tight">
+          <p className="max-w-full font-semibold text-gray-600 uppercase tracking-wider mb-1 text-center leading-tight" style={{ fontSize: isLowDensity ? '13px' : isHighDensity ? '10px' : '11px' }}>
             {data.jobRole}
           </p>
         )}
         
         {/* Contact info list with simple pipes */}
-        <div className="w-full flex flex-wrap justify-center items-center gap-x-2 text-[10px] text-gray-700 tracking-wide font-sans mt-0.5">
+        <div className="w-full flex flex-wrap justify-center items-center gap-x-2 tracking-wide font-sans mt-0.5" style={{ fontSize: contactFontSize }}>
           {contactItems.map((item, idx) => (
             <Fragment key={idx}>
               {item}
@@ -87,10 +110,11 @@ const ClassicTemplate = ({ data, customSections }: TemplateProps) => {
 
       {/* Summary */}
       {data.summary && (
-        <section className="mb-4">
-          <h2 className="text-[12px] font-bold text-gray-900 border-b border-gray-900 mb-2 pb-0.5 uppercase tracking-wider text-left">
+        <section className={sectionSpacing}>
+          <h2 className="font-bold text-gray-950 uppercase tracking-wider text-left" style={{ fontSize: headingFontSize }}>
             Professional Summary
           </h2>
+          <hr className="border-t border-gray-900 mt-1 mb-2" />
           <p className="text-gray-800 leading-relaxed text-justify">
             {data.summary}
           </p>
@@ -99,21 +123,22 @@ const ClassicTemplate = ({ data, customSections }: TemplateProps) => {
 
       {/* Experience */}
       {cleanExp && cleanExp.length > 0 && (
-        <section className="mb-4">
-          <h2 className="text-[12px] font-bold text-gray-900 border-b border-gray-900 mb-2 pb-0.5 uppercase tracking-wider text-left">
+        <section className={sectionSpacing}>
+          <h2 className="font-bold text-gray-950 uppercase tracking-wider text-left" style={{ fontSize: headingFontSize }}>
             Experience
           </h2>
-          <div className="space-y-4">
+          <hr className="border-t border-gray-900 mt-1 mb-2" />
+          <div className={itemSpacing}>
             {cleanExp.map((exp, index) => (
-              <div key={index}>
+              <div key={index} className="break-inside-avoid" style={{ breakInside: 'avoid' }}>
                 <div className="flex flex-wrap justify-between items-baseline gap-x-3 gap-y-1 font-bold text-gray-950">
-                  <span className="min-w-0">{exp.role}</span>
-                  <span className="shrink-0 font-normal text-gray-700">{exp.duration}</span>
+                  <span className="min-w-0" style={{ fontSize: isLowDensity ? '13px' : isHighDensity ? '10.5px' : '11.5px' }}>{exp.role}</span>
+                  <span className="shrink-0 font-normal text-gray-700" style={{ fontSize: isLowDensity ? '11px' : isHighDensity ? '9px' : '10px' }}>{exp.duration}</span>
                 </div>
                 <div className="text-gray-800 mt-0.5">
                   <span className="italic font-medium">{exp.company}</span>
                 </div>
-                <ul className="list-disc list-outside ml-4 mt-1 space-y-1 text-gray-800 leading-relaxed text-justify">
+                <ul className={`list-disc list-outside ml-4 mt-1 ${listSpacing} text-gray-800 leading-relaxed text-justify`}>
                   {parseBulletPoints(exp.description).map((bullet, i) => (
                     <li key={i} className="pl-1">
                       {bullet}
@@ -128,15 +153,16 @@ const ClassicTemplate = ({ data, customSections }: TemplateProps) => {
 
       {/* Projects */}
       {cleanProj && cleanProj.length > 0 && (
-        <section className="mb-4">
-          <h2 className="text-[12px] font-bold text-gray-900 border-b border-gray-900 mb-2 pb-0.5 uppercase tracking-wider text-left">
+        <section className={sectionSpacing}>
+          <h2 className="font-bold text-gray-950 uppercase tracking-wider text-left" style={{ fontSize: headingFontSize }}>
             Projects
           </h2>
-          <div className="space-y-4">
+          <hr className="border-t border-gray-900 mt-1 mb-2" />
+          <div className={itemSpacing}>
             {cleanProj.map((project, index) => (
-              <div key={index}>
+              <div key={index} className="break-inside-avoid" style={{ breakInside: 'avoid' }}>
                 <div className="flex flex-wrap justify-between items-baseline gap-x-3 gap-y-1 font-bold text-gray-950">
-                  <div className="min-w-0">
+                  <div className="min-w-0" style={{ fontSize: isLowDensity ? '13px' : isHighDensity ? '10.5px' : '11.5px' }}>
                     <span>{project.name}</span>
                     {project.technologies && (
                       <span className="font-normal text-gray-700">
@@ -146,7 +172,7 @@ const ClassicTemplate = ({ data, customSections }: TemplateProps) => {
                     )}
                   </div>
                 </div>
-                <ul className="list-disc list-outside ml-4 mt-1 space-y-1 text-gray-800 leading-relaxed text-justify">
+                <ul className={`list-disc list-outside ml-4 mt-1 ${listSpacing} text-gray-800 leading-relaxed text-justify`}>
                   {parseBulletPoints(project.description).map((bullet, i) => (
                     <li key={i} className="pl-1">
                       {bullet}
@@ -161,21 +187,22 @@ const ClassicTemplate = ({ data, customSections }: TemplateProps) => {
 
       {/* Education */}
       {cleanEdu && cleanEdu.length > 0 && (
-        <section className="mb-4">
-          <h2 className="text-[12px] font-bold text-gray-900 border-b border-gray-900 mb-2 pb-0.5 uppercase tracking-wider text-left">
+        <section className={sectionSpacing}>
+          <h2 className="font-bold text-gray-950 uppercase tracking-wider text-left" style={{ fontSize: headingFontSize }}>
             Education
           </h2>
+          <hr className="border-t border-gray-900 mt-1 mb-2" />
           <div className="space-y-3">
             {cleanEdu.map((edu, index) => (
-              <div key={index}>
+              <div key={index} className="break-inside-avoid" style={{ breakInside: 'avoid' }}>
                 <div className="flex flex-wrap justify-between items-baseline gap-x-3 gap-y-1 font-bold text-gray-950">
-                  <span className="min-w-0">{edu.institution}</span>
-                  <span className="shrink-0 font-normal text-gray-700">{edu.year}</span>
+                  <span className="min-w-0" style={{ fontSize: isLowDensity ? '13px' : isHighDensity ? '10.5px' : '11.5px' }}>{edu.institution}</span>
+                  <span className="shrink-0 font-normal text-gray-700" style={{ fontSize: isLowDensity ? '11px' : isHighDensity ? '9px' : '10px' }}>{edu.year}</span>
                 </div>
                 <div className="flex flex-wrap justify-between items-baseline gap-x-3 gap-y-1 mt-0.5 text-gray-800">
                   <span className="min-w-0 italic font-medium">{edu.degree}</span>
                   {edu.gpa && (
-                    <span className="text-[10px] text-gray-600 font-sans font-bold">
+                    <span className="text-gray-600 font-sans font-bold" style={{ fontSize: isLowDensity ? '11px' : isHighDensity ? '9px' : '10px' }}>
                       GPA: {edu.gpa}
                     </span>
                   )}
@@ -188,10 +215,11 @@ const ClassicTemplate = ({ data, customSections }: TemplateProps) => {
 
       {/* Skills */}
       {data.skills && data.skills.length > 0 && (
-        <section className="mb-4">
-          <h2 className="text-[12px] font-bold text-gray-900 border-b border-gray-900 mb-2 pb-0.5 uppercase tracking-wider text-left">
+        <section className={sectionSpacing}>
+          <h2 className="font-bold text-gray-950 uppercase tracking-wider text-left" style={{ fontSize: headingFontSize }}>
             Technical Skills
           </h2>
+          <hr className="border-t border-gray-900 mt-1 mb-2" />
           <p className="text-gray-800 leading-relaxed text-justify">
             <span className="font-bold text-gray-950">Skills & Technologies:</span> {data.skills.join(', ')}
           </p>
@@ -200,13 +228,14 @@ const ClassicTemplate = ({ data, customSections }: TemplateProps) => {
 
       {/* Certifications */}
       {data.certifications && data.certifications.length > 0 && (
-        <section className="mb-4">
-          <h2 className="text-[12px] font-bold text-gray-900 border-b border-gray-900 mb-2 pb-0.5 uppercase tracking-wider text-left">
+        <section className={sectionSpacing}>
+          <h2 className="font-bold text-gray-950 uppercase tracking-wider text-left" style={{ fontSize: headingFontSize }}>
             Certifications
           </h2>
-          <ul className="list-disc list-outside ml-4 space-y-1 text-gray-800">
+          <hr className="border-t border-gray-900 mt-1 mb-2" />
+          <ul className={`list-disc list-outside ml-4 ${listSpacing} text-gray-800`}>
             {data.certifications.map((cert, index) => (
-              <li key={index} className="pl-1">{cert}</li>
+              <li key={index} className="pl-1 break-inside-avoid" style={{ breakInside: 'avoid' }}>{cert}</li>
             ))}
           </ul>
         </section>
@@ -214,10 +243,11 @@ const ClassicTemplate = ({ data, customSections }: TemplateProps) => {
 
       {/* Languages */}
       {data.languages && data.languages.length > 0 && (
-        <section className="mb-4">
-          <h2 className="text-[12px] font-bold text-gray-900 border-b border-gray-900 mb-2 pb-0.5 uppercase tracking-wider text-left">
+        <section className={sectionSpacing}>
+          <h2 className="font-bold text-gray-950 uppercase tracking-wider text-left" style={{ fontSize: headingFontSize }}>
             Languages
           </h2>
+          <hr className="border-t border-gray-900 mt-1 mb-2" />
           <p className="text-gray-800 leading-relaxed text-justify">
             {data.languages.join(', ')}
           </p>
@@ -226,13 +256,14 @@ const ClassicTemplate = ({ data, customSections }: TemplateProps) => {
 
       {/* Honors & Awards */}
       {data.achievements && data.achievements.length > 0 && (
-        <section className="mb-4">
-          <h2 className="text-[12px] font-bold text-gray-900 border-b border-gray-900 mb-2 pb-0.5 uppercase tracking-wider text-left">
+        <section className={sectionSpacing}>
+          <h2 className="font-bold text-gray-950 uppercase tracking-wider text-left" style={{ fontSize: headingFontSize }}>
             Honors & Awards
           </h2>
-          <ul className="list-disc list-outside ml-4 space-y-1 text-gray-800">
+          <hr className="border-t border-gray-900 mt-1 mb-2" />
+          <ul className={`list-disc list-outside ml-4 ${listSpacing} text-gray-800`}>
             {data.achievements.map((achievement, index) => (
-              <li key={index} className="pl-1">{achievement}</li>
+              <li key={index} className="pl-1 break-inside-avoid" style={{ breakInside: 'avoid' }}>{achievement}</li>
             ))}
           </ul>
         </section>
@@ -242,10 +273,11 @@ const ClassicTemplate = ({ data, customSections }: TemplateProps) => {
       {customSections && customSections.length > 0 && (
         <div className="space-y-4">
           {customSections.map((section) => (
-            <section key={section.id} className="mb-4">
-              <h2 className="text-[12px] font-bold text-gray-900 border-b border-gray-900 mb-2 pb-0.5 uppercase tracking-wider text-left">
+            <section key={section.id} className={sectionSpacing}>
+              <h2 className="font-bold text-gray-950 uppercase tracking-wider text-left" style={{ fontSize: headingFontSize }}>
                 {section.title}
               </h2>
+              <hr className="border-t border-gray-900 mt-1 mb-2" />
               <p className="text-gray-800 leading-relaxed text-justify whitespace-pre-wrap">
                 {section.content}
               </p>
