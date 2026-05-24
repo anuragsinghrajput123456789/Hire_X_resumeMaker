@@ -17,9 +17,12 @@ interface TemplateProps {
     title: string;
     content: string;
   }>;
+  fontSizeAdjustment?: number;
+  lineHeightAdjustment?: string;
+  spacingAdjustment?: string;
 }
 
-const CreativeTemplate = ({ data, customSections }: TemplateProps) => {
+const CreativeTemplate = ({ data, customSections, fontSizeAdjustment, lineHeightAdjustment, spacingAdjustment }: TemplateProps) => {
   const cleanExp = filterExperience(data.experience);
   const cleanEdu = filterEducation(data.education);
   const cleanProj = filterProjects(data.projects);
@@ -43,23 +46,36 @@ const CreativeTemplate = ({ data, customSections }: TemplateProps) => {
   const isHighDensity = totalItemsCount > 16;
 
   // Spacing and sizing tokens
-  const baseFontSize = isLowDensity ? '12.5px' : isHighDensity ? '11px' : '11.5px';
-  const headingFontSize = isLowDensity ? '15px' : isHighDensity ? '12px' : '13px';
-  const sectionSpacing = isLowDensity ? 'space-y-6' : isHighDensity ? 'space-y-3' : 'space-y-4.5';
-  const listSpacing = isLowDensity ? 'space-y-2' : isHighDensity ? 'space-y-0.5' : 'space-y-1.5';
-  const timelineGap = isLowDensity ? 'space-y-6' : isHighDensity ? 'space-y-3' : 'space-y-5';
+  const baseFontSize = `calc(${isLowDensity ? '12.5px' : isHighDensity ? '11px' : '11.5px'} + ${fontSizeAdjustment || 0}px)`;
+  const headingFontSize = `calc(${isLowDensity ? '15px' : isHighDensity ? '12px' : '13px'} + ${fontSizeAdjustment || 0}px)`;
+  
+  let sectionSpacing = isLowDensity ? 'space-y-6' : isHighDensity ? 'space-y-3' : 'space-y-4.5';
+  let listSpacing = isLowDensity ? 'space-y-2' : isHighDensity ? 'space-y-0.5' : 'space-y-1.5';
+  let timelineGap = isLowDensity ? 'space-y-6' : isHighDensity ? 'space-y-3' : 'space-y-5';
+
+  if (spacingAdjustment === 'compact') {
+    sectionSpacing = isLowDensity ? 'space-y-4' : isHighDensity ? 'space-y-1.5' : 'space-y-3';
+    listSpacing = isLowDensity ? 'space-y-1' : isHighDensity ? 'space-y-0' : 'space-y-0.5';
+    timelineGap = isLowDensity ? 'space-y-4' : isHighDensity ? 'space-y-1.5' : 'space-y-3';
+  } else if (spacingAdjustment === 'spacious') {
+    sectionSpacing = isLowDensity ? 'space-y-8' : isHighDensity ? 'space-y-4.5' : 'space-y-6';
+    listSpacing = isLowDensity ? 'space-y-2.5' : isHighDensity ? 'space-y-1' : 'space-y-2';
+    timelineGap = isLowDensity ? 'space-y-8' : isHighDensity ? 'space-y-4.5' : 'space-y-6.5';
+  }
 
   const hasSidebarContent = (data.skills && data.skills.length > 0) || 
                             (data.languages && data.languages.length > 0) || 
                             (data.certifications && data.certifications.length > 0);
-  const contactIconSize = isLowDensity ? 11 : isHighDensity ? 9.5 : 10.5;
+
+  const customLineHeight = lineHeightAdjustment === 'tight' ? '1.25' : lineHeightAdjustment === 'loose' ? '1.6' : '1.4';
 
   return (
     <div 
       className="bg-white text-slate-800 font-sans min-h-[297mm] w-full max-w-[210mm] mx-auto flex flex-row box-border shadow-sm break-words [overflow-wrap:anywhere]"
       style={{ 
         fontFamily: '"Poppins", "Inter", sans-serif', 
-        fontSize: baseFontSize 
+        fontSize: baseFontSize,
+        lineHeight: customLineHeight
       }}
     >
       
@@ -84,46 +100,46 @@ const CreativeTemplate = ({ data, customSections }: TemplateProps) => {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '10px', color: '#cbd5e1' }}>
               {data.email && (
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '10.5px', height: '10.5px', flexShrink: 0 }}>
-                    <Mail size={10.5} style={{ display: 'block', color: '#6366f1' }} />
+                  <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '12px', height: '12px', flexShrink: 0, verticalAlign: 'middle' }}>
+                    <Mail size={11} strokeWidth={2.5} style={{ display: 'block', color: '#6366f1' }} />
                   </span>
-                  <a href={`mailto:${data.email}`} style={{ wordBreak: 'break-all' }}>{data.email}</a>
+                  <a href={`mailto:${data.email}`} style={{ wordBreak: 'break-all', verticalAlign: 'middle' }}>{data.email}</a>
                 </div>
               )}
               {data.phone && (
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '10.5px', height: '10.5px', flexShrink: 0 }}>
-                    <Phone size={10.5} style={{ display: 'block', color: '#6366f1' }} />
+                  <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '12px', height: '12px', flexShrink: 0, verticalAlign: 'middle' }}>
+                    <Phone size={11} strokeWidth={2.5} style={{ display: 'block', color: '#6366f1' }} />
                   </span>
-                  <span style={{ wordBreak: 'break-word', minWidth: 0 }}>{data.phone}</span>
+                  <span style={{ wordBreak: 'break-word', minWidth: 0, verticalAlign: 'middle' }}>{data.phone}</span>
                 </div>
               )}
               {data.linkedin && (
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '10.5px', height: '10.5px', flexShrink: 0 }}>
-                    <Linkedin size={10.5} style={{ display: 'block', color: '#6366f1' }} />
+                  <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '12px', height: '12px', flexShrink: 0, verticalAlign: 'middle' }}>
+                    <Linkedin size={11} strokeWidth={2.5} style={{ display: 'block', color: '#6366f1' }} />
                   </span>
-                  <a href={data.linkedin} target="_blank" rel="noopener noreferrer" style={{ wordBreak: 'break-all' }}>
+                  <a href={data.linkedin} target="_blank" rel="noopener noreferrer" style={{ wordBreak: 'break-all', verticalAlign: 'middle' }}>
                     {cleanLinkedin(data.linkedin)}
                   </a>
                 </div>
               )}
               {data.github && (
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '10.5px', height: '10.5px', flexShrink: 0 }}>
-                    <Github size={10.5} style={{ display: 'block', color: '#6366f1' }} />
+                  <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '12px', height: '12px', flexShrink: 0, verticalAlign: 'middle' }}>
+                    <Github size={11} strokeWidth={2.5} style={{ display: 'block', color: '#6366f1' }} />
                   </span>
-                  <a href={data.github} target="_blank" rel="noopener noreferrer" style={{ wordBreak: 'break-all' }}>
+                  <a href={data.github} target="_blank" rel="noopener noreferrer" style={{ wordBreak: 'break-all', verticalAlign: 'middle' }}>
                     {cleanGithub(data.github)}
                   </a>
                 </div>
               )}
               {data.portfolio && (
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '10.5px', height: '10.5px', flexShrink: 0 }}>
-                    <Globe size={10.5} style={{ display: 'block', color: '#6366f1' }} />
+                  <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '12px', height: '12px', flexShrink: 0, verticalAlign: 'middle' }}>
+                    <Globe size={11} strokeWidth={2.5} style={{ display: 'block', color: '#6366f1' }} />
                   </span>
-                  <a href={data.portfolio} target="_blank" rel="noopener noreferrer" style={{ wordBreak: 'break-all' }}>
+                  <a href={data.portfolio} target="_blank" rel="noopener noreferrer" style={{ wordBreak: 'break-all', verticalAlign: 'middle' }}>
                     {cleanPortfolio(data.portfolio)}
                   </a>
                 </div>
@@ -219,42 +235,42 @@ const CreativeTemplate = ({ data, customSections }: TemplateProps) => {
             <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-slate-500 font-medium mt-4 border-t border-slate-100 pt-4" style={{ fontSize: isLowDensity ? '11px' : '9.5px' }}>
               {data.email && (
                 <div className="flex items-center gap-1.5 hover:text-indigo-600 transition-colors">
-                  <span className="shrink-0 flex items-center justify-center" style={{ width: `${contactIconSize}px`, height: `${contactIconSize}px` }}>
-                    <Mail size={contactIconSize} className="text-indigo-500" />
+                  <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '12px', height: '12px', flexShrink: 0, verticalAlign: 'middle' }}>
+                    <Mail size={11} strokeWidth={2.5} style={{ display: 'block', color: '#6366f1' }} />
                   </span>
-                  <a href={`mailto:${data.email}`} className="break-all">{data.email}</a>
+                  <a href={`mailto:${data.email}`} className="break-all" style={{ verticalAlign: 'middle' }}>{data.email}</a>
                 </div>
               )}
               {data.phone && (
                 <div className="flex items-center gap-1.5">
-                  <span className="shrink-0 flex items-center justify-center" style={{ width: `${contactIconSize}px`, height: `${contactIconSize}px` }}>
-                    <Phone size={contactIconSize} className="text-indigo-500" />
+                  <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '12px', height: '12px', flexShrink: 0, verticalAlign: 'middle' }}>
+                    <Phone size={11} strokeWidth={2.5} style={{ display: 'block', color: '#6366f1' }} />
                   </span>
-                  <span className="break-words">{data.phone}</span>
+                  <span className="break-words" style={{ verticalAlign: 'middle' }}>{data.phone}</span>
                 </div>
               )}
               {data.linkedin && (
                 <div className="flex items-center gap-1.5 hover:text-indigo-600 transition-colors">
-                  <span className="shrink-0 flex items-center justify-center" style={{ width: `${contactIconSize}px`, height: `${contactIconSize}px` }}>
-                    <Linkedin size={contactIconSize} className="text-indigo-500" />
+                  <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '12px', height: '12px', flexShrink: 0, verticalAlign: 'middle' }}>
+                    <Linkedin size={11} strokeWidth={2.5} style={{ display: 'block', color: '#6366f1' }} />
                   </span>
-                  <a href={data.linkedin} target="_blank" rel="noopener noreferrer">{cleanLinkedin(data.linkedin)}</a>
+                  <a href={data.linkedin} target="_blank" rel="noopener noreferrer" style={{ verticalAlign: 'middle' }}>{cleanLinkedin(data.linkedin)}</a>
                 </div>
               )}
               {data.github && (
                 <div className="flex items-center gap-1.5 hover:text-indigo-600 transition-colors">
-                  <span className="shrink-0 flex items-center justify-center" style={{ width: `${contactIconSize}px`, height: `${contactIconSize}px` }}>
-                    <Github size={contactIconSize} className="text-indigo-500" />
+                  <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '12px', height: '12px', flexShrink: 0, verticalAlign: 'middle' }}>
+                    <Github size={11} strokeWidth={2.5} style={{ display: 'block', color: '#6366f1' }} />
                   </span>
-                  <a href={data.github} target="_blank" rel="noopener noreferrer">{cleanGithub(data.github)}</a>
+                  <a href={data.github} target="_blank" rel="noopener noreferrer" style={{ verticalAlign: 'middle' }}>{cleanGithub(data.github)}</a>
                 </div>
               )}
               {data.portfolio && (
                 <div className="flex items-center gap-1.5 hover:text-indigo-600 transition-colors">
-                  <span className="shrink-0 flex items-center justify-center" style={{ width: `${contactIconSize}px`, height: `${contactIconSize}px` }}>
-                    <Globe size={contactIconSize} className="text-indigo-500" />
+                  <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '12px', height: '12px', flexShrink: 0, verticalAlign: 'middle' }}>
+                    <Globe size={11} strokeWidth={2.5} style={{ display: 'block', color: '#6366f1' }} />
                   </span>
-                  <a href={data.portfolio} target="_blank" rel="noopener noreferrer">{cleanPortfolio(data.portfolio)}</a>
+                  <a href={data.portfolio} target="_blank" rel="noopener noreferrer" style={{ verticalAlign: 'middle' }}>{cleanPortfolio(data.portfolio)}</a>
                 </div>
               )}
             </div>

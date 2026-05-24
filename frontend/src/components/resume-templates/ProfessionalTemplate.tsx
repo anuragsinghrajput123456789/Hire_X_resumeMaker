@@ -9,9 +9,12 @@ interface TemplateProps {
     title: string;
     content: string;
   }>;
+  fontSizeAdjustment?: number;
+  lineHeightAdjustment?: string;
+  spacingAdjustment?: string;
 }
 
-const ProfessionalTemplate = ({ data, customSections }: TemplateProps) => {
+const ProfessionalTemplate = ({ data, customSections, fontSizeAdjustment, lineHeightAdjustment, spacingAdjustment }: TemplateProps) => {
   const cleanExp = filterExperience(data.experience);
   const cleanEdu = filterEducation(data.education);
   const cleanProj = filterProjects(data.projects);
@@ -31,12 +34,25 @@ const ProfessionalTemplate = ({ data, customSections }: TemplateProps) => {
   const isHighDensity = totalItemsCount > 16;
 
   // Spacing and sizing tokens
-  const baseFontSize = isLowDensity ? '12px' : isHighDensity ? '10.5px' : '11.5px';
-  const headingFontSize = isLowDensity ? '13px' : isHighDensity ? '11px' : '12px';
-  const contactFontSize = isLowDensity ? '11px' : isHighDensity ? '9px' : '10px';
-  const sectionSpacing = isLowDensity ? 'mb-6' : isHighDensity ? 'mb-2.5' : 'mb-4';
-  const itemSpacing = isLowDensity ? 'space-y-4' : isHighDensity ? 'space-y-2' : 'space-y-3';
-  const listSpacing = isLowDensity ? 'space-y-1.5' : isHighDensity ? 'space-y-0.5' : 'space-y-1';
+  const baseFontSize = `calc(${isLowDensity ? '12px' : isHighDensity ? '10.5px' : '11.5px'} + ${fontSizeAdjustment || 0}px)`;
+  const headingFontSize = `calc(${isLowDensity ? '13px' : isHighDensity ? '11px' : '12px'} + ${fontSizeAdjustment || 0}px)`;
+  const contactFontSize = `calc(${isLowDensity ? '11px' : isHighDensity ? '9px' : '10px'} + ${fontSizeAdjustment || 0}px)`;
+  
+  let sectionSpacing = isLowDensity ? 'mb-6' : isHighDensity ? 'mb-2.5' : 'mb-4';
+  let itemSpacing = isLowDensity ? 'space-y-4' : isHighDensity ? 'space-y-2' : 'space-y-3';
+  let listSpacing = isLowDensity ? 'space-y-1.5' : isHighDensity ? 'space-y-0.5' : 'space-y-1';
+
+  if (spacingAdjustment === 'compact') {
+    sectionSpacing = isLowDensity ? 'mb-4' : isHighDensity ? 'mb-1.5' : 'mb-2.5';
+    itemSpacing = isLowDensity ? 'space-y-2.5' : isHighDensity ? 'space-y-1' : 'space-y-1.5';
+    listSpacing = isLowDensity ? 'space-y-1' : isHighDensity ? 'space-y-0' : 'space-y-0.5';
+  } else if (spacingAdjustment === 'spacious') {
+    sectionSpacing = isLowDensity ? 'mb-8' : isHighDensity ? 'mb-4' : 'mb-6';
+    itemSpacing = isLowDensity ? 'space-y-6' : isHighDensity ? 'space-y-3.5' : 'space-y-5';
+    listSpacing = isLowDensity ? 'space-y-2' : isHighDensity ? 'space-y-1' : 'space-y-1.5';
+  }
+
+  const customLineHeight = lineHeightAdjustment === 'tight' ? '1.25' : lineHeightAdjustment === 'loose' ? '1.6' : '1.4';
 
   return (
     <div 
@@ -44,7 +60,7 @@ const ProfessionalTemplate = ({ data, customSections }: TemplateProps) => {
       style={{ 
         fontFamily: '"Arial", "Helvetica", "Inter", sans-serif', 
         fontSize: baseFontSize,
-        lineHeight: '1.4'
+        lineHeight: customLineHeight
       }}
     >
       
@@ -65,47 +81,47 @@ const ProfessionalTemplate = ({ data, customSections }: TemplateProps) => {
           {/* Contact Details Column - fully inline styles for html2canvas PDF */}
           <div style={{ display: 'flex', flexDirection: 'column', minWidth: '190px', maxWidth: '100%', gap: '5px', color: '#1f2937', fontWeight: 500, fontSize: contactFontSize }}>
             {data.email && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: `${isLowDensity ? 12 : isHighDensity ? 10 : 11}px`, height: `${isLowDensity ? 12 : isHighDensity ? 10 : 11}px`, flexShrink: 0 }}>
-                  <Mail size={isLowDensity ? 12 : isHighDensity ? 10 : 11} style={{ display: 'block', color: '#4b5563' }} />
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '12px', height: '12px', flexShrink: 0, verticalAlign: 'middle' }}>
+                  <Mail size={11} strokeWidth={2.5} style={{ display: 'block', color: '#4b5563' }} />
                 </span>
-                <a href={`mailto:${data.email}`} style={{ minWidth: 0, wordBreak: 'break-all', textAlign: 'left' }}>{data.email}</a>
+                <a href={`mailto:${data.email}`} style={{ minWidth: 0, wordBreak: 'break-all', textAlign: 'left', verticalAlign: 'middle' }}>{data.email}</a>
               </div>
             )}
             {data.phone && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: `${isLowDensity ? 12 : isHighDensity ? 10 : 11}px`, height: `${isLowDensity ? 12 : isHighDensity ? 10 : 11}px`, flexShrink: 0 }}>
-                  <Phone size={isLowDensity ? 12 : isHighDensity ? 10 : 11} style={{ display: 'block', color: '#4b5563' }} />
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '12px', height: '12px', flexShrink: 0, verticalAlign: 'middle' }}>
+                  <Phone size={11} strokeWidth={2.5} style={{ display: 'block', color: '#4b5563' }} />
                 </span>
-                <span style={{ minWidth: 0, wordBreak: 'break-word', textAlign: 'left' }}>{data.phone}</span>
+                <span style={{ minWidth: 0, wordBreak: 'break-word', textAlign: 'left', verticalAlign: 'middle' }}>{data.phone}</span>
               </div>
             )}
             {data.linkedin && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: `${isLowDensity ? 12 : isHighDensity ? 10 : 11}px`, height: `${isLowDensity ? 12 : isHighDensity ? 10 : 11}px`, flexShrink: 0 }}>
-                  <Linkedin size={isLowDensity ? 12 : isHighDensity ? 10 : 11} style={{ display: 'block', color: '#4b5563' }} />
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '12px', height: '12px', flexShrink: 0, verticalAlign: 'middle' }}>
+                  <Linkedin size={11} strokeWidth={2.5} style={{ display: 'block', color: '#4b5563' }} />
                 </span>
-                <a href={data.linkedin} target="_blank" rel="noopener noreferrer" style={{ minWidth: 0, wordBreak: 'break-all', textAlign: 'left' }}>
+                <a href={data.linkedin} target="_blank" rel="noopener noreferrer" style={{ minWidth: 0, wordBreak: 'break-all', textAlign: 'left', verticalAlign: 'middle' }}>
                   {cleanLinkedin(data.linkedin)}
                 </a>
               </div>
             )}
             {data.github && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: `${isLowDensity ? 12 : isHighDensity ? 10 : 11}px`, height: `${isLowDensity ? 12 : isHighDensity ? 10 : 11}px`, flexShrink: 0 }}>
-                  <Github size={isLowDensity ? 12 : isHighDensity ? 10 : 11} style={{ display: 'block', color: '#4b5563' }} />
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '12px', height: '12px', flexShrink: 0, verticalAlign: 'middle' }}>
+                  <Github size={11} strokeWidth={2.5} style={{ display: 'block', color: '#4b5563' }} />
                 </span>
-                <a href={data.github} target="_blank" rel="noopener noreferrer" style={{ minWidth: 0, wordBreak: 'break-all', textAlign: 'left' }}>
+                <a href={data.github} target="_blank" rel="noopener noreferrer" style={{ minWidth: 0, wordBreak: 'break-all', textAlign: 'left', verticalAlign: 'middle' }}>
                   {cleanGithub(data.github)}
                 </a>
               </div>
             )}
             {data.portfolio && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: `${isLowDensity ? 12 : isHighDensity ? 10 : 11}px`, height: `${isLowDensity ? 12 : isHighDensity ? 10 : 11}px`, flexShrink: 0 }}>
-                  <Globe size={isLowDensity ? 12 : isHighDensity ? 10 : 11} style={{ display: 'block', color: '#4b5563' }} />
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '12px', height: '12px', flexShrink: 0, verticalAlign: 'middle' }}>
+                  <Globe size={11} strokeWidth={2.5} style={{ display: 'block', color: '#4b5563' }} />
                 </span>
-                <a href={data.portfolio} target="_blank" rel="noopener noreferrer" style={{ minWidth: 0, wordBreak: 'break-all', textAlign: 'left' }}>
+                <a href={data.portfolio} target="_blank" rel="noopener noreferrer" style={{ minWidth: 0, wordBreak: 'break-all', textAlign: 'left', verticalAlign: 'middle' }}>
                   {cleanPortfolio(data.portfolio)}
                 </a>
               </div>

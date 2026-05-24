@@ -9,9 +9,12 @@ interface TemplateProps {
     title: string;
     content: string;
   }>;
+  fontSizeAdjustment?: number;
+  lineHeightAdjustment?: string;
+  spacingAdjustment?: string;
 }
 
-const ClassicTemplate = ({ data, customSections }: TemplateProps) => {
+const ClassicTemplate = ({ data, customSections, fontSizeAdjustment, lineHeightAdjustment, spacingAdjustment }: TemplateProps) => {
   const cleanExp = filterExperience(data.experience);
   const cleanEdu = filterEducation(data.education);
   const cleanProj = filterProjects(data.projects);
@@ -31,12 +34,25 @@ const ClassicTemplate = ({ data, customSections }: TemplateProps) => {
   const isHighDensity = totalItemsCount > 16;
 
   // Spacing and sizing tokens
-  const baseFontSize = isLowDensity ? '13px' : isHighDensity ? '11px' : '12px';
-  const headingFontSize = isLowDensity ? '13px' : isHighDensity ? '11px' : '12px';
-  const contactFontSize = isLowDensity ? '11px' : isHighDensity ? '9.5px' : '10px';
-  const sectionSpacing = isLowDensity ? 'mb-6' : isHighDensity ? 'mb-2.5' : 'mb-4';
-  const itemSpacing = isLowDensity ? 'space-y-4' : isHighDensity ? 'space-y-2' : 'space-y-3';
-  const listSpacing = isLowDensity ? 'space-y-1.5' : isHighDensity ? 'space-y-0.5' : 'space-y-1';
+  const baseFontSize = `calc(${isLowDensity ? '13px' : isHighDensity ? '11px' : '12px'} + ${fontSizeAdjustment || 0}px)`;
+  const headingFontSize = `calc(${isLowDensity ? '13px' : isHighDensity ? '11px' : '12px'} + ${fontSizeAdjustment || 0}px)`;
+  const contactFontSize = `calc(${isLowDensity ? '11px' : isHighDensity ? '9.5px' : '10px'} + ${fontSizeAdjustment || 0}px)`;
+  
+  let sectionSpacing = isLowDensity ? 'mb-6' : isHighDensity ? 'mb-2.5' : 'mb-4';
+  let itemSpacing = isLowDensity ? 'space-y-4' : isHighDensity ? 'space-y-2' : 'space-y-3';
+  let listSpacing = isLowDensity ? 'space-y-1.5' : isHighDensity ? 'space-y-0.5' : 'space-y-1';
+
+  if (spacingAdjustment === 'compact') {
+    sectionSpacing = isLowDensity ? 'mb-4' : isHighDensity ? 'mb-1.5' : 'mb-2.5';
+    itemSpacing = isLowDensity ? 'space-y-2.5' : isHighDensity ? 'space-y-1' : 'space-y-1.5';
+    listSpacing = isLowDensity ? 'space-y-1' : isHighDensity ? 'space-y-0' : 'space-y-0.5';
+  } else if (spacingAdjustment === 'spacious') {
+    sectionSpacing = isLowDensity ? 'mb-8' : isHighDensity ? 'mb-4' : 'mb-6';
+    itemSpacing = isLowDensity ? 'space-y-6' : isHighDensity ? 'space-y-3.5' : 'space-y-5';
+    listSpacing = isLowDensity ? 'space-y-2' : isHighDensity ? 'space-y-1' : 'space-y-1.5';
+  }
+
+  const customLineHeight = lineHeightAdjustment === 'tight' ? '1.25' : lineHeightAdjustment === 'loose' ? '1.6' : '1.4';
 
   // Construct dynamic inline contact info
   const contactItems: React.ReactNode[] = [];
@@ -83,7 +99,7 @@ const ClassicTemplate = ({ data, customSections }: TemplateProps) => {
       style={{ 
         fontFamily: '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif', 
         fontSize: baseFontSize,
-        lineHeight: '1.4'
+        lineHeight: customLineHeight
       }}
     >
       {/* Centered Minimalist Header */}

@@ -46,6 +46,9 @@ const ResumeGenerator = ({ onResumeGenerated }: { onResumeGenerated: (resume: st
   const [customSections, setCustomSections] = useState<CustomSection[]>([]);
   const [selectedTemplate, setSelectedTemplate] = useState<TemplateId>('modern');
   const [activeMobileView, setActiveMobileView] = useState<'edit' | 'preview'>('edit');
+  const [fontSizeAdjustment, setFontSizeAdjustment] = useState<number>(0);
+  const [lineHeightAdjustment, setLineHeightAdjustment] = useState<string>('normal');
+  const [spacingAdjustment, setSpacingAdjustment] = useState<string>('normal');
   const { toast } = useToast();
   
   const containerRef = useRef<HTMLDivElement>(null);
@@ -159,9 +162,46 @@ const ResumeGenerator = ({ onResumeGenerated }: { onResumeGenerated: (resume: st
         achievements: data.achievements ? data.achievements.split(',').map(s => s.trim()).filter(s => s.length > 0) : []
       };
 
-      const atsContent = await generateResume(processedData);
-      setAtsOptimizedContent(atsContent);
-      setGeneratedData(processedData);
+      const atsResponse = await generateResume(processedData);
+      const rawText = atsResponse.result;
+      const parsedData = atsResponse.parsedData;
+
+      setAtsOptimizedContent(rawText);
+
+      if (parsedData && Object.keys(parsedData).length > 0) {
+        // Dynamically reset the form fields with the AI-optimized suggestions!
+        const optimizedFormData: FormData = {
+          fullName: parsedData.fullName || data.fullName,
+          email: parsedData.email || data.email,
+          phone: parsedData.phone || data.phone,
+          linkedin: parsedData.linkedin || data.linkedin,
+          github: parsedData.github || data.github,
+          portfolio: parsedData.portfolio || data.portfolio,
+          jobRole: parsedData.jobRole || data.jobRole,
+          summary: parsedData.summary || data.summary,
+          skills: Array.isArray(parsedData.skills) ? parsedData.skills.join(', ') : data.skills,
+          certifications: Array.isArray(parsedData.certifications) ? parsedData.certifications.join(', ') : data.certifications,
+          languages: Array.isArray(parsedData.languages) ? parsedData.languages.join(', ') : data.languages,
+          achievements: Array.isArray(parsedData.achievements) ? parsedData.achievements.join(', ') : data.achievements,
+          education: parsedData.education || data.education,
+          experience: parsedData.experience || data.experience,
+          projects: parsedData.projects || data.projects
+        };
+        reset(optimizedFormData);
+        
+        // Update the live canvas with the parsed AI optimization!
+        setGeneratedData({
+          ...parsedData,
+          skills: Array.isArray(parsedData.skills) ? parsedData.skills : [],
+          certifications: Array.isArray(parsedData.certifications) ? parsedData.certifications : [],
+          languages: Array.isArray(parsedData.languages) ? parsedData.languages : [],
+          achievements: Array.isArray(parsedData.achievements) ? parsedData.achievements : []
+        });
+      } else {
+        // Fallback to input data if AI returned unparseable text
+        setGeneratedData(processedData);
+      }
+
       onResumeGenerated('ATS-Optimized Resume Generated');
       
       toast({
@@ -603,7 +643,7 @@ const ResumeGenerator = ({ onResumeGenerated }: { onResumeGenerated: (resume: st
     return () => {
       observer.disconnect();
     };
-  }, [previewData, selectedTemplate, customSections]);
+  }, [previewData, selectedTemplate, customSections, fontSizeAdjustment, lineHeightAdjustment, spacingAdjustment]);
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 relative pb-20">
@@ -814,6 +854,86 @@ const ResumeGenerator = ({ onResumeGenerated }: { onResumeGenerated: (resume: st
             </div>
           </CardHeader>
 
+          {/* Advanced Resizing & Spacing Settings Sub-Bar */}
+          <div className="bg-[#0A0E1A]/60 border-b border-indigo-500/10 p-3 shrink-0 flex flex-wrap items-center justify-between gap-4 text-xs font-semibold select-none z-15">
+            <div className="flex items-center gap-6 flex-wrap">
+              {/* Font Size Adjuster */}
+              <div className="flex items-center gap-2.5">
+                <span className="text-slate-400 font-bold uppercase tracking-wider text-[10px]">Font Size:</span>
+                <div className="flex items-center gap-1.5 bg-white/[0.02] border border-white/[0.04] p-0.5 rounded-lg">
+                  <button 
+                    type="button"
+                    onClick={() => setFontSizeAdjustment(prev => Math.max(-3, prev - 1))}
+                    className="w-6 h-6 rounded-md hover:bg-white/5 text-slate-400 hover:text-white transition-colors font-bold text-xs"
+                  >
+                    A-
+                  </button>
+                  <span className="text-indigo-400 px-1 text-[10px] font-bold min-w-[20px] text-center">
+                    {fontSizeAdjustment >= 0 ? `+${fontSizeAdjustment}` : fontSizeAdjustment}px
+                  </span>
+                  <button 
+                    type="button"
+                    onClick={() => setFontSizeAdjustment(prev => Math.min(3, prev + 1))}
+                    className="w-6 h-6 rounded-md hover:bg-white/5 text-slate-400 hover:text-white transition-colors font-bold text-xs"
+                  >
+                    A+
+                  </button>
+                </div>
+              </div>
+
+              {/* Line Height Selector */}
+              <div className="flex items-center gap-2.5">
+                <span className="text-slate-400 font-bold uppercase tracking-wider text-[10px]">Line Height:</span>
+                <div className="flex items-center bg-white/[0.02] border border-white/[0.04] p-0.5 rounded-lg gap-0.5">
+                  {['tight', 'normal', 'loose'].map((lh) => (
+                    <button
+                      key={lh}
+                      type="button"
+                      onClick={() => setLineHeightAdjustment(lh)}
+                      className={`px-2 py-1 rounded-md text-[9px] font-bold uppercase tracking-wider transition-all duration-200 ${
+                        lineHeightAdjustment === lh ? 'bg-white/[0.06] border border-white/[0.08] text-indigo-400 shadow-sm' : 'text-slate-500 hover:text-slate-300'
+                      }`}
+                    >
+                      {lh}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Section Spacing Selector */}
+              <div className="flex items-center gap-2.5">
+                <span className="text-slate-400 font-bold uppercase tracking-wider text-[10px]">Spacing:</span>
+                <div className="flex items-center bg-white/[0.02] border border-white/[0.04] p-0.5 rounded-lg gap-0.5">
+                  {['compact', 'normal', 'spacious'].map((sp) => (
+                    <button
+                      key={sp}
+                      type="button"
+                      onClick={() => setSpacingAdjustment(sp)}
+                      className={`px-2 py-1 rounded-md text-[9px] font-bold uppercase tracking-wider transition-all duration-200 ${
+                        spacingAdjustment === sp ? 'bg-white/[0.06] border border-white/[0.08] text-indigo-400 shadow-sm' : 'text-slate-500 hover:text-slate-300'
+                      }`}
+                    >
+                      {sp}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Quick Reset Layout Button */}
+            <button
+              type="button"
+              onClick={() => {
+                setFontSizeAdjustment(0);
+                setLineHeightAdjustment('normal');
+                setSpacingAdjustment('normal');
+              }}
+              className="text-[9px] font-bold uppercase tracking-widest text-slate-500 hover:text-rose-400 transition-colors"
+            >
+              Reset Layout
+            </button>
+          </div>
+
           <CardContent className="p-0 flex-1 overflow-hidden flex flex-col bg-slate-50/50 dark:bg-black/20">
             <AnimatePresence mode="wait">
               {previewData ? (
@@ -849,10 +969,10 @@ const ResumeGenerator = ({ onResumeGenerated }: { onResumeGenerated: (resume: st
                         boxShadow: '0 25px 50px -12px rgb(0 0 0 / 0.25)'
                       }}
                     >
-                      {selectedTemplate === 'modern' && <ModernTemplate data={previewData} customSections={customSections} />}
-                      {selectedTemplate === 'classic' && <ClassicTemplate data={previewData} customSections={customSections} />}
-                      {selectedTemplate === 'creative' && <CreativeTemplate data={previewData} customSections={customSections} />}
-                      {selectedTemplate === 'professional' && <ProfessionalTemplate data={previewData} customSections={customSections} />}
+                      {selectedTemplate === 'modern' && <ModernTemplate data={previewData} customSections={customSections} fontSizeAdjustment={fontSizeAdjustment} lineHeightAdjustment={lineHeightAdjustment} spacingAdjustment={spacingAdjustment} />}
+                      {selectedTemplate === 'classic' && <ClassicTemplate data={previewData} customSections={customSections} fontSizeAdjustment={fontSizeAdjustment} lineHeightAdjustment={lineHeightAdjustment} spacingAdjustment={spacingAdjustment} />}
+                      {selectedTemplate === 'creative' && <CreativeTemplate data={previewData} customSections={customSections} fontSizeAdjustment={fontSizeAdjustment} lineHeightAdjustment={lineHeightAdjustment} spacingAdjustment={spacingAdjustment} />}
+                      {selectedTemplate === 'professional' && <ProfessionalTemplate data={previewData} customSections={customSections} fontSizeAdjustment={fontSizeAdjustment} lineHeightAdjustment={lineHeightAdjustment} spacingAdjustment={spacingAdjustment} />}
                     </div>
                   </div>
                 </motion.div>

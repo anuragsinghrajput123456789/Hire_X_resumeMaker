@@ -108,7 +108,12 @@ export const generateResumeContent = async (prompt: string): Promise<string> => 
     }
 };
 
-export const generateResume = async (data: ResumeData): Promise<string> => {
+export interface GenerateResumeResponse {
+  result: string;
+  parsedData?: ResumeData;
+}
+
+export const generateResume = async (data: ResumeData): Promise<GenerateResumeResponse> => {
     try {
         const response = await fetch(`${API_URL}/generate-resume`, {
             method: 'POST',
@@ -116,10 +121,13 @@ export const generateResume = async (data: ResumeData): Promise<string> => {
             body: JSON.stringify({ data })
         });
         const resData = await handleResponse(response, 'generate resume');
-        return resData.result;
+        return {
+            result: resData.result,
+            parsedData: resData.parsedData
+        };
     } catch (error) {
-        console.error("generateResume error:", error);
-        throw error;
+         console.error("generateResume error:", error);
+         throw error;
     }
 };
 
