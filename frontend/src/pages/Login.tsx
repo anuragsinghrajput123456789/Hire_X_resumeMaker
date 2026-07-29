@@ -16,8 +16,12 @@ const Login = () => {
 
   const navigate = useNavigate();
   const authContext = useContext(AuthContext);
-
-  const { login, isLoading, isError, isSuccess, message, user } = authContext!;
+  const login = authContext?.login || (async () => {});
+  const isLoading = authContext?.isLoading || false;
+  const isError = authContext?.isError || false;
+  const isSuccess = authContext?.isSuccess || false;
+  const message = authContext?.message || '';
+  const user = authContext?.user || null;
 
   useEffect(() => {
     if (isError) {

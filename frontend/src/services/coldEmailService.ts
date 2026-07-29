@@ -1,10 +1,6 @@
-import { apiUrl, authHeaders } from './apiClient';
+import { apiUrl, authHeaders, apiFetch } from './apiClient';
 
 const API_URL = apiUrl('/cold-email');
-
-const getAuthHeaders = () => {
-    return authHeaders();
-};
 
 interface ColdEmailData {
   recipientName: string;
@@ -22,17 +18,11 @@ interface ColdEmailData {
 
 export const saveColdEmail = async (emailData: ColdEmailData) => {
     try {
-        const response = await fetch(`${API_URL}/save`, {
+        const response = await apiFetch(`${API_URL}/save`, {
             method: 'POST',
-            headers: getAuthHeaders(),
+            headers: authHeaders(),
             body: JSON.stringify(emailData)
         });
-        
-        if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.error || 'Failed to save email');
-        }
-        
         return await response.json();
     } catch (error) {
         console.error('Error saving cold email:', error);
@@ -42,16 +32,10 @@ export const saveColdEmail = async (emailData: ColdEmailData) => {
 
 export const getColdEmailHistory = async () => {
     try {
-        const response = await fetch(`${API_URL}/history`, {
+        const response = await apiFetch(`${API_URL}/history`, {
             method: 'GET',
-            headers: getAuthHeaders()
+            headers: authHeaders()
         });
-        
-        if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.error || 'Failed to fetch history');
-        }
-        
         return await response.json();
     } catch (error) {
         console.error('Error fetching history:', error);
@@ -61,16 +45,10 @@ export const getColdEmailHistory = async () => {
 
 export const deleteColdEmail = async (id: string) => {
     try {
-        const response = await fetch(`${API_URL}/${id}`, {
+        const response = await apiFetch(`${API_URL}/${id}`, {
             method: 'DELETE',
-            headers: getAuthHeaders()
+            headers: authHeaders()
         });
-        
-        if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.error || 'Failed to delete email');
-        }
-        
         return await response.json();
     } catch (error) {
         console.error('Error deleting email:', error);

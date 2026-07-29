@@ -27,11 +27,19 @@ const errorHandler = (err, req, res, next) => {
     message = 'Invalid JSON request body';
   }
 
+  // Prevent double-send if headers already flushed (e.g. streaming)
+  if (res.headersSent) {
+    return;
+  }
+
   res.status(statusCode);
 
+  // Standardized response: include both `message` and `error` so frontend
+  // can read either field regardless of which route generated the error
   res.json({
     success: false,
     message,
+    error: message,
     ...(process.env.NODE_ENV === 'production' ? {} : { stack: err.stack }),
   });
 };

@@ -12,7 +12,8 @@ import {
   Brain,
   LogOut,
   User,
-  ChevronRight
+  ChevronRight,
+  Sparkles
 } from 'lucide-react';
 import AuthContext from '../context/AuthContext';
 import { Button } from './ui/button';
@@ -32,7 +33,8 @@ const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const authContext = useContext(AuthContext);
-  const { user, logout } = authContext!;
+  const user = authContext?.user;
+  const logout = authContext?.logout || (() => {});
 
   useEffect(() => {
     const handleScroll = () => {
@@ -47,6 +49,7 @@ const Navbar = () => {
     { path: '/analyzer', label: 'Analyzer', icon: Search, description: 'Analyze & Improve' },
     { path: '/job-match', label: 'Job Portals', icon: Globe, description: 'Find Perfect Jobs' },
     { path: '/cold-email', label: 'Cold Email', icon: Mail, description: 'Write Emails' },
+    { path: '/cover-letter', label: 'Cover Letter', icon: Sparkles, description: 'Write Cover Letters' },
     { path: '/chat', label: 'AI Chat', icon: MessageCircle, description: 'Career Assistant' }
   ];
 

@@ -437,7 +437,7 @@ const ResumeAnalyzer = () => {
                       </CardHeader>
                       <CardContent className="p-5">
                         <ul className="space-y-3.5">
-                          {analysis.formatSuggestions.map((item, i) => (
+                          {(analysis?.formatSuggestions || []).map((item, i) => (
                             <li key={i} className="flex items-start gap-2.5">
                               <div className="w-1.5 h-1.5 rounded-full bg-rose-400 mt-2 shrink-0" />
                               <p className="text-xs text-gray-300 font-medium leading-relaxed">{item}</p>
@@ -446,7 +446,7 @@ const ResumeAnalyzer = () => {
                         </ul>
                       </CardContent>
                     </Card>
-
+ 
                     {/* Improvements Section */}
                     <Card className="glass-card border-white/5 bg-[#0F1424]/80 shadow-xl">
                       <CardHeader className="pb-3 border-b border-white/5">
@@ -456,7 +456,7 @@ const ResumeAnalyzer = () => {
                       </CardHeader>
                       <CardContent className="p-5">
                         <ul className="space-y-3.5">
-                          {analysis.improvements.map((item, i) => (
+                          {(analysis?.improvements || []).map((item, i) => (
                             <li key={i} className="flex items-start gap-2.5">
                               <div className="w-1.5 h-1.5 rounded-full bg-indigo-400 mt-2 shrink-0" />
                               <p className="text-xs text-gray-300 font-medium leading-relaxed">{item}</p>
@@ -465,18 +465,18 @@ const ResumeAnalyzer = () => {
                         </ul>
                       </CardContent>
                     </Card>
-
+ 
                     {/* Keywords Section */}
                     <Card className="glass-card border-white/5 bg-[#0F1424]/80 shadow-xl md:col-span-2">
                       <CardHeader className="pb-3 border-b border-white/5 flex flex-row items-center justify-between">
                         <CardTitle className="text-purple-400 text-sm font-black flex items-center gap-2">
                           <Sparkles className="w-4 h-4" /> CRITICAL KEYWORDS MISSING
                         </CardTitle>
-                        <Badge variant="secondary" className="bg-purple-500/10 text-purple-400 border-purple-500/20 text-xs font-bold">{analysis.missingKeywords.length}</Badge>
+                        <Badge variant="secondary" className="bg-purple-500/10 text-purple-400 border-purple-500/20 text-xs font-bold">{(analysis?.missingKeywords || []).length}</Badge>
                       </CardHeader>
                       <CardContent className="p-5">
                         <div className="flex flex-wrap gap-2">
-                          {analysis.missingKeywords.map((keyword, i) => (
+                          {(analysis?.missingKeywords || []).map((keyword, i) => (
                             <Badge key={i} className="px-3.5 py-1.5 rounded-xl bg-purple-500/5 text-purple-300 border-purple-500/10 font-bold text-xs">
                               + {keyword}
                             </Badge>
@@ -484,7 +484,7 @@ const ResumeAnalyzer = () => {
                         </div>
                       </CardContent>
                     </Card>
-
+ 
                     {/* Job Roles Section */}
                     <Card className="glass-card border-white/5 bg-[#0F1424]/80 shadow-xl md:col-span-2">
                       <CardHeader className="pb-3 border-b border-white/5">
@@ -494,7 +494,7 @@ const ResumeAnalyzer = () => {
                       </CardHeader>
                       <CardContent className="p-5">
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                          {analysis.matchingJobRoles.map((role, i) => (
+                          {(analysis?.matchingJobRoles || []).map((role, i) => (
                             <div key={i} className="flex items-center gap-2.5 p-2.5 bg-[#0A0E1A]/60 rounded-xl border border-white/5">
                               <div className="w-7 h-7 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-400 shrink-0">
                                 <Award className="w-3.5 h-3.5" />

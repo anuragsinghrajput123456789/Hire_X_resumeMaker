@@ -18,8 +18,12 @@ const Register = () => {
 
   const navigate = useNavigate();
   const authContext = useContext(AuthContext);
-
-  const { register, isLoading, isError, isSuccess, message, user } = authContext!;
+  const register = authContext?.register || (async () => {});
+  const isLoading = authContext?.isLoading || false;
+  const isError = authContext?.isError || false;
+  const isSuccess = authContext?.isSuccess || false;
+  const message = authContext?.message || '';
+  const user = authContext?.user || null;
 
   useEffect(() => {
     if (isError) {

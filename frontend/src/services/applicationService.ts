@@ -1,10 +1,6 @@
-import { apiUrl, authHeaders } from './apiClient';
+import { apiUrl, authHeaders, apiFetch } from './apiClient';
 
 const API_URL = apiUrl('/applications');
-
-const getAuthHeaders = () => {
-    return authHeaders();
-};
 
 export interface JobApplication {
     _id: string;
@@ -21,13 +17,9 @@ export interface JobApplication {
 
 export const getApplications = async () => {
     try {
-        const response = await fetch(API_URL, {
-            headers: getAuthHeaders()
+        const response = await apiFetch(API_URL, {
+            headers: authHeaders()
         });
-        if (!response.ok) {
-            const errJson = await response.json().catch(() => ({}));
-            throw new Error(errJson.message || errJson.error || 'Failed to fetch applications');
-        }
         return await response.json();
     } catch (error) {
         console.error('Error fetching applications:', error);
@@ -37,15 +29,11 @@ export const getApplications = async () => {
 
 export const saveApplication = async (data: Omit<JobApplication, '_id' | 'createdAt'>) => {
     try {
-        const response = await fetch(`${API_URL}/save`, {
+        const response = await apiFetch(`${API_URL}/save`, {
             method: 'POST',
-            headers: getAuthHeaders(),
+            headers: authHeaders(),
             body: JSON.stringify(data)
         });
-        if (!response.ok) {
-            const errJson = await response.json().catch(() => ({}));
-            throw new Error(errJson.message || errJson.error || 'Failed to save application');
-        }
         return await response.json();
     } catch (error) {
         console.error('Error saving application:', error);
@@ -55,15 +43,11 @@ export const saveApplication = async (data: Omit<JobApplication, '_id' | 'create
 
 export const updateApplication = async (id: string, data: Partial<JobApplication>) => {
     try {
-        const response = await fetch(`${API_URL}/${id}`, {
+        const response = await apiFetch(`${API_URL}/${id}`, {
             method: 'PUT',
-            headers: getAuthHeaders(),
+            headers: authHeaders(),
             body: JSON.stringify(data)
         });
-        if (!response.ok) {
-            const errJson = await response.json().catch(() => ({}));
-            throw new Error(errJson.message || errJson.error || 'Failed to update application');
-        }
         return await response.json();
     } catch (error) {
         console.error('Error updating application:', error);
@@ -73,14 +57,10 @@ export const updateApplication = async (id: string, data: Partial<JobApplication
 
 export const deleteApplication = async (id: string) => {
     try {
-        const response = await fetch(`${API_URL}/${id}`, {
+        const response = await apiFetch(`${API_URL}/${id}`, {
             method: 'DELETE',
-            headers: getAuthHeaders()
+            headers: authHeaders()
         });
-        if (!response.ok) {
-            const errJson = await response.json().catch(() => ({}));
-            throw new Error(errJson.message || errJson.error || 'Failed to delete application');
-        }
         return await response.json();
     } catch (error) {
         console.error('Error deleting application:', error);

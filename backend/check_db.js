@@ -1,1 +1,0 @@
-// Cleaned DB check script.

@@ -1,180 +1,195 @@
-# 🚀 Hire-X — Ultimate AI Resume Builder & Career Suite
+# 🚀 Hire-X — Enterprise AI Career Intelligence Suite
 
 <div align="center">
-  
-  [![React Version](https://img.shields.io/badge/React-18.x-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
-  [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-  [![Node.js](https://img.shields.io/badge/Node.js-18.x-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)](https://nodejs.org/)
-  [![MongoDB](https://img.shields.io/badge/MongoDB-9.x-47A248?style=for-the-badge&logo=mongodb&logoColor=white)](https://www.mongodb.com/)
-  [![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-3.x-38B2AC?style=for-the-badge&logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
-  [![License](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
+
+  <img src="https://img.shields.io/badge/React-18.3-61DAFB?style=for-the-badge&logo=react&logoColor=black" alt="React 18" />
+  <img src="https://img.shields.io/badge/TypeScript-5.5-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript 5" />
+  <img src="https://img.shields.io/badge/Node.js-18.x-339933?style=for-the-badge&logo=nodedotjs&logoColor=white" alt="Node.js 18" />
+  <img src="https://img.shields.io/badge/Express-5.2-000000?style=for-the-badge&logo=express&logoColor=white" alt="Express 5" />
+  <img src="https://img.shields.io/badge/MongoDB-Atlas-47A248?style=for-the-badge&logo=mongodb&logoColor=white" alt="MongoDB Atlas" />
+  <img src="https://img.shields.io/badge/OpenRouter-AI-FF6F61?style=for-the-badge&logo=openai&logoColor=white" alt="OpenRouter AI" />
+  <img src="https://img.shields.io/badge/Vercel-Deployed-000000?style=for-the-badge&logo=vercel&logoColor=white" alt="Vercel" />
+  <img src="https://img.shields.io/badge/Render-Deployed-46E3B7?style=for-the-badge&logo=render&logoColor=black" alt="Render" />
+
+  <br /><br />
 
   <p align="center">
-    <strong>An enterprise-grade, full-stack AI Career Suite that transforms job application workflows. Build high-fidelity ATS-optimized resumes with real-time responsive scaling, analyze descriptions against job descriptions, track job applications, and generate professional recruiter outreach cold emails.</strong>
+    <strong>Hire-X is an enterprise-grade, full-stack AI Career Intelligence Platform designed to transform modern job search workflows. Build high-fidelity ATS-optimized resumes with real-time responsive scaling, generate tailored recruiter cover letters and cold outreach emails, conduct interactive AI interview preparation sessions with RAG document knowledge retrieval, and manage job applications via a unified Kanban tracker.</strong>
   </p>
 
 </div>
 
 ---
 
-## 🌟 Key Features
+## 🌟 Key Features & Modules
 
-### 📄 1. High-Fidelity AI Resume Builder
-* **Premium Live Preview Canvas**: Features a responsive split-workspace design that auto-centers A4 resume canvas templates utilizing high-performance reactive `ResizeObserver` loops.
-* **4 Professional Templates**: Seamlessly switch between Modern, Classic, Creative, and Professional structures with beautiful typography and clean grid systems.
-* **Intelligent PDF Render Pipeline**: Generates flat, high-fidelity, high-resolution printable A4 PDFs that match the live canvas layout identically.
-* **Pristine State Placeholders**: Populates interactive dummy content instantly upon page load to give users immediate interactive design contexts.
-* **Data Sanitization**: Employs strict whitespace sanitization so that unused lists, experience sections, or project descriptions fade away elegantly without rendering empty bullet points or stray margins.
+### 📄 1. Live Interactive Resume Builder & PDF Engine
+* **A4 Canvas Live Preview**: Split-workspace interface featuring live template previews powered by high-performance `ResizeObserver` layout scaling.
+* **4 Professionally Styled Templates**: Modern, Classic, Creative, and Professional structures crafted with custom typography and grid layouts.
+* **Instant PDF Export**: Generates high-resolution, print-ready A4 PDFs matching the live canvas identically via `html2pdf.js`.
+* **Smart Data Sanitization**: Gracefully suppresses empty bullet points or unfilled experience blocks without ugly whitespace defects.
 
-### 🧠 2. Deep AI Recruiter Outreach & Chat
-* **AI Career Chatbot**: Instant interactive career counselling, resume feedback, and target job interview preparation.
-* **AI Cold Email Generator**: Creates customized, high-converting recruiter cold emails from a set of simple outreach parameters, persisting generated history directly to your secure user history dashboard.
+### ✉️ 2. Tailored AI Cover Letter Generator
+* **Role & Company Alignment**: Generates highly targeted, compelling cover letters by matching candidate resumes directly against target job descriptions.
+* **Tone & Experience Controls**: Customizable tone (Professional, Confident, Executive, Creative) and length controls (Short, Medium, Detailed).
+* **PDF Export & Persistent History**: Download tailored letters as clean PDFs and manage saved history items directly in your dashboard.
 
-### 🎯 3. ATS & Resume Description Analyzer
-* **Real-time Keyword Matcher**: Scans resume text against industry standard guidelines, returning matching and missing keyword indicators.
-* **ATS Compatibility Scoring**: Renders exact structural readability scores, found formatting defects, and overall strength levels based on specific targeted positions.
-* **Job Description Evaluator**: Directly compares active copy pasted descriptions against your current resume blocks, pinpointing key insertions and missing skills.
+### 🎯 3. ATS & Resume Compatibility Analyzer
+* **Real-time Keyword Matcher**: Analyzes candidate resume text against job descriptions, identifying missing skills and recommended insertions.
+* **ATS Compatibility Scoring**: Generates overall ATS readability scores, formatting issue breakdowns, and actionable feedback.
 
-### 📊 4. Job Application Kanban tracker
-* **Unified Kanban Tracking**: Save, update, and manage job pipelines (Applied, Interview, Offer, Rejected) along with salary scales, custom notes, links, and dates.
+### 📩 4. AI Cold Email Outreach Engine
+* **High-Converting Outreach**: Crafts personalized cold emails for recruiters, engineering managers, and founders based on personal notes and key tech stack experience.
+* **One-Click Clipboard & History**: Save outreach drafts and copy formatted body copy in one click.
+
+### 🎙️ 5. Interview Intelligence & RAG Knowledge Hub
+* **AI Interview Roadmaps**: Compiles custom preparation roadmaps based on company, role, and difficulty level.
+* **Question Stepping & Real-Time Answer Evaluation**: Generates adaptive questions and evaluates candidate answers with detailed feedback and model answers.
+* **RAG Document Knowledge Base**: Upload custom study notes and PDFs for vector-retrieved semantic context during mock interviews.
+* **Final Performance Analytics**: Detailed score breakdowns (Technical, Communication, System Design, Problem Solving) with custom study plans and career intelligence insights.
+
+### 📊 6. Job Application Kanban Tracker
+* **Pipeline Management**: Save, edit, and organize job applications across stages (`Applied`, `Interview`, `Offer`, `Rejected`).
+* **Detailed Records**: Track target roles, companies, dates applied, compensation ranges, links, and notes.
 
 ---
 
-## 🛠️ Technology Stack
+## 🏗️ Architecture & Technology Stack
 
 ```mermaid
 graph TD
-    Client[React + Vite Frontend] <--> |HTTPS / Auth Headers| API[Express + Node.js Backend]
-    API <--> |Mongoose ODM| DB[(MongoDB database)]
-    API <--> |JSON Payloads| OpenRouter[OpenRouter AI Provider]
+    Client[React + TypeScript + Vite Client] <--> |Centralized apiFetch Client| API[Express 5 + Node.js Backend API]
+    API <--> |Mongoose ODM (Indexed User Fields)| DB[(MongoDB Atlas Database)]
+    API <--> |Priority Queue + Fallbacks| OpenRouter[OpenRouter AI Gateway]
+    OpenRouter <--> |Resilient Model Chain| Models[Gemini 2.0 Flash / LLaMA 3.3 70B / Qwen 2.5 72B]
 ```
 
-### Frontend
-* **Core Framework**: React 18 & Vite (Supercharged dev startup)
-* **Type Safety**: TypeScript 5
-* **Styling**: TailwindCSS & Shadcn UI Components
-* **Dynamic Animations**: Framer Motion & Lucide Icons
-* **PDF Compile Engine**: `html2pdf.js` & `html2canvas`
-
-### Backend
-* **Runtime**: Node.js & Express 5
-* **Database Interface**: Mongoose 9 (MongoDB ODM)
-* **Auth**: JSON Web Tokens (JWT) & BcryptJS password hashing
-* **AI Provider**: OpenRouter Client integrations using robust fallback model routines (`google/gemini-flash-1.5`)
+### System Architecture Highlights
+* **Centralized API Client (`apiClient.ts`)**: Implements 30s/60s request timeouts, 1 automatic retry on network drops or 5xx failures, 401 token auto-clear, and normalized error messages.
+* **Feature-Based Modular Architecture (`src/features/`)**: Self-contained domain modules for Auth, Resume, Cover Letter, Cold Email, Interview, Application, Chat, and AI workflows.
+* **Resilient AI Pipeline**: Priority queueing (`AIRequestQueue`), request deduplication (`RequestDeduplicator`), pre-flight injection protection (`RequestValidator`), automatic model fallback switching, and character-by-character JSON healing (`JsonExtractor`).
 
 ---
 
-## 🚀 Getting Started
-
-### Prerequisites
-* **Node.js** (v18.x or higher)
-* **MongoDB** (Local instance running or MongoDB Atlas Connection string)
-* **OpenRouter API Key** (For powering the suite's AI modules)
-
----
-
-### 📂 Repository Folder Structure
+## 📁 Directory Structure
 
 ```
 Hire-XfinalVerdict/
-├── backend/            # Express REST API Server
-│   ├── config/         # Environment and Database connectors
-│   ├── controllers/    # Route controllers (AI, Auth, Resumes, Chats)
-│   ├── middleware/     # Auth checks, global Express error handlers
-│   ├── models/         # Mongoose DB Schemas
-│   └── routes/         # API Endpoint bindings
-├── frontend/           # Vite + React Client
-│   ├── src/
-│   │   ├── components/ # Premium UI blocks & Resume templates
-│   │   ├── context/    # Global Auth States
-│   │   ├── lib/        # Sanitization helpers
-│   │   ├── pages/      # Views (Generator, ATS, Tracker, Dashboard)
-│   │   └── services/   # Client API connectors
+├── DEPLOYMENT.md              # Production Deployment Guide (Vercel & Render)
+├── README.md                  # Main Repository Guide
+├── backend/                   # Node.js & Express API Server
+│   ├── config/                # Environment validation & DB connection setup
+│   ├── middleware/            # Auth protection & error handlers
+│   ├── models/                # Mongoose Schemas (Indexed User Fields)
+│   ├── routes/                # Express API Route Wrappers
+│   └── src/
+│       ├── ai/                # AI Request Engine (Queue, Prompts, Parsers)
+│       └── features/          # Feature Modules (Auth, CoverLetter, ColdEmail, Interview, etc.)
+├── frontend/                  # Vite + React Client App
+│   ├── vercel.json            # Vercel SPA routing rewrite rules & security headers
+│   └── src/
+│       ├── config/            # Centralized application constants
+│       ├── features/          # Feature UI Subcomponents
+│       ├── hooks/             # Custom Hooks (useCoverLetter, useColdEmail, etc.)
+│       ├── pages/             # Lazy-loaded page routes
+│       ├── services/          # Centralized apiFetch HTTP client & services
+│       └── types/             # Reusable TypeScript type definitions
+└── doc/                       # System Architecture & Production Operations Docs
 ```
 
 ---
 
-### 💻 Step-by-Step Installation
+## ⚡ Quick Start & Local Setup
 
-#### 1. Setup the Backend Server
+### Prerequisites
+- **Node.js** (v18.x or higher)
+- **MongoDB** (Local instance or MongoDB Atlas Connection string)
+- **OpenRouter API Key** (For powering AI features)
+
+---
+
+### 1. Setup Backend Server
+
 ```bash
-# Navigate to backend directory
+# Navigate to backend
 cd backend
 
-# Install all backend dependencies
+# Install dependencies
 npm install
 
-# Create your .env file from the example
+# Create environment configuration
 cp .env.example .env
 ```
 
-Configure your **`backend/.env`** file:
+Configure **`backend/.env`**:
 ```env
+NODE_ENV=development
 PORT=5000
 MONGO_URI=mongodb://127.0.0.1:27017/hirex
-JWT_SECRET=YOUR_SECURE_JWT_SECRET_KEY_AT_LEAST_32_CHARS
-OPENROUTER_API_KEY=your-openrouter-api-key
+JWT_SECRET=your_secure_random_jwt_secret_key_at_least_32_chars
+OPENROUTER_API_KEY=sk-or-v1-your-openrouter-key
+OPENROUTER_MODEL=google/gemini-2.0-flash-001
+CLIENT_URL=http://localhost:5173
 ```
 
-*Note: Ensure your `JWT_SECRET` is at least 32 characters long to satisfy security runtime validation constraints.*
-
-#### 2. Start the Backend Server
+Start the backend development server:
 ```bash
-# Start in development mode with Nodemon
 npm run dev
 ```
-
-The backend server will spin up on **`http://localhost:5000`** and log a successful MongoDB connection.
+The server will run at **`http://localhost:5000`**. You can verify health via `http://localhost:5000/api/health`.
 
 ---
 
-#### 3. Setup the Frontend Client
-```bash
-# Navigate to the frontend directory
-cd ../frontend
+### 2. Setup Frontend Client
 
-# Install all frontend dependencies
+```bash
+# Open a new terminal and navigate to frontend
+cd frontend
+
+# Install dependencies
 npm install
 
-# Create your .env file
-echo "VITE_API_URL=http://localhost:5000/api" > .env
+# Create environment configuration
+cp .env.example .env
 ```
 
-#### 4. Start the Frontend Client
+Configure **`frontend/.env`**:
+```env
+VITE_API_URL=http://localhost:5000/api
+```
+
+Start the Vite development client:
 ```bash
-# Start Vite development server
 npm run dev
 ```
-
-The frontend application will spin up on **`http://localhost:8080`** or **`http://localhost:5173`** with hot-module reloading enabled!
+The client app will launch at **`http://localhost:5173`** or **`http://localhost:8080`**.
 
 ---
 
-## 🏭 Production Build & Deployment
+## 🌐 Production Deployment
 
-To build the client app for production:
+Hire-X is fully prepared for SaaS production deployment:
+
+- **Frontend Deployment (Vercel)**: Detailed step-by-step instructions in [DEPLOYMENT.md](DEPLOYMENT.md#%-part-2-deploying-frontend-to-vercel).
+- **Backend Deployment (Render)**: Detailed step-by-step instructions in [DEPLOYMENT.md](DEPLOYMENT.md#%-part-1-deploying-backend-to-render).
+- **SRE & Production Readiness**: Operations guide in [doc/PRODUCTION_READINESS.md](doc/PRODUCTION_READINESS.md).
 
 ```bash
-cd frontend
-npm run build
-```
+# Verify Frontend Production Build locally
+cd frontend && npm run build
 
-This compiles optimized static bundles into the `dist` directory, fully prepared for deployment on hosting providers such as Vercel, Netlify, or AWS Amplify.
-
-To start the backend in production mode:
-```bash
-cd backend
-npm start
+# Verify Backend Engine locally
+cd backend && npm start
 ```
 
 ---
 
-## 🔒 Security & Best Practices
-* **Environment Validation**: Built-in backend validation verifies all environment parameters (JWT length, DB connectivity) prior to port binding to prevent failures in production.
-* **Robust Error Handling**: Explicit Express middleware captures database constraint failures (`Duplicate Resource 11000`), CastErrors, and validations, presenting user-friendly messages while keeping server logs safe.
-* **CORS Policies**: Pre-configured dynamic origin checking protects server access while supporting seamless development.
+## 📄 Documentation Index
+- 📘 [DEPLOYMENT.md](DEPLOYMENT.md) — Comprehensive Cloud Deployment Guide
+- 📙 [doc/ARCHITECTURE.md](doc/ARCHITECTURE.md) — Enterprise Architecture & AI Pipeline Overview
+- 📗 [doc/PRODUCTION_READINESS.md](doc/PRODUCTION_READINESS.md) — SRE Operations, Monitoring & Health Probes
 
 ---
 
-## 📄 License
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+## 📜 License
+This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.

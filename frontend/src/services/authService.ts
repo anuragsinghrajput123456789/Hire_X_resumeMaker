@@ -1,4 +1,4 @@
-import { apiUrl } from './apiClient';
+import { apiUrl, apiFetch } from './apiClient';
 
 const API_URL = apiUrl('/auth');
 
@@ -17,43 +17,33 @@ export interface AuthUser {
 
 // Register user
 export const register = async (userData: AuthFormData): Promise<AuthUser> => {
-  const response = await fetch(`${API_URL}/register`, {
+  const response = await apiFetch(`${API_URL}/register`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(userData),
+    skipAuthRedirect: true, // Auth endpoints should not trigger auth redirect
   });
 
   const data = await response.json();
-
-  if (response.ok) {
-    localStorage.setItem('user', JSON.stringify(data));
-  } else {
-    throw new Error(data.message || 'Registration failed');
-  }
-
+  localStorage.setItem('user', JSON.stringify(data));
   return data;
 };
 
 // Login user
 export const login = async (userData: AuthFormData): Promise<AuthUser> => {
-  const response = await fetch(`${API_URL}/login`, {
+  const response = await apiFetch(`${API_URL}/login`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(userData),
+    skipAuthRedirect: true, // Auth endpoints should not trigger auth redirect
   });
 
   const data = await response.json();
-
-  if (response.ok) {
-    localStorage.setItem('user', JSON.stringify(data));
-  } else {
-    throw new Error(data.message || 'Login failed');
-  }
-
+  localStorage.setItem('user', JSON.stringify(data));
   return data;
 };
 

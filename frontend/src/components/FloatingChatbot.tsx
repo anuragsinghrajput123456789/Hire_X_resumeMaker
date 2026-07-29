@@ -71,7 +71,7 @@ const FloatingChatbot = () => {
       }
       if (response.ok) {
         const data = await response.json();
-        setChatHistory(data);
+        setChatHistory(Array.isArray(data) ? data : []);
       }
     } catch (error) {
       console.error('Failed to fetch chat history:', error);
@@ -85,7 +85,7 @@ const FloatingChatbot = () => {
   }, [fetchChatHistory, isOpen, token]);
 
   const loadChat = (chat: ChatSession) => {
-    setMessages(chat.messages);
+    setMessages(chat.messages || []);
     setCurrentChatId(chat._id);
     setShowHistory(false);
   };

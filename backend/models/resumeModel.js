@@ -4,7 +4,8 @@ const resumeSchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
-    required: true
+    required: true,
+    index: true
   },
   templateId: {
     type: String,
@@ -45,6 +46,10 @@ const resumeSchema = new mongoose.Schema({
     title: String,
     content: String
   }],
+  fontSizeAdjustment: { type: Number, default: 0 },
+  lineHeightAdjustment: { type: String, default: 'normal' },
+  spacingAdjustment: { type: String, default: 'normal' },
+  targetPages: { type: String, default: 'auto' },
   createdAt: {
     type: Date,
     default: Date.now

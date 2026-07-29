@@ -49,6 +49,8 @@ const ResumeGenerator = ({ onResumeGenerated }: { onResumeGenerated: (resume: st
   const [fontSizeAdjustment, setFontSizeAdjustment] = useState<number>(0);
   const [lineHeightAdjustment, setLineHeightAdjustment] = useState<string>('normal');
   const [spacingAdjustment, setSpacingAdjustment] = useState<string>('normal');
+  const [targetPages, setTargetPages] = useState<'auto' | '1' | '2'>('auto');
+  const [activeResumeId, setActiveResumeId] = useState<string | null>(null);
   const { toast } = useToast();
   
   const containerRef = useRef<HTMLDivElement>(null);
@@ -156,10 +158,10 @@ const ResumeGenerator = ({ onResumeGenerated }: { onResumeGenerated: (resume: st
     try {
       const processedData: ResumeData = {
         ...data,
-        skills: data.skills.split(',').map(s => s.trim()).filter(s => s.length > 0),
-        certifications: data.certifications.split(',').map(s => s.trim()).filter(s => s.length > 0),
-        languages: data.languages ? data.languages.split(',').map(s => s.trim()).filter(s => s.length > 0) : [],
-        achievements: data.achievements ? data.achievements.split(',').map(s => s.trim()).filter(s => s.length > 0) : []
+        skills: (data.skills || '').split(',').map(s => s.trim()).filter(s => s.length > 0),
+        certifications: (data.certifications || '').split(',').map(s => s.trim()).filter(s => s.length > 0),
+        languages: data.languages ? (data.languages || '').split(',').map(s => s.trim()).filter(s => s.length > 0) : [],
+        achievements: data.achievements ? (data.achievements || '').split(',').map(s => s.trim()).filter(s => s.length > 0) : []
       };
 
       const atsResponse = await generateResume(processedData);
@@ -244,10 +246,10 @@ const ResumeGenerator = ({ onResumeGenerated }: { onResumeGenerated: (resume: st
 
     const currentData = watchedData.fullName ? {
       ...watchedData,
-      skills: watchedData.skills.split(',').map(s => s.trim()).filter(s => s.length > 0),
-      certifications: watchedData.certifications.split(',').map(s => s.trim()).filter(s => s.length > 0),
-      languages: watchedData.languages ? watchedData.languages.split(',').map(s => s.trim()).filter(s => s.length > 0) : [],
-      achievements: watchedData.achievements ? watchedData.achievements.split(',').map(s => s.trim()).filter(s => s.length > 0) : []
+      skills: (watchedData.skills || '').split(',').map(s => s.trim()).filter(s => s.length > 0),
+      certifications: (watchedData.certifications || '').split(',').map(s => s.trim()).filter(s => s.length > 0),
+      languages: watchedData.languages ? (watchedData.languages || '').split(',').map(s => s.trim()).filter(s => s.length > 0) : [],
+      achievements: watchedData.achievements ? (watchedData.achievements || '').split(',').map(s => s.trim()).filter(s => s.length > 0) : []
     } : generatedData;
 
     if (!currentData) {
@@ -262,11 +264,19 @@ const ResumeGenerator = ({ onResumeGenerated }: { onResumeGenerated: (resume: st
     try {
       const resumeToSave = {
         ...currentData,
+        _id: activeResumeId || undefined,
         templateId: selectedTemplate,
-        customSections 
+        customSections,
+        fontSizeAdjustment,
+        lineHeightAdjustment,
+        spacingAdjustment,
+        targetPages
       };
       
-      await resumeService.saveResume(resumeToSave);
+      const saved = await resumeService.saveResume(resumeToSave);
+      if (saved && saved.data && saved.data._id) {
+        setActiveResumeId(saved.data._id);
+      }
       toast({
         title: "Success",
         description: "Resume saved successfully!",
@@ -345,6 +355,20 @@ const ResumeGenerator = ({ onResumeGenerated }: { onResumeGenerated: (resume: st
     };
 
     reset(formData);
+
+    setActiveResumeId(resume._id);
+    if (resume.fontSizeAdjustment !== undefined) {
+      setFontSizeAdjustment(resume.fontSizeAdjustment);
+    }
+    if (resume.lineHeightAdjustment) {
+      setLineHeightAdjustment(resume.lineHeightAdjustment);
+    }
+    if (resume.spacingAdjustment) {
+      setSpacingAdjustment(resume.spacingAdjustment);
+    }
+    if (resume.targetPages) {
+      setTargetPages(resume.targetPages as 'auto' | '1' | '2');
+    }
 
     if (resume.templateId) {
       setSelectedTemplate(resume.templateId as TemplateId);
@@ -645,6 +669,39 @@ const ResumeGenerator = ({ onResumeGenerated }: { onResumeGenerated: (resume: st
     };
   }, [previewData, selectedTemplate, customSections, fontSizeAdjustment, lineHeightAdjustment, spacingAdjustment]);
 
+  // Smart Auto-Fit Engine Effect
+  useEffect(() => {
+    if (targetPages === 'auto') return;
+
+    const limit = targetPages === '1' ? 1123 : 2246;
+
+    // Small delay to let the height recalculate before measuring
+    const timer = setTimeout(() => {
+      if (previewHeight > limit) {
+        if (spacingAdjustment !== 'compact') {
+          setSpacingAdjustment('compact');
+        } else if (fontSizeAdjustment > -3) {
+          setFontSizeAdjustment(prev => Math.max(-3, prev - 1));
+        } else if (lineHeightAdjustment !== 'tight') {
+          setLineHeightAdjustment('tight');
+        }
+      } else if (previewHeight < limit - 100) {
+        // Gently scale back up if there's plenty of space to maximize aesthetics
+        if (fontSizeAdjustment < 0) {
+          setFontSizeAdjustment(prev => prev + 1);
+        } else if (lineHeightAdjustment === 'tight') {
+          setLineHeightAdjustment('normal');
+        } else if (spacingAdjustment === 'compact') {
+          setSpacingAdjustment('normal');
+        }
+      }
+    }, 100);
+
+    return () => clearTimeout(timer);
+  }, [previewHeight, targetPages, selectedTemplate]);
+
+  const computedPreviewHeight = targetPages === '1' ? 1123 : targetPages === '2' ? 2246 : previewHeight;
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 relative pb-20">
       
@@ -854,27 +911,54 @@ const ResumeGenerator = ({ onResumeGenerated }: { onResumeGenerated: (resume: st
             </div>
           </CardHeader>
 
-          {/* Advanced Resizing & Spacing Settings Sub-Bar */}
-          <div className="bg-[#0A0E1A]/60 border-b border-indigo-500/10 p-3 shrink-0 flex flex-wrap items-center justify-between gap-4 text-xs font-semibold select-none z-15">
-            <div className="flex items-center gap-6 flex-wrap">
+          {/* Upgraded Premium Resizing & Spacing Settings Bar */}
+          <div className="bg-[#0A0E1A]/80 border-b border-indigo-500/10 p-3 shrink-0 flex flex-wrap items-center justify-between gap-4 text-xs font-semibold select-none z-15 backdrop-blur-md">
+            <div className="flex items-center gap-5 flex-wrap">
+              {/* Target Page Selector */}
+              <div className="flex items-center gap-2">
+                <span className="text-slate-400 font-bold uppercase tracking-wider text-[9px] flex items-center gap-1.5">
+                  <Layout className="w-3 h-3 text-indigo-400" /> Target Page:
+                </span>
+                <div className="flex items-center bg-white/[0.02] border border-white/[0.04] p-0.5 rounded-lg gap-0.5">
+                  {[
+                    { val: 'auto', label: 'Auto' },
+                    { val: '1', label: '1 Page' },
+                    { val: '2', label: '2 Pages' }
+                  ].map((p) => (
+                    <button
+                      key={p.val}
+                      type="button"
+                      onClick={() => setTargetPages(p.val as 'auto' | '1' | '2')}
+                      className={`px-2 py-1 rounded-md text-[9px] font-bold uppercase tracking-wider transition-all duration-200 ${
+                        targetPages === p.val ? 'bg-indigo-500/15 border border-indigo-500/30 text-indigo-400 shadow-sm shadow-indigo-500/5' : 'text-slate-500 hover:text-slate-300 border border-transparent'
+                      }`}
+                    >
+                      {p.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
               {/* Font Size Adjuster */}
-              <div className="flex items-center gap-2.5">
-                <span className="text-slate-400 font-bold uppercase tracking-wider text-[10px]">Font Size:</span>
-                <div className="flex items-center gap-1.5 bg-white/[0.02] border border-white/[0.04] p-0.5 rounded-lg">
+              <div className="flex items-center gap-2">
+                <span className="text-slate-400 font-bold uppercase tracking-wider text-[9px] flex items-center gap-1.5">
+                  <span className="text-xs text-indigo-400 font-black">A</span> Size:
+                </span>
+                <div className="flex items-center gap-1 bg-white/[0.02] border border-white/[0.04] p-0.5 rounded-lg">
                   <button 
                     type="button"
                     onClick={() => setFontSizeAdjustment(prev => Math.max(-3, prev - 1))}
-                    className="w-6 h-6 rounded-md hover:bg-white/5 text-slate-400 hover:text-white transition-colors font-bold text-xs"
+                    className="w-5.5 h-5.5 rounded-md hover:bg-white/5 text-slate-400 hover:text-white transition-colors font-bold text-xs"
                   >
                     A-
                   </button>
-                  <span className="text-indigo-400 px-1 text-[10px] font-bold min-w-[20px] text-center">
+                  <span className="text-indigo-400 px-1 text-[9px] font-bold min-w-[20px] text-center">
                     {fontSizeAdjustment >= 0 ? `+${fontSizeAdjustment}` : fontSizeAdjustment}px
                   </span>
                   <button 
                     type="button"
                     onClick={() => setFontSizeAdjustment(prev => Math.min(3, prev + 1))}
-                    className="w-6 h-6 rounded-md hover:bg-white/5 text-slate-400 hover:text-white transition-colors font-bold text-xs"
+                    className="w-5.5 h-5.5 rounded-md hover:bg-white/5 text-slate-400 hover:text-white transition-colors font-bold text-xs"
                   >
                     A+
                   </button>
@@ -882,8 +966,8 @@ const ResumeGenerator = ({ onResumeGenerated }: { onResumeGenerated: (resume: st
               </div>
 
               {/* Line Height Selector */}
-              <div className="flex items-center gap-2.5">
-                <span className="text-slate-400 font-bold uppercase tracking-wider text-[10px]">Line Height:</span>
+              <div className="flex items-center gap-2">
+                <span className="text-slate-400 font-bold uppercase tracking-wider text-[9px]">Height:</span>
                 <div className="flex items-center bg-white/[0.02] border border-white/[0.04] p-0.5 rounded-lg gap-0.5">
                   {['tight', 'normal', 'loose'].map((lh) => (
                     <button
@@ -891,7 +975,7 @@ const ResumeGenerator = ({ onResumeGenerated }: { onResumeGenerated: (resume: st
                       type="button"
                       onClick={() => setLineHeightAdjustment(lh)}
                       className={`px-2 py-1 rounded-md text-[9px] font-bold uppercase tracking-wider transition-all duration-200 ${
-                        lineHeightAdjustment === lh ? 'bg-white/[0.06] border border-white/[0.08] text-indigo-400 shadow-sm' : 'text-slate-500 hover:text-slate-300'
+                        lineHeightAdjustment === lh ? 'bg-indigo-500/15 border border-indigo-500/30 text-indigo-400 shadow-sm' : 'text-slate-500 hover:text-slate-300 border border-transparent'
                       }`}
                     >
                       {lh}
@@ -901,8 +985,8 @@ const ResumeGenerator = ({ onResumeGenerated }: { onResumeGenerated: (resume: st
               </div>
 
               {/* Section Spacing Selector */}
-              <div className="flex items-center gap-2.5">
-                <span className="text-slate-400 font-bold uppercase tracking-wider text-[10px]">Spacing:</span>
+              <div className="flex items-center gap-2">
+                <span className="text-slate-400 font-bold uppercase tracking-wider text-[9px]">Spacing:</span>
                 <div className="flex items-center bg-white/[0.02] border border-white/[0.04] p-0.5 rounded-lg gap-0.5">
                   {['compact', 'normal', 'spacious'].map((sp) => (
                     <button
@@ -910,7 +994,7 @@ const ResumeGenerator = ({ onResumeGenerated }: { onResumeGenerated: (resume: st
                       type="button"
                       onClick={() => setSpacingAdjustment(sp)}
                       className={`px-2 py-1 rounded-md text-[9px] font-bold uppercase tracking-wider transition-all duration-200 ${
-                        spacingAdjustment === sp ? 'bg-white/[0.06] border border-white/[0.08] text-indigo-400 shadow-sm' : 'text-slate-500 hover:text-slate-300'
+                        spacingAdjustment === sp ? 'bg-indigo-500/15 border border-indigo-500/30 text-indigo-400 shadow-sm' : 'text-slate-500 hover:text-slate-300 border border-transparent'
                       }`}
                     >
                       {sp}
@@ -927,6 +1011,7 @@ const ResumeGenerator = ({ onResumeGenerated }: { onResumeGenerated: (resume: st
                 setFontSizeAdjustment(0);
                 setLineHeightAdjustment('normal');
                 setSpacingAdjustment('normal');
+                setTargetPages('auto');
               }}
               className="text-[9px] font-bold uppercase tracking-widest text-slate-500 hover:text-rose-400 transition-colors"
             >
@@ -949,7 +1034,7 @@ const ResumeGenerator = ({ onResumeGenerated }: { onResumeGenerated: (resume: st
                   <div 
                     style={{ 
                       width: `${794 * scale}px`, 
-                      height: `${previewHeight * scale}px`, 
+                      height: `${computedPreviewHeight * scale}px`, 
                       overflow: 'hidden',
                       position: 'relative',
                       transition: 'all 0.15s ease-out'
@@ -969,6 +1054,32 @@ const ResumeGenerator = ({ onResumeGenerated }: { onResumeGenerated: (resume: st
                         boxShadow: '0 25px 50px -12px rgb(0 0 0 / 0.25)'
                       }}
                     >
+                      {/* Virtual A4 Page Guidelines */}
+                      {previewHeight > 1123 && (
+                        <div 
+                          data-html2canvas-ignore="true"
+                          className="absolute left-0 right-0 border-b border-dashed border-rose-500/40 pointer-events-none z-[40] print:hidden" 
+                          style={{ top: '1123px' }}
+                        >
+                          <div className="absolute right-4 -top-2 bg-rose-500 text-white text-[8px] font-black px-2 py-0.5 rounded shadow flex items-center gap-1 select-none">
+                            <span className="w-1 h-1 rounded-full bg-white animate-pulse" />
+                            PAGE 1 LIMIT (A4)
+                          </div>
+                        </div>
+                      )}
+                      {previewHeight > 2246 && (
+                        <div 
+                          data-html2canvas-ignore="true"
+                          className="absolute left-0 right-0 border-b border-dashed border-rose-500/40 pointer-events-none z-[40] print:hidden" 
+                          style={{ top: '2246px' }}
+                        >
+                          <div className="absolute right-4 -top-2 bg-rose-500 text-white text-[8px] font-black px-2 py-0.5 rounded shadow flex items-center gap-1 select-none">
+                            <span className="w-1 h-1 rounded-full bg-white animate-pulse" />
+                            PAGE 2 LIMIT (A4)
+                          </div>
+                        </div>
+                      )}
+
                       {selectedTemplate === 'modern' && <ModernTemplate data={previewData} customSections={customSections} fontSizeAdjustment={fontSizeAdjustment} lineHeightAdjustment={lineHeightAdjustment} spacingAdjustment={spacingAdjustment} />}
                       {selectedTemplate === 'classic' && <ClassicTemplate data={previewData} customSections={customSections} fontSizeAdjustment={fontSizeAdjustment} lineHeightAdjustment={lineHeightAdjustment} spacingAdjustment={spacingAdjustment} />}
                       {selectedTemplate === 'creative' && <CreativeTemplate data={previewData} customSections={customSections} fontSizeAdjustment={fontSizeAdjustment} lineHeightAdjustment={lineHeightAdjustment} spacingAdjustment={spacingAdjustment} />}

@@ -1,5 +1,5 @@
 import { ResumeData } from '../types/resumeTypes';
-import { apiUrl, authHeaders } from './apiClient';
+import { apiUrl, authHeaders, apiFetch } from './apiClient';
 
 const API_URL = apiUrl('/ai');
 
@@ -33,32 +33,18 @@ export interface JobDescriptionAnalysis {
   }>;
 }
 
-const handleResponse = async (response: Response, functionName: string) => {
-    if (!response.ok) {
-        const text = await response.text();
-        console.error(`API Error in ${functionName}:`, response.status, response.statusText, text);
-        let errorMessage = `Failed to ${functionName} (Status ${response.status})`;
-        try {
-            const json = JSON.parse(text);
-            if (json.error || json.message) {
-                errorMessage = json.error || json.message;
-            }
-        } catch {
-            errorMessage = `Failed to ${functionName}: ${text.substring(0, 100)}...`;
-        }
-        throw new Error(errorMessage);
-    }
-    return await response.json();
-};
+// AI requests get a longer timeout (60s) since they involve LLM processing
+const AI_TIMEOUT = 60_000;
 
 export const analyzeResumeRealTime = async (resumeText: string, jobRole: string): Promise<RealTimeAnalysis> => {
     try {
-        const response = await fetch(`${API_URL}/analyze-resume-realtime`, {
+        const response = await apiFetch(`${API_URL}/analyze-resume-realtime`, {
             method: 'POST',
             headers: authHeaders(),
-            body: JSON.stringify({ resumeText, jobRole })
+            body: JSON.stringify({ resumeText, jobRole }),
+            timeoutMs: AI_TIMEOUT,
         });
-        return await handleResponse(response, 'analyze resume real-time');
+        return await response.json();
     } catch (error) {
         console.error("analyzeResumeRealTime error:", error);
         throw error;
@@ -67,12 +53,13 @@ export const analyzeResumeRealTime = async (resumeText: string, jobRole: string)
 
 export const analyzeResume = async (resumeText: string, jobRole?: string): Promise<AnalysisResult> => {
     try {
-        const response = await fetch(`${API_URL}/analyze-resume`, {
+        const response = await apiFetch(`${API_URL}/analyze-resume`, {
             method: 'POST',
             headers: authHeaders(),
-            body: JSON.stringify({ resumeText, jobRole })
+            body: JSON.stringify({ resumeText, jobRole }),
+            timeoutMs: AI_TIMEOUT,
         });
-        return await handleResponse(response, 'analyze resume');
+        return await response.json();
     } catch (error) {
          console.error("analyzeResume error:", error);
          throw error;
@@ -81,12 +68,13 @@ export const analyzeResume = async (resumeText: string, jobRole?: string): Promi
 
 export const analyzeJobDescription = async (resumeText: string, jobDescription: string): Promise<JobDescriptionAnalysis> => {
     try {
-        const response = await fetch(`${API_URL}/analyze-job`, {
+        const response = await apiFetch(`${API_URL}/analyze-job`, {
             method: 'POST',
             headers: authHeaders(),
-            body: JSON.stringify({ resumeText, jobDescription })
+            body: JSON.stringify({ resumeText, jobDescription }),
+            timeoutMs: AI_TIMEOUT,
         });
-        return await handleResponse(response, 'analyze job description');
+        return await response.json();
     } catch (error) {
         console.error("analyzeJobDescription error:", error);
         throw error;
@@ -95,12 +83,13 @@ export const analyzeJobDescription = async (resumeText: string, jobDescription: 
 
 export const generateResumeContent = async (prompt: string): Promise<string> => {
     try {
-        const response = await fetch(`${API_URL}/generate-content`, {
+        const response = await apiFetch(`${API_URL}/generate-content`, {
             method: 'POST',
             headers: authHeaders(),
-            body: JSON.stringify({ prompt })
+            body: JSON.stringify({ prompt }),
+            timeoutMs: AI_TIMEOUT,
         });
-        const data = await handleResponse(response, 'generate content');
+        const data = await response.json();
         return data.result;
     } catch (error) {
         console.error("generateResumeContent error:", error);
@@ -115,12 +104,13 @@ export interface GenerateResumeResponse {
 
 export const generateResume = async (data: ResumeData): Promise<GenerateResumeResponse> => {
     try {
-        const response = await fetch(`${API_URL}/generate-resume`, {
+        const response = await apiFetch(`${API_URL}/generate-resume`, {
             method: 'POST',
             headers: authHeaders(),
-            body: JSON.stringify({ data })
+            body: JSON.stringify({ data }),
+            timeoutMs: AI_TIMEOUT,
         });
-        const resData = await handleResponse(response, 'generate resume');
+        const resData = await response.json();
         return {
             result: resData.result,
             parsedData: resData.parsedData
@@ -133,12 +123,13 @@ export const generateResume = async (data: ResumeData): Promise<GenerateResumeRe
 
 export const getJobSuggestions = async (resumeText: string, targetRole?: string): Promise<string> => {
     try {
-        const response = await fetch(`${API_URL}/job-suggestions`, {
+        const response = await apiFetch(`${API_URL}/job-suggestions`, {
             method: 'POST',
             headers: authHeaders(),
-            body: JSON.stringify({ resumeText, targetRole })
+            body: JSON.stringify({ resumeText, targetRole }),
+            timeoutMs: AI_TIMEOUT,
         });
-        const data = await handleResponse(response, 'get job suggestions');
+        const data = await response.json();
         return data.result;
     } catch (error) {
          console.error("getJobSuggestions error:", error);
@@ -148,12 +139,13 @@ export const getJobSuggestions = async (resumeText: string, targetRole?: string)
 
 export const generateChatResponse = async (message: string, history?: { role: string, content: string }[]): Promise<string> => {
     try {
-        const response = await fetch(`${API_URL}/chat`, {
+        const response = await apiFetch(`${API_URL}/chat`, {
             method: 'POST',
             headers: authHeaders(),
-            body: JSON.stringify({ message, history })
+            body: JSON.stringify({ message, history }),
+            timeoutMs: AI_TIMEOUT,
         });
-        const data = await handleResponse(response, 'generate chat response');
+        const data = await response.json();
         return data.result;
     } catch (error) {
          console.error("generateChatResponse error:", error);
@@ -163,15 +155,51 @@ export const generateChatResponse = async (message: string, history?: { role: st
 
 export const generateColdEmail = async (prompt: string): Promise<string> => {
     try {
-        const response = await fetch(`${API_URL}/cold-email`, {
+        const response = await apiFetch(`${API_URL}/cold-email`, {
             method: 'POST',
             headers: authHeaders(),
-            body: JSON.stringify({ prompt })
+            body: JSON.stringify({ prompt }),
+            timeoutMs: AI_TIMEOUT,
         });
-        const data = await handleResponse(response, 'generate cold email');
+        const data = await response.json();
         return data.result;
     } catch (error) {
          console.error("generateColdEmail error:", error);
          throw error;
-    }
+     }
+};
+
+export interface CoverLetterResponse {
+  company: string;
+  jobTitle: string;
+  opening: string;
+  experience: string;
+  skills: string;
+  closing: string;
+  coverLetter: string;
+  missingSkills: string[];
+  recommendedChanges: string[];
+}
+
+export const generateCoverLetter = async (params: {
+  resumeText: string;
+  jobDescription: string;
+  tone?: string;
+  length?: string;
+  experienceLevel?: string;
+  companyName?: string;
+  jobTitle?: string;
+}): Promise<CoverLetterResponse> => {
+  try {
+    const response = await apiFetch(`${API_URL}/cover-letter`, {
+      method: 'POST',
+      headers: authHeaders(),
+      body: JSON.stringify(params),
+      timeoutMs: AI_TIMEOUT,
+    });
+    return await response.json();
+  } catch (error) {
+    console.error("generateCoverLetter error:", error);
+    throw error;
+  }
 };

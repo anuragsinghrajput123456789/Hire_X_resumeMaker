@@ -24,13 +24,19 @@ const protect = asyncHandler(async (req, res, next) => {
         throw new Error('Not authorized, user not found');
       }
 
-      next();
+      return next();
     } catch (error) {
+      // If the error was already a 401 from user-not-found, re-throw as-is
+      if (res.statusCode === 401) {
+        throw error;
+      }
+      // Token verification failed (expired, malformed, etc.)
       res.status(401);
       throw new Error('Not authorized, token failed');
     }
   }
 
+  // No Authorization header at all
   if (!token) {
     res.status(401);
     throw new Error('Not authorized, no token');
