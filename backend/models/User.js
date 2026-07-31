@@ -23,11 +23,20 @@ const userSchema = mongoose.Schema(
       type: Number,
       default: 0,
     },
+    role: {
+      type: String,
+      enum: ['user', 'admin'],
+      default: 'user',
+    },
   },
   {
     timestamps: true,
   }
 );
+
+// Indexes for database performance
+userSchema.index({ email: 1 });
+userSchema.index({ createdAt: -1 });
 
 // Encrypt password using bcrypt
 userSchema.pre('save', async function (next) {

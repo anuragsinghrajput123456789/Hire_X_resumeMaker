@@ -3,24 +3,81 @@ import { generateColdEmail } from '../services/aiService';
 import { saveColdEmail, getColdEmailHistory, deleteColdEmail } from '../services/coldEmailService';
 import { useToast } from '../components/ui/use-toast';
 
+export const TONE_OPTIONS = [
+  { id: 'persuasive', label: 'Persuasive & Impact-Driven', icon: '⚡' },
+  { id: 'direct', label: 'Short & Direct (< 150 words)', icon: '🎯' },
+  { id: 'executive', label: 'Formal & Executive', icon: '💼' },
+  { id: 'casual', label: 'Casual & Friendly', icon: '☕' },
+];
+
+export const GOAL_OPTIONS = [
+  { id: 'job_inquiry', label: 'Direct Job Inquiry' },
+  { id: 'networking', label: 'Networking & Advice' },
+  { id: 'referral', label: 'Internal Referral Request' },
+  { id: 'follow_up', label: 'Application Follow Up' },
+];
+
+export const CTA_OPTIONS = [
+  { id: 'call_15', label: '15-min Intro Call' },
+  { id: 'resume_review', label: 'Resume Review' },
+  { id: 'quick_reply', label: 'Simple Reply' },
+];
+
 export const useColdEmail = (token?: string) => {
   const { toast } = useToast();
 
+  // Form Fields State
   const [recipientName, setRecipientName] = useState('');
   const [recipientEmail, setRecipientEmail] = useState('');
   const [recipientCompany, setRecipientCompany] = useState('');
   const [recipientRole, setRecipientRole] = useState('');
+
   const [senderName, setSenderName] = useState('');
   const [senderEmail, setSenderEmail] = useState('');
   const [jobTitle, setJobTitle] = useState('');
   const [experience, setExperience] = useState('');
   const [skills, setSkills] = useState('');
   const [personalNote, setPersonalNote] = useState('');
+  const [portfolioUrl, setPortfolioUrl] = useState('');
 
+  // Strategy Presets
+  const [tone, setTone] = useState('persuasive');
+  const [goal, setGoal] = useState('job_inquiry');
+  const [ctaType, setCtaType] = useState('call_15');
+
+  // Status & Generation State
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedEmail, setGeneratedEmail] = useState('');
+  const [subjectLine, setSubjectLine] = useState('');
+  const [emailBody, setEmailBody] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [history, setHistory] = useState<any[]>([]);
+
+  // Parse subject line and body from raw AI generated content
+  const parseGeneratedEmail = (content: string) => {
+    if (!content) {
+      setSubjectLine('');
+      setEmailBody('');
+      return;
+    }
+
+    const subjectMatch = content.match(/^Subject:\s*(.*(?:\r?\n|$))/i);
+    if (subjectMatch) {
+      const extractedSub = subjectMatch[1].trim();
+      const extractedBody = content.replace(/^Subject:\s*.*(?:\r?\n)+/i, '').trim();
+      setSubjectLine(extractedSub);
+      setEmailBody(extractedBody);
+    } else {
+      const lines = content.split('\n');
+      if (lines[0].toLowerCase().includes('subject')) {
+        setSubjectLine(lines[0].replace(/subject:\s*/i, '').trim());
+        setEmailBody(lines.slice(1).join('\n').trim());
+      } else {
+        setSubjectLine(`Application for ${jobTitle || 'Target Role'} - ${senderName || 'Candidate'}`);
+        setEmailBody(content.trim());
+      }
+    }
+  };
 
   const fetchHistory = useCallback(async () => {
     try {
@@ -38,38 +95,71 @@ export const useColdEmail = (token?: string) => {
   }, [token, fetchHistory]);
 
   const handleGenerate = async () => {
-    if (!recipientName.trim() || !jobTitle.trim()) {
+    if (!recipientName.trim()) {
       toast({
-        title: 'Missing Required Fields',
-        description: 'Please specify at least the recipient name and job title.',
+        title: 'Recipient Name Required',
+        description: 'Please enter the name of the recipient (e.g. Sarah Jenkins).',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    if (!jobTitle.trim()) {
+      toast({
+        title: 'Target Job Title Required',
+        description: 'Please specify the position you are applying for.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    if (!recipientCompany.trim()) {
+      toast({
+        title: 'Company Name Required',
+        description: 'Please specify the target company name.',
         variant: 'destructive',
       });
       return;
     }
 
     setIsGenerating(true);
-    setGeneratedEmail('');
+
+    const selectedToneLabel = TONE_OPTIONS.find((t) => t.id === tone)?.label || tone;
+    const selectedGoalLabel = GOAL_OPTIONS.find((g) => g.id === goal)?.label || goal;
+    const selectedCtaLabel = CTA_OPTIONS.find((c) => c.id === ctaType)?.label || ctaType;
 
     const prompt = `
-Write a highly compelling, personalized cold email for a job opportunity.
+Write a high-converting, tailored cold outreach email.
 Recipient Name: ${recipientName}
-${recipientCompany ? `Company: ${recipientCompany}` : ''}
-${recipientRole ? `Recipient Role: ${recipientRole}` : ''}
-Sender Name: ${senderName || 'Job Applicant'}
+Target Company: ${recipientCompany}
+${recipientRole ? `Recipient Title/Role: ${recipientRole}` : ''}
+${recipientEmail ? `Recipient Email: ${recipientEmail}` : ''}
+Sender Name: ${senderName || 'Candidate'}
+${senderEmail ? `Sender Email: ${senderEmail}` : ''}
 Target Job Title: ${jobTitle}
-${experience ? `Experience Overview: ${experience}` : ''}
-${skills ? `Key Skills: ${skills}` : ''}
-${personalNote ? `Personal Note / Context: ${personalNote}` : ''}
+${skills ? `Key Skills & Stack: ${skills}` : ''}
+${experience ? `Experience Overview & Key Achievements: ${experience}` : ''}
+${personalNote ? `Specific Context / Reference / Blog / Project: ${personalNote}` : ''}
+${portfolioUrl ? `Portfolio / GitHub / LinkedIn: ${portfolioUrl}` : ''}
 
-Generate a clear subject line and professional body text. Format with subject on top.
+OUTREACH STRATEGY PARAMETERS:
+- Overall Tone: ${selectedToneLabel}
+- Outreach Primary Goal: ${selectedGoalLabel}
+- Requested Call to Action: ${selectedCtaLabel}
+
+CRITICAL FORMATTING INSTRUCTIONS:
+1. Provide a crisp, high-open-rate Subject Line starting with "Subject: ".
+2. Follow with a personalized email body that grabs attention, highlights relevant value/skills immediately, and ends with a clear, low-friction Call to Action.
+3. Include a clean sign-off with candidate contact details.
 `;
 
     try {
       const result = await generateColdEmail(prompt);
       setGeneratedEmail(result);
+      parseGeneratedEmail(result);
       toast({
-        title: 'Email Generated!',
-        description: 'Your personalized cold outreach email is ready.',
+        title: 'Cold Email Crafted!',
+        description: 'Your personalized outreach message is ready to send.',
       });
     } catch (error: any) {
       toast({
@@ -102,8 +192,8 @@ Generate a clear subject line and professional body text. Format with subject on
 
       setHistory((prev) => [saved, ...prev]);
       toast({
-        title: 'Email Saved!',
-        description: 'Saved to history.',
+        title: 'Email Saved to History!',
+        description: 'You can revisit or re-copy this outreach draft anytime.',
       });
     } catch (error: any) {
       toast({
@@ -133,6 +223,13 @@ Generate a clear subject line and professional body text. Format with subject on
     }
   };
 
+  const getGmailComposerUrl = () => {
+    const toParam = encodeURIComponent(recipientEmail || '');
+    const subjectParam = encodeURIComponent(subjectLine || `Application for ${jobTitle} - ${senderName}`);
+    const bodyParam = encodeURIComponent(emailBody || generatedEmail);
+    return `https://mail.google.com/mail/?view=cm&fs=1&to=${toParam}&su=${subjectParam}&body=${bodyParam}`;
+  };
+
   return {
     recipientName, setRecipientName,
     recipientEmail, setRecipientEmail,
@@ -144,12 +241,20 @@ Generate a clear subject line and professional body text. Format with subject on
     experience, setExperience,
     skills, setSkills,
     personalNote, setPersonalNote,
+    portfolioUrl, setPortfolioUrl,
+    tone, setTone,
+    goal, setGoal,
+    ctaType, setCtaType,
     isGenerating,
     generatedEmail,
+    subjectLine, setSubjectLine,
+    emailBody, setEmailBody,
     isSaving,
     history,
     handleGenerate,
     handleSave,
     handleDelete,
+    getGmailComposerUrl,
   };
 };
+

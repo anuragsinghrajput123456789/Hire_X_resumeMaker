@@ -11,31 +11,70 @@ const PORT = process.env.PORT || 5000;
 
 const helmet = require('helmet');
 const mongoSanitize = require('express-mongo-sanitize');
-const { rateLimit } = require('express-rate-limit');
+const { generalLimiter } = require('./middleware/rateLimiter');
+const securityLogger = require('./src/utils/securityLogger');
 
 validateEnv();
 
-// Middleware
+// Allowed origins
 const allowedOrigins = getAllowedOrigins();
-
-app.use(helmet());
-app.use(compression());
-app.use(mongoSanitize());
 
 app.use(cors({
   origin(origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
+    if (!origin || allowedOrigins.includes(origin) || /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)) {
       return callback(null, true);
     }
-
+    securityLogger.logEvent('cors_blocked', { origin });
     return callback(new Error(`CORS blocked origin: ${origin}`));
   },
   credentials: true
 }));
 
-app.use(express.json({ limit: '50mb' }));
+app.use(express.json({ limit: '10mb' }));
 
-// Request logging middleware
+// Helmet security headers (Phase 7)
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "https://challenges.cloudflare.com"],
+      frameSrc: ["'self'", "https://challenges.cloudflare.com"],
+      imgSrc: ["'self'", "data:", "blob:", "https:"],
+      connectSrc: ["'self'", "https://openrouter.ai", "https://api.openai.com"]
+    }
+  },
+  crossOriginEmbedderPolicy: false,
+  hsts: {
+    maxAge: 31536000,
+    includeSubDomains: true,
+    preload: true
+  },
+  referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
+  xFrameOptions: { action: 'deny' },
+  xContentTypeOptions: true
+}));
+
+// Additional security response headers
+app.use((req, res, next) => {
+  res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+  next();
+});
+
+app.use(compression());
+
+// MongoDB Sanitizer middleware (Phase 8 - NoSQL Injection protection)
+const sanitizeObject = (obj) => {
+  if (!obj || typeof obj !== 'object') return obj;
+  return mongoSanitize.sanitize(obj, { replaceWith: '_' });
+};
+
+app.use((req, res, next) => {
+  if (req.body) sanitizeObject(req.body);
+  if (req.params) sanitizeObject(req.params);
+  next();
+});
+
+// Request logging middleware (Phase 9)
 app.use((req, res, next) => {
   const start = Date.now();
   const requestId = `REQ-${Date.now().toString(36)}-${Math.random().toString(36).substring(2, 6)}`;
@@ -43,6 +82,9 @@ app.use((req, res, next) => {
 
   res.on('finish', () => {
     const duration = Date.now() - start;
+    if (res.statusCode === 429) {
+      securityLogger.logRateLimitHit(req.ip, req.originalUrl, req.baseUrl);
+    }
     const logLevel = res.statusCode >= 500 ? 'error' : res.statusCode >= 400 ? 'warn' : 'info';
     const logFn = logLevel === 'error' ? console.error : logLevel === 'warn' ? console.warn : console.log;
     logFn(`[${requestId}] ${req.method} ${req.originalUrl} → ${res.statusCode} (${duration}ms)${req.user ? ` user=${req.user._id}` : ''}`);
@@ -51,34 +93,11 @@ app.use((req, res, next) => {
   next();
 });
 
-// Rate limiters
-const generalLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  limit: 200, // Limit each IP to 200 requests per 15 minutes
-  standardHeaders: 'draft-7',
-  legacyHeaders: false,
-  message: {
-    success: false,
-    message: 'Too many requests from this IP, please try again after 15 minutes.'
-  }
-});
-
-const aiLimiter = rateLimit({
-  windowMs: 60 * 60 * 1000, // 1 hour
-  limit: 50, // Limit each IP to 50 AI requests per hour
-  standardHeaders: 'draft-7',
-  legacyHeaders: false,
-  message: {
-    success: false,
-    message: 'AI generation limit reached for this hour. Please try again later.'
-  }
-});
-
+// Global API Rate Limiter (Phase 1)
 app.use('/api/', generalLimiter);
-app.use('/api/ai', aiLimiter);
 
 app.get('/', (req, res) => {
-  res.send('API is running...');
+  res.send('Hire-X Security Hardened API is running...');
 });
 
 app.get('/api/health', (req, res) => {
@@ -101,6 +120,28 @@ app.get('/api/ready', (req, res) => {
   res.status(503).json({ status: 'not ready', reason: 'Database not connected' });
 });
 
+// Comprehensive AI Health Check endpoint
+app.get('/api/health/ai', async (req, res) => {
+  const mongoose = require('mongoose');
+  const AIService = require('./src/features/ai/ai.service');
+  try {
+    const aiHealth = await AIService.healthCheck();
+    const { metrics, snapshot } = AIService.getMetrics();
+    res.json({
+      status: aiHealth.isHealthy ? 'ok' : 'degraded',
+      backend: 'running',
+      database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
+      aiProvider: aiHealth.providerName,
+      aiModel: aiHealth.model,
+      metrics,
+      queueSnapshot: snapshot,
+      timestamp: new Date().toISOString()
+    });
+  } catch (err) {
+    res.status(500).json({ status: 'error', message: err.message });
+  }
+});
+
 // Database Connection
 connectDB();
 
@@ -113,6 +154,7 @@ app.use('/api/cold-email', require('./routes/coldEmailRoutes'));
 app.use('/api/applications', require('./routes/applicationRoutes'));
 app.use('/api/cover-letter', require('./routes/coverLetterRoutes'));
 app.use('/api/interviews', require('./routes/interviewRoutes'));
+app.use('/api/admin', require('./routes/adminRoutes'));
 
 const { notFound, errorHandler } = require('./middleware/errorMiddleware');
 app.use(notFound);
@@ -122,14 +164,13 @@ const server = app.listen(PORT, () => {
   console.log(`Server running on port ${PORT} [${process.env.NODE_ENV || 'development'}]`);
 });
 
-// Graceful shutdown (Render sends SIGTERM before killing the process)
+// Graceful shutdown (Phase 12)
 const gracefulShutdown = (signal) => {
   console.log(`${signal} received. Shutting down gracefully...`);
 
   server.close(() => {
     console.log('HTTP server closed.');
 
-    // Clean up AI queue
     try {
       const QueueManager = require('./src/ai/QueueManager');
       if (QueueManager.shutdown) {
@@ -137,7 +178,6 @@ const gracefulShutdown = (signal) => {
       }
     } catch { /* Queue may not be initialised */ }
 
-    // Close MongoDB connection
     const mongoose = require('mongoose');
     mongoose.connection.close(false).then(() => {
       console.log('MongoDB connection closed.');
@@ -147,7 +187,6 @@ const gracefulShutdown = (signal) => {
     });
   });
 
-  // Force exit after 10s if graceful shutdown hangs
   setTimeout(() => {
     console.error('Forced shutdown after timeout.');
     process.exit(1);
@@ -159,7 +198,6 @@ process.on('SIGINT', () => gracefulShutdown('SIGINT'));
 
 process.on('unhandledRejection', (error) => {
   console.error(`Unhandled rejection: ${error.message}`);
-  // In production, log but don't crash — let the process continue
   if (process.env.NODE_ENV !== 'production') {
     server.close(() => process.exit(1));
   }

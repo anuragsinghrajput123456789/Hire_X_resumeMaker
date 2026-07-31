@@ -1,10 +1,7 @@
 /**
  * AIRequestQueue — the single public gateway for all AI request execution.
- * Every AI feature request enters through this module, is deduplicated,
- * assigned a priority, queued, and executed by the QueueWorker.
- *
- * Controllers call AIRequestQueue instead of AIManager directly.
- * AIManager remains the provider/prompt orchestrator but is no longer the entry point.
+ * Integrates Authentication, Quota Management, Deduplication, Validation,
+ * Queueing, and Response Caching.
  */
 const QueueManager = require('./QueueManager');
 const QueueWorker = require('./QueueWorker');
@@ -15,6 +12,9 @@ const RequestMetrics = require('./RequestMetrics');
 const QueueLogger = require('./QueueLogger');
 const QueueConfig = require('./QueueConfig');
 const AIError = require('./errors/AIError');
+const QuotaManager = require('./QuotaManager');
+const AICache = require('./AICache');
+const securityLogger = require('../utils/securityLogger');
 
 let _workerInstance = null;
 
@@ -26,10 +26,6 @@ class AIRequestQueue {
     this.worker = _workerInstance;
   }
 
-  /**
-   * Lazily initialises the QueueManager with AIManager and PromptManager references.
-   * Called once on the first request to break circular dependency chains.
-   */
   _ensureInitialised() {
     if (!QueueManager.aiManager) {
       const AIManager = require('./AIManager');
@@ -39,18 +35,7 @@ class AIRequestQueue {
   }
 
   /**
-   * Enqueues a standard (non-streaming) AI request.
-   *
-   * @param {Object} params
-   * @param {string} params.promptName  - The feature/prompt key (e.g. 'atsAnalysis')
-   * @param {Object} params.variables   - Variables for the prompt compiler
-   * @param {string} [params.schemaType] - Schema name for response validation
-   * @param {number} [params.temperature]
-   * @param {number} [params.maxTokens]
-   * @param {string} [params.providerName]
-   * @param {string} [params.userId]
-   * @param {AbortSignal} [params.abortSignal] - Optional external abort signal
-   * @returns {Promise<any>} Parsed and validated AI response
+   * Enqueues a standard (non-streaming) AI request following the target security & cost protection pipeline.
    */
   async enqueue({
     promptName,
@@ -64,18 +49,32 @@ class AIRequestQueue {
   }) {
     this._ensureInitialised();
 
-    // 1. Pre-flight validation — reject bad requests before they enter the queue
+    // 1. Pre-flight input validation — reject bad or injection requests
     RequestValidator.validate(promptName, variables);
 
-    // 2. Deduplication — if an identical request is already in-flight, piggyback on it
+    // 2. Per-User Daily Quota Check — reject if limit reached
+    QuotaManager.checkQuota(userId, promptName);
+
+    // 3. Response Cache Check — return cached result if available (saving OpenRouter costs)
+    const cachedResult = AICache.get(promptName, variables);
+    if (cachedResult) {
+      QueueLogger.info(`Cache HIT for [${promptName}]`, { feature: promptName, userId });
+      securityLogger.logAiUsage(userId, promptName, 0, true);
+      return cachedResult;
+    }
+
+    // 4. Deduplication — if identical request is in-flight, collapse to existing promise
     const dedupKey = RequestDeduplicator.generateKey(promptName, variables);
     const existingPromise = RequestDeduplicator.get(dedupKey);
     if (existingPromise) {
-      QueueLogger.info(`Deduplicating request for [${promptName}]`, { feature: promptName });
+      QueueLogger.info(`Deduplicating active request for [${promptName}]`, { feature: promptName });
       return existingPromise;
     }
 
-    // 3. Build a new job descriptor
+    // Increment user daily quota usage
+    QuotaManager.incrementQuota(userId, promptName);
+
+    // 5. Build new job descriptor
     const requestId = this._generateId();
     const signal = CancellationManager.register(requestId, abortSignal);
 
@@ -90,7 +89,7 @@ class AIRequestQueue {
         providerName,
         userId,
         signal,
-        onChunk: null,          // null = standard request (not streaming)
+        onChunk: null,
         retries: 0,
         enqueueTime: Date.now(),
         state: 'queued',
@@ -98,7 +97,7 @@ class AIRequestQueue {
         reject,
       };
 
-      // 4. Check queue capacity
+      // 6. Enqueue & check capacity
       const accepted = QueueManager.enqueue(job);
       if (!accepted) {
         CancellationManager.unregister(requestId);
@@ -106,14 +105,12 @@ class AIRequestQueue {
         return;
       }
 
-      // 5. Kick the worker loop
       this.worker.tick();
     });
 
-    // 6. Register in deduplicator (auto-cleanup on settle)
     RequestDeduplicator.add(dedupKey, resultPromise);
     resultPromise
-      .catch(() => {})            // Prevent unhandled rejection from cleanup
+      .catch(() => {})
       .finally(() => {
         RequestDeduplicator.remove(dedupKey);
       });
@@ -123,17 +120,6 @@ class AIRequestQueue {
 
   /**
    * Enqueues a streaming AI request.
-   *
-   * @param {Object} params
-   * @param {string}   params.promptName
-   * @param {Object}   params.variables
-   * @param {number}   [params.temperature]
-   * @param {number}   [params.maxTokens]
-   * @param {string}   [params.providerName]
-   * @param {Function} params.onChunk - Callback invoked with each streaming chunk
-   * @param {AbortSignal} [params.abortSignal]
-   * @param {string}   [params.userId]
-   * @returns {Promise<void>}
    */
   async enqueueStream({
     promptName,
@@ -148,6 +134,9 @@ class AIRequestQueue {
     this._ensureInitialised();
 
     RequestValidator.validate(promptName, variables);
+    QuotaManager.checkQuota(userId, promptName);
+
+    QuotaManager.incrementQuota(userId, promptName);
 
     const requestId = this._generateId();
     const signal = CancellationManager.register(requestId, abortSignal);
@@ -182,39 +171,30 @@ class AIRequestQueue {
     });
   }
 
-  // ─── Cancellation API ────────────────────────────────────────────
-
-  /**
-   * Cancel a single request by ID.
-   */
   cancel(requestId) {
     QueueManager.cancelJob(requestId);
     return CancellationManager.cancel(requestId);
   }
 
-  /**
-   * Cancel all queued and active requests.
-   */
   cancelAll() {
     CancellationManager.cancelAll();
   }
 
-  // ─── Metrics API ─────────────────────────────────────────────────
-
   getMetrics() {
-    return RequestMetrics.getMetrics();
+    return {
+      ...RequestMetrics.getMetrics(),
+      cache: AICache.getMetrics(),
+      quotas: QuotaManager.getSnapshot()
+    };
   }
 
   getSnapshot() {
     return QueueManager.getSnapshot();
   }
 
-  // ─── Internal helpers ────────────────────────────────────────────
-
   _generateId() {
     return `REQ-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(36).substring(2, 7).toUpperCase()}`;
   }
 }
 
-// Export as singleton
 module.exports = new AIRequestQueue();

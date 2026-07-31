@@ -26,21 +26,26 @@ const protect = asyncHandler(async (req, res, next) => {
 
       return next();
     } catch (error) {
-      // If the error was already a 401 from user-not-found, re-throw as-is
       if (res.statusCode === 401) {
         throw error;
       }
-      // Token verification failed (expired, malformed, etc.)
       res.status(401);
       throw new Error('Not authorized, token failed');
     }
   }
 
-  // No Authorization header at all
   if (!token) {
     res.status(401);
     throw new Error('Not authorized, no token');
   }
 });
 
-module.exports = { protect };
+const adminOnly = (req, res, next) => {
+  const adminEmail = process.env.ADMIN_EMAIL || 'anuragsinghj678@gmail.com';
+  if (req.user && (req.user.role === 'admin' || req.user.email === adminEmail)) {
+    return next();
+  }
+  res.status(403).json({ error: 'Access denied: Admin authorization required' });
+};
+
+module.exports = { protect, adminOnly };

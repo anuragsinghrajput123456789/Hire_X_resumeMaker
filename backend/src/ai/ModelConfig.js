@@ -2,11 +2,15 @@
  * Centralized model parameter configuration for LLMs.
  */
 module.exports = {
-  primaryModel: process.env.OPENROUTER_MODEL || 'google/gemini-2.0-flash-001',
+  primaryModel: process.env.OPENROUTER_MODEL || 'inclusionai/ling-3.0-flash:free',
   fallbackModels: [
-    process.env.OPENROUTER_MODEL || 'google/gemini-2.0-flash-001',
+    process.env.OPENROUTER_MODEL || 'inclusionai/ling-3.0-flash:free',
+    'inclusionai/ling-3.0-flash:free',
+    'google/gemini-2.0-flash-001',
     'meta-llama/llama-3.3-70b-instruct:free',
+    'google/gemini-2.0-flash-lite-preview-02-05:free',
     'meta-llama/llama-3.2-3b-instruct:free',
+    'deepseek/deepseek-r1:free',
     'qwen/qwen-2.5-72b-instruct:free'
   ],
   defaultParams: {

@@ -142,6 +142,9 @@ export const apiFetch = async (
       if (response.status === 401 && !skipAuthRedirect) {
         clearAuthStorage();
         const msg = await extractErrorMessage(response, 'Session expired. Please log in again.');
+        if (typeof window !== 'undefined' && window.location.pathname !== '/login' && window.location.pathname !== '/register') {
+          window.location.href = '/login';
+        }
         throw new Error(msg);
       }
 

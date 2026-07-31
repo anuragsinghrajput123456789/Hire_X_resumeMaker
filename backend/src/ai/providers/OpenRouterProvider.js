@@ -13,6 +13,7 @@ class OpenRouterProvider extends AIProvider {
   }
 
   async initialize() {
+    this.apiKey = process.env.OPENROUTER_API_KEY || process.env.OPENAI_API_KEY;
     if (!this.apiKey) {
       throw new AIError(503, 'AI service API key is not configured');
     }

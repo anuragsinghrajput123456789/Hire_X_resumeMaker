@@ -23,6 +23,7 @@ const JobMatchPage = lazy(() => import("./pages/JobMatchPage"));
 const ChatPage = lazy(() => import("./pages/ChatPage"));
 const ColdEmailPage = lazy(() => import("./pages/ColdEmailPage"));
 const CoverLetterPage = lazy(() => import("./pages/CoverLetterPage"));
+const ProfilePage = lazy(() => import("./pages/ProfilePage"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const PageFallback = () => (
@@ -79,6 +80,7 @@ const App = () => {
                     <Route path="/chat" element={<ErrorBoundary><ChatPage /></ErrorBoundary>} />
                     <Route path="/cold-email" element={<ErrorBoundary><ColdEmailPage /></ErrorBoundary>} />
                     <Route path="/cover-letter" element={<ErrorBoundary><CoverLetterPage /></ErrorBoundary>} />
+                    <Route path="/profile" element={<ErrorBoundary><ProfilePage /></ErrorBoundary>} />
                     <Route path="*" element={<ErrorBoundary><NotFound /></ErrorBoundary>} />
                   </Routes>
                 </Suspense>

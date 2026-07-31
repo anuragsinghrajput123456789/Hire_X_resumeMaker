@@ -102,13 +102,16 @@ class RequestValidator {
 
     // 3. Prompt injection detection
     const injectionSignatures = [
-      /ignore\s+(?:previous|all|the\s+above)\s+instructions/i,
-      /you\s+must\s+now\s+act\s+as/i,
+      /ignore\s+(?:previous|all|the\s+above|your)\s+(?:instructions|rules|directives|prompts)/i,
+      /you\s+must\s+now\s+(?:act\s+as|behave\s+as)/i,
+      /act\s+as\s+(?:an?\s+)?(?:system|admin|root|unrestricted)/i,
       /system\s*(?:message|prompt|directive):/i,
       /instead\s+of\s+doing\s+what\s+you\s+were\s+told/i,
-      /override\s+original\s+instructions/i,
+      /override\s+(?:original|previous)\s+instructions/i,
       /stop\s+doing\s+that\s+and/i,
-      /ignore\s+rules/i
+      /ignore\s+(?:all\s+)?rules/i,
+      /jailbreak/i,
+      /dan\s+mode/i
     ];
 
     for (const key in variables) {

@@ -145,6 +145,11 @@ const Navbar = () => {
                     </div>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator className="bg-white/10" />
+                  <DropdownMenuItem onClick={() => navigate('/profile')} className="p-3 rounded-xl cursor-pointer hover:bg-white/10 text-gray-200 focus:bg-white/10 focus:text-white transition-colors">
+                    <User className="w-4 h-4 mr-2 text-[#00F2FE]" />
+                    <span className="font-bold">My Profile & Quotas</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator className="bg-white/10" />
                   <DropdownMenuItem onClick={onLogout} className="p-3 rounded-xl cursor-pointer text-red-400 hover:bg-red-500/10 focus:bg-red-500/10 focus:text-red-400 transition-colors">
                     <LogOut className="w-4 h-4 mr-2" />
                     <span className="font-bold">Log out</span>
@@ -212,7 +217,22 @@ const Navbar = () => {
                   </Link>
                 );
               })}
-              {!user && (
+              {user ? (
+                <Link
+                  to="/profile"
+                  onClick={() => setIsMenuOpen(false)}
+                  className="flex items-center justify-between p-3 rounded-xl transition-all duration-300 hover:bg-white/5 text-gray-300 border border-white/5 mt-2"
+                >
+                  <div className="flex items-center gap-4.5">
+                    <User className="w-5 h-5 text-[#00F2FE]" />
+                    <div className="text-left">
+                      <p className="text-sm font-bold leading-tight">My Profile & Quotas</p>
+                      <p className="text-[10px] mt-0.5 font-medium text-gray-500">View Usage & Account Settings</p>
+                    </div>
+                  </div>
+                  <ChevronRight className="w-4 h-4 opacity-55 text-gray-400" />
+                </Link>
+              ) : (
                 <div className="grid grid-cols-2 gap-3 mt-2 pt-2 border-t border-white/5">
                   <Link to="/login" onClick={() => setIsMenuOpen(false)}>
                     <Button variant="ghost" className="w-full rounded-xl text-slate-300 hover:text-white hover:bg-white/5 border border-white/5">Login</Button>

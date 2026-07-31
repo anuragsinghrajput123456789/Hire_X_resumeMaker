@@ -91,11 +91,10 @@ class QueueWorker {
 
       // Only parse and validate if it was a non-streaming request
       if (!job.onChunk) {
-        job.state = 'parsing';
-        const parsed = ResponseParser.parse(textResult);
-
-        finalResult = parsed;
         if (job.schemaType) {
+          job.state = 'parsing';
+          const parsed = ResponseParser.parse(textResult);
+
           job.state = 'validating';
           const validationResult = SchemaValidator.validate(parsed, job.schemaType);
           if (!validationResult.isValid) {
@@ -106,6 +105,14 @@ class QueueWorker {
             );
           }
           finalResult = validationResult.data;
+        } else {
+          // Non-schema text requests (e.g. chat, cold email, content generation)
+          // Try parsing JSON if available; otherwise return raw text response
+          try {
+            finalResult = ResponseParser.parse(textResult);
+          } catch {
+            finalResult = textResult;
+          }
         }
       }
 
@@ -113,6 +120,19 @@ class QueueWorker {
       const executionTime = Date.now() - startTime;
       RequestMetrics.recordSuccess(executionTime);
       QueueLogger.info(`Request ${job.id} completed successfully`, { requestId: job.id, executionTimeMs: executionTime });
+
+      // Populate AICache for non-streaming requests
+      if (!job.onChunk && finalResult) {
+        const AICache = require('./AICache');
+        AICache.set(job.feature, job.variables, finalResult);
+      }
+
+      // Record DB usage strictly on successful AI generation
+      const aiUsageService = require('../features/ai/aiUsage.service');
+      aiUsageService.incrementUsage(job.userId, job.feature);
+
+      const securityLogger = require('../utils/securityLogger');
+      securityLogger.logAiUsage(job.userId, job.feature, Math.ceil(compiledPrompt.length / 4), false);
 
       CancellationManager.unregister(job.id);
       job.resolve(finalResult);

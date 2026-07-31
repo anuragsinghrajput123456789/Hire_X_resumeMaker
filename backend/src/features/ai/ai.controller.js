@@ -336,6 +336,16 @@ const cancelRequest = async (req, res) => {
   }
 };
 
+const getUsage = async (req, res) => {
+  try {
+    const aiUsageService = require('./aiUsage.service');
+    const usageData = await aiUsageService.getUserUsage(req.user ? req.user._id : null);
+    res.json(usageData);
+  } catch (error) {
+    sendError(res, error, 'Failed to fetch AI usage statistics');
+  }
+};
+
 module.exports = {
   chat,
   coldEmail,
@@ -349,4 +359,5 @@ module.exports = {
   healthCheck,
   queueMetrics,
   cancelRequest,
+  getUsage,
 };

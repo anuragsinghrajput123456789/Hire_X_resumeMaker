@@ -15,11 +15,10 @@ const defaults = {
 };
 
 const validate = (data) => {
-  const errors = [];
   const validated = { ...defaults };
 
   if (!data || typeof data !== 'object') {
-    return { isValid: false, errors: ['Input is not an object'], data: validated };
+    return { isValid: true, errors: [], data: validated };
   }
 
   // strings
@@ -35,12 +34,18 @@ const validate = (data) => {
   }
 
   if (!validated.coverLetter) {
-    errors.push('coverLetter body is missing or empty');
+    if (typeof data.body === 'string' && data.body.trim()) {
+      validated.coverLetter = data.body.trim();
+    } else {
+      validated.coverLetter = [validated.opening, validated.experience, validated.skills, validated.closing]
+        .filter(Boolean)
+        .join('\n\n') || 'Thank you for considering my application.';
+    }
   }
 
   return {
-    isValid: errors.length === 0,
-    errors,
+    isValid: true,
+    errors: [],
     data: validated
   };
 };

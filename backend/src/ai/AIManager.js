@@ -30,7 +30,10 @@ class AIManager {
   }
 
   getProvider(providerName) {
-    const name = providerName || process.env.AI_PROVIDER || 'openrouter';
+    let name = providerName || process.env.AI_PROVIDER;
+    if (!name) {
+      name = process.env.GEMINI_API_KEY ? 'gemini' : 'openrouter';
+    }
     const provider = this.providers[name.toLowerCase()];
     if (!provider) {
       throw new Error(`AI Provider '${name}' not configured inside AIManager.`);

@@ -10,8 +10,11 @@ class RequestDeduplicator {
    * Generates a stable lookup key from the feature name and variable payload.
    */
   generateKey(feature, variables) {
+    const crypto = require('crypto');
     const sortedVariables = this.sortObjectKeys(variables);
-    return `${feature}:${JSON.stringify(sortedVariables)}`;
+    const serialized = JSON.stringify(sortedVariables);
+    const hash = crypto.createHash('sha256').update(serialized).digest('hex');
+    return `${feature}:${hash}`;
   }
 
   /**

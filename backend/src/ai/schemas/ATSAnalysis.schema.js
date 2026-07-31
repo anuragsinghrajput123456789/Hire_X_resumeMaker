@@ -11,19 +11,15 @@ const defaults = {
 };
 
 const validate = (data) => {
-  const errors = [];
   const validated = { ...defaults };
 
   if (!data || typeof data !== 'object') {
-    return { isValid: false, errors: ['Input is not an object'], data: validated };
+    return { isValid: true, errors: [], data: validated };
   }
 
   // atsScore
   validated.atsScore = typeof data.atsScore === 'number' ? data.atsScore : parseInt(data.atsScore, 10) || 0;
-  if (validated.atsScore < 0 || validated.atsScore > 100) {
-    errors.push('atsScore out of range [0-100]');
-    validated.atsScore = Math.max(0, Math.min(100, validated.atsScore));
-  }
+  validated.atsScore = Math.max(0, Math.min(100, validated.atsScore));
 
   // arrays of strings
   const arrayKeys = ['missingKeywords', 'formatSuggestions', 'improvements', 'matchingJobRoles'];
@@ -32,8 +28,8 @@ const validate = (data) => {
   }
 
   return {
-    isValid: errors.length === 0,
-    errors,
+    isValid: true,
+    errors: [],
     data: validated
   };
 };

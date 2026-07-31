@@ -203,3 +203,35 @@ export const generateCoverLetter = async (params: {
     throw error;
   }
 };
+
+export interface FeatureUsage {
+  used: number;
+  limit: number;
+  remaining: number;
+  progressPercent: number;
+}
+
+export interface AIUsageResponse {
+  date: string;
+  tier: string;
+  countdown: {
+    hours: number;
+    minutes: number;
+    totalSeconds: number;
+    formatted: string;
+  };
+  usage: Record<string, FeatureUsage>;
+}
+
+export const getAIUsage = async (): Promise<AIUsageResponse> => {
+  try {
+    const response = await apiFetch(`${API_URL}/usage`, {
+      method: 'GET',
+      headers: authHeaders(),
+    });
+    return await response.json();
+  } catch (error) {
+    console.error("getAIUsage error:", error);
+    throw error;
+  }
+};
