@@ -1,8 +1,7 @@
-
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MessageCircle, X, Send, Bot, User, Minimize2, Maximize2, History, Trash2, Plus, Sparkles } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -12,6 +11,8 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { motion, AnimatePresence } from 'framer-motion';
 import { generateChatResponse } from '@/services/aiService';
 import { apiUrl, authHeaders, getStoredToken, clearAuthStorage } from '@/services/apiClient';
+import AITypingIndicator from './AITypingIndicator';
+import { springBouncy, springSmooth } from '@/lib/animations';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -136,7 +137,6 @@ const FloatingChatbot = () => {
     setIsLoading(true);
 
     try {
-      // 1. Get AI Response
       const history = messages.map(m => ({ role: m.role, content: m.content }));
       const aiResponseContent = await generateChatResponse(inputMessage, history);
       
@@ -148,10 +148,8 @@ const FloatingChatbot = () => {
 
       setMessages(prev => [...prev, assistantMessage]);
 
-      // 2. Save to Backend (if logged in)
       if (token) {
         if (!currentChatId) {
-          // Create new chat
           const createResponse = await fetch(apiUrl('/chats'), {
             method: 'POST',
             headers: authHeaders(),
@@ -164,10 +162,9 @@ const FloatingChatbot = () => {
           if (createResponse.ok) {
             const newChat = await createResponse.json();
             setCurrentChatId(newChat._id);
-            fetchChatHistory(); // Refresh list
+            fetchChatHistory();
           }
         } else {
-          // Update existing chat
           await fetch(apiUrl(`/chats/${currentChatId}`), {
             method: 'PUT',
             headers: authHeaders(),
@@ -226,7 +223,9 @@ const FloatingChatbot = () => {
             initial={{ scale: 0, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0, opacity: 0 }}
-            transition={{ type: "spring", stiffness: 260, damping: 20 }}
+            whileHover={{ scale: 1.08 }}
+            whileTap={{ scale: 0.95 }}
+            transition={springBouncy}
             className={`fixed ${isMobile ? 'bottom-4 right-4' : 'bottom-8 right-8'} z-50`}
           >
              <div className="absolute -inset-1 bg-gradient-to-r from-teal-500 to-sky-600 rounded-full blur opacity-40 animate-pulse"></div>
@@ -250,10 +249,10 @@ const FloatingChatbot = () => {
         {/* Chat Window */}
         {isOpen && (
           <motion.div
-            initial={{ opacity: 0, y: 50, scale: 0.9 }}
+            initial={{ opacity: 0, y: 30, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 50, scale: 0.9 }}
-            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+            exit={{ opacity: 0, y: 30, scale: 0.95 }}
+            transition={springSmooth}
             className={`fixed ${
               isMobile 
                 ? 'bottom-2 right-2 left-2 top-20' 
@@ -299,7 +298,7 @@ const FloatingChatbot = () => {
               </div>
 
               {!isMinimized && (
-                <CardContent className="flex flex-col flex-1 p-0 overflow-hidden relative animate-in fade-in duration-300">
+                <CardContent className="flex flex-col flex-1 p-0 overflow-hidden relative">
                   {!token ? (
                     <div className="flex flex-col items-center justify-center text-center p-6 flex-1 bg-[#0F1424]/95 select-none relative">
                       <div className="absolute inset-0 bg-grid-soft opacity-5 pointer-events-none" />
@@ -366,8 +365,9 @@ const FloatingChatbot = () => {
                            {messages.map((message, idx) => (
                              <motion.div
                                key={idx}
-                               initial={{ opacity: 0, y: 10 }}
-                               animate={{ opacity: 1, y: 0 }}
+                               initial={{ opacity: 0, y: 8, scale: 0.98 }}
+                               animate={{ opacity: 1, y: 0, scale: 1 }}
+                               transition={springSmooth}
                                className={`flex items-start gap-2.5 ${message.role === 'user' ? 'flex-row-reverse' : ''}`}
                              >
                                 <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${message.role === 'user' ? 'bg-gray-200 dark:bg-gray-700' : 'bg-teal-100 dark:bg-teal-900/50'}`}>
@@ -385,15 +385,11 @@ const FloatingChatbot = () => {
                              </motion.div>
                            ))}
                            {isLoading && (
-                             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex items-start gap-2.5">
+                             <motion.div initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }} className="flex items-start gap-2.5">
                                 <div className="w-8 h-8 rounded-full bg-teal-100 dark:bg-teal-900/50 flex items-center justify-center shrink-0">
                                    <Bot className="w-4 h-4 text-teal-600 dark:text-teal-400" />
                                 </div>
-                                <div className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-2xl rounded-tl-sm px-4 py-3 shadow-sm flex items-center gap-1.5 h-10">
-                                   <span className="w-1.5 h-1.5 bg-teal-500 rounded-full animate-bounce"></span>
-                                   <span className="w-1.5 h-1.5 bg-teal-500 rounded-full animate-bounce delay-100"></span>
-                                   <span className="w-1.5 h-1.5 bg-teal-500 rounded-full animate-bounce delay-200"></span>
-                                </div>
+                                <AITypingIndicator label="Hire-X is writing..." />
                              </motion.div>
                            )}
                            <div ref={messagesEndRef} />
@@ -428,4 +424,3 @@ const FloatingChatbot = () => {
 };
 
 export default FloatingChatbot;
-

@@ -1,5 +1,6 @@
 import { lazy, Suspense, useEffect, useState } from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import { AnimatePresence } from "framer-motion";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -9,6 +10,8 @@ import Navbar from "./components/Navbar";
 import FloatingChatbot from "./components/FloatingChatbot";
 import Footer from "./components/Footer";
 import ErrorBoundary from "./components/ErrorBoundary";
+import PageTransition from "./components/PageTransition";
+import ScrollToTopButton from "./components/ScrollToTopButton";
 import { Loader2 } from "lucide-react";
 
 // Synchronous loading for core landing & auth pages
@@ -27,8 +30,12 @@ const ProfilePage = lazy(() => import("./pages/ProfilePage"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const PageFallback = () => (
-  <div className="min-h-[60vh] flex items-center justify-center">
-    <Loader2 className="w-8 h-8 text-primary animate-spin" />
+  <div className="min-h-[65vh] flex flex-col items-center justify-center gap-3">
+    <div className="relative flex items-center justify-center">
+      <div className="w-12 h-12 rounded-full border-2 border-indigo-500/20 border-t-indigo-500 animate-spin" />
+      <Loader2 className="w-5 h-5 text-[#00F2FE] absolute animate-pulse" />
+    </div>
+    <span className="text-xs font-semibold text-slate-400 font-mono tracking-wider animate-pulse">Loading Workspace...</span>
   </div>
 );
 
@@ -44,6 +51,28 @@ const queryClient = new QueryClient({
     },
   },
 });
+
+const AnimatedRoutes = () => {
+  const location = useLocation();
+
+  return (
+    <AnimatePresence mode="wait">
+      <Routes location={location} key={location.pathname}>
+        <Route path="/" element={<ErrorBoundary><PageTransition><Index /></PageTransition></ErrorBoundary>} />
+        <Route path="/login" element={<ErrorBoundary><PageTransition><Login /></PageTransition></ErrorBoundary>} />
+        <Route path="/register" element={<ErrorBoundary><PageTransition><Register /></PageTransition></ErrorBoundary>} />
+        <Route path="/generator" element={<ErrorBoundary><PageTransition><GeneratorPage /></PageTransition></ErrorBoundary>} />
+        <Route path="/analyzer" element={<ErrorBoundary><PageTransition><AnalyzerPage /></PageTransition></ErrorBoundary>} />
+        <Route path="/job-match" element={<ErrorBoundary><PageTransition><JobMatchPage /></PageTransition></ErrorBoundary>} />
+        <Route path="/chat" element={<ErrorBoundary><PageTransition><ChatPage /></PageTransition></ErrorBoundary>} />
+        <Route path="/cold-email" element={<ErrorBoundary><PageTransition><ColdEmailPage /></PageTransition></ErrorBoundary>} />
+        <Route path="/cover-letter" element={<ErrorBoundary><PageTransition><CoverLetterPage /></PageTransition></ErrorBoundary>} />
+        <Route path="/profile" element={<ErrorBoundary><PageTransition><ProfilePage /></PageTransition></ErrorBoundary>} />
+        <Route path="*" element={<ErrorBoundary><PageTransition><NotFound /></PageTransition></ErrorBoundary>} />
+      </Routes>
+    </AnimatePresence>
+  );
+};
 
 const App = () => {
   const [isLoaded, setIsLoaded] = useState(false);
@@ -66,27 +95,16 @@ const App = () => {
           <Toaster />
           <Sonner />
           <BrowserRouter>
-            <div className={`min-h-screen bg-mesh transition-all duration-500 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}>
+            <div className={`min-h-screen bg-mesh transition-opacity duration-500 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}>
               <Navbar />
               <main className="relative pt-32">
                 <Suspense fallback={<PageFallback />}>
-                  <Routes>
-                    <Route path="/" element={<ErrorBoundary><Index /></ErrorBoundary>} />
-                    <Route path="/login" element={<ErrorBoundary><Login /></ErrorBoundary>} />
-                    <Route path="/register" element={<ErrorBoundary><Register /></ErrorBoundary>} />
-                    <Route path="/generator" element={<ErrorBoundary><GeneratorPage /></ErrorBoundary>} />
-                    <Route path="/analyzer" element={<ErrorBoundary><AnalyzerPage /></ErrorBoundary>} />
-                    <Route path="/job-match" element={<ErrorBoundary><JobMatchPage /></ErrorBoundary>} />
-                    <Route path="/chat" element={<ErrorBoundary><ChatPage /></ErrorBoundary>} />
-                    <Route path="/cold-email" element={<ErrorBoundary><ColdEmailPage /></ErrorBoundary>} />
-                    <Route path="/cover-letter" element={<ErrorBoundary><CoverLetterPage /></ErrorBoundary>} />
-                    <Route path="/profile" element={<ErrorBoundary><ProfilePage /></ErrorBoundary>} />
-                    <Route path="*" element={<ErrorBoundary><NotFound /></ErrorBoundary>} />
-                  </Routes>
+                  <AnimatedRoutes />
                 </Suspense>
               </main>
               <Footer />
               <FloatingChatbot />
+              <ScrollToTopButton />
             </div>
           </BrowserRouter>
         </TooltipProvider>

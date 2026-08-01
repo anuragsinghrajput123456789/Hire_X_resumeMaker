@@ -8,15 +8,15 @@ import {
   ShieldCheck,
   Target,
   Wand2,
-  Sparkles,
   CheckCircle2,
-  TrendingUp,
-  FileText
 } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardDescription, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { HeroSection } from '@/components/Hero';
+import AnimatedSection from '@/components/AnimatedSection';
+import InteractiveCard from '@/components/InteractiveCard';
+import { staggerChildVariants } from '@/lib/animations';
 
 const features = [
   {
@@ -25,6 +25,7 @@ const features = [
     icon: Wand2,
     link: '/generator',
     glowClass: 'glow-pink',
+    glowColor: 'rgba(217, 70, 239, 0.15)',
     iconColor: 'text-[#D946EF] bg-[#D946EF]/10 border border-[#D946EF]/20'
   },
   {
@@ -33,6 +34,7 @@ const features = [
     icon: Search,
     link: '/analyzer',
     glowClass: 'glow-cyan',
+    glowColor: 'rgba(0, 242, 254, 0.15)',
     iconColor: 'text-[#00F2FE] bg-[#00F2FE]/10 border border-[#00F2FE]/20'
   },
   {
@@ -41,6 +43,7 @@ const features = [
     icon: Target,
     link: '/job-match',
     glowClass: 'glow-rose',
+    glowColor: 'rgba(255, 8, 68, 0.15)',
     iconColor: 'text-[#FF0844] bg-[#FF0844]/10 border border-[#FF0844]/20'
   },
   {
@@ -49,6 +52,7 @@ const features = [
     icon: Mail,
     link: '/cold-email',
     glowClass: 'glow-cyan',
+    glowColor: 'rgba(79, 172, 254, 0.15)',
     iconColor: 'text-[#4FACFE] bg-[#4FACFE]/10 border border-[#4FACFE]/20'
   },
   {
@@ -57,6 +61,7 @@ const features = [
     icon: MessageSquare,
     link: '/chat',
     glowClass: 'glow-emerald',
+    glowColor: 'rgba(0, 245, 160, 0.15)',
     iconColor: 'text-[#00F5A0] bg-[#00F5A0]/10 border border-[#00F5A0]/20'
   },
   {
@@ -65,14 +70,15 @@ const features = [
     icon: ShieldCheck,
     link: '/generator',
     glowClass: 'glow-pink',
+    glowColor: 'rgba(236, 72, 153, 0.15)',
     iconColor: 'text-[#EC4899] bg-[#EC4899]/10 border border-[#EC4899]/20'
   }
 ];
 
 const stats = [
-  { value: '14,200+', label: 'Successful Resumes', glowClass: 'glow-pink' },
-  { value: '98.6%', label: 'Average ATS Match', glowClass: 'glow-cyan' },
-  { value: '450k+', label: 'AI Operations Ran', glowClass: 'glow-rose' }
+  { value: '14,200+', label: 'Successful Resumes', glowClass: 'glow-pink', glowColor: 'rgba(217, 70, 239, 0.15)' },
+  { value: '98.6%', label: 'Average ATS Match', glowClass: 'glow-cyan', glowColor: 'rgba(0, 242, 254, 0.15)' },
+  { value: '450k+', label: 'AI Operations Ran', glowClass: 'glow-rose', glowColor: 'rgba(255, 8, 68, 0.15)' }
 ];
 
 const conveyorItems = [
@@ -87,7 +93,7 @@ const Index = () => {
   return (
     <div className="relative min-h-screen overflow-hidden bg-mesh-vibrant selection:bg-[#00F2FE]/20">
       
-      {/* 1. Hero Section (Headline -> CTAs -> AI Demo Showcase) */}
+      {/* 1. Hero Section */}
       <HeroSection />
 
       {/* 2. Live Workspace Tracker Ticker Strip */}
@@ -104,7 +110,7 @@ const Index = () => {
             {conveyorItems.concat(conveyorItems).map((item, idx) => (
               <div
                 key={idx}
-                className={`glass-card border rounded-xl px-4 py-2.5 flex items-center gap-3 min-w-[260px] ${item.color} transition-all duration-200 hover:scale-[1.01]`}
+                className={`glass-card border rounded-xl px-4 py-2.5 flex items-center gap-3 min-w-[260px] ${item.color} transition-all duration-300 hover:scale-[1.02] hover:border-white/20`}
               >
                 <div className="w-6 h-6 rounded-full bg-[#00F2FE]/10 border border-[#00F2FE]/30 flex items-center justify-center text-[#00F2FE] shrink-0">
                   <CheckCircle2 className="w-3.5 h-3.5" />
@@ -124,7 +130,7 @@ const Index = () => {
       </section>
 
       {/* 3. Feature Highlights Grid Section */}
-      <section className="relative px-6 py-12 sm:px-8 md:py-16 z-10 max-w-7xl mx-auto">
+      <AnimatedSection className="relative px-6 py-12 sm:px-8 md:py-16 z-10 max-w-7xl mx-auto">
         <div className="container mx-auto max-w-6xl">
           
           <div className="text-center mb-10 max-w-xl mx-auto">
@@ -136,41 +142,46 @@ const Index = () => {
             </p>
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {features.map((feature, index) => (
-              <motion.div
-                key={feature.title}
-                initial={{ opacity: 0, y: 15 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: '-20px' }}
-                transition={{ delay: index * 0.05, duration: 0.4 }}
-              >
+          <motion.div 
+            variants={{
+              hidden: { opacity: 0 },
+              visible: { opacity: 1, transition: { staggerChildren: 0.06 } }
+            }}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-40px" }}
+            className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
+          >
+            {features.map((feature) => (
+              <motion.div key={feature.title} variants={staggerChildVariants}>
                 <Link to={feature.link} className="group block h-full">
-                  <Card className={`h-full overflow-hidden glass-card border rounded-xl p-5 transition-all duration-200 hover:border-white/20 hover:shadow-xl ${feature.glowClass}`}>
-                    <div className="flex items-center justify-between mb-3">
-                      <div className={`flex h-9 w-9 items-center justify-center rounded-lg ${feature.iconColor}`}>
-                        <feature.icon className="h-4.5 w-4.5" />
+                  <InteractiveCard glowColor={feature.glowColor} className="h-full">
+                    <Card className={`h-full overflow-hidden glass-card border rounded-xl p-5 transition-all duration-300 hover:border-white/20 hover:shadow-xl ${feature.glowClass}`}>
+                      <div className="flex items-center justify-between mb-3">
+                        <div className={`flex h-9 w-9 items-center justify-center rounded-lg ${feature.iconColor}`}>
+                          <feature.icon className="h-4.5 w-4.5" />
+                        </div>
+                        <ArrowRight className="h-3.5 w-3.5 text-slate-500 group-hover:text-[#00F2FE] group-hover:translate-x-1 transition-all duration-300" />
                       </div>
-                      <ArrowRight className="h-3.5 w-3.5 text-slate-500 group-hover:text-[#00F2FE] group-hover:translate-x-0.5 transition-all duration-200" />
-                    </div>
 
-                    <CardTitle className="text-sm font-bold tracking-tight text-white font-poppins mb-1.5">
-                      {feature.title}
-                    </CardTitle>
+                      <CardTitle className="text-sm font-bold tracking-tight text-white font-poppins mb-1.5">
+                        {feature.title}
+                      </CardTitle>
 
-                    <CardDescription className="text-xs font-normal leading-relaxed text-slate-400">
-                      {feature.description}
-                    </CardDescription>
-                  </Card>
+                      <CardDescription className="text-xs font-normal leading-relaxed text-slate-400">
+                        {feature.description}
+                      </CardDescription>
+                    </Card>
+                  </InteractiveCard>
                 </Link>
               </motion.div>
             ))}
-          </div>
+          </motion.div>
         </div>
-      </section>
+      </AnimatedSection>
 
       {/* 4. Candidate Workflow Pipeline Section */}
-      <section className="relative px-6 py-10 sm:px-8 md:py-14 z-10 max-w-7xl mx-auto">
+      <AnimatedSection className="relative px-6 py-10 sm:px-8 md:py-14 z-10 max-w-7xl mx-auto">
         <div className="container mx-auto max-w-5xl">
           <div className="rounded-2xl border border-white/[0.08] bg-[#070A18]/60 p-6 sm:p-8 shadow-xl backdrop-blur-md">
             
@@ -190,89 +201,74 @@ const Index = () => {
                 { title: 'Audit', text: 'Scan formatting, spelling, and keywords directly.', icon: Search },
                 { title: 'Outreach', text: 'Auto-generate recruiter letters and find matches.', icon: Target }
               ].map((item, index) => (
-                <motion.div
-                  key={item.title}
-                  initial={{ opacity: 0, y: 15 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: index * 0.08, duration: 0.4 }}
-                  className="relative overflow-hidden rounded-xl border border-white/[0.06] bg-[#050814]/80 p-4 text-left group hover:border-white/20 transition-all duration-200"
-                >
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-[#8B5CF6] to-[#EC4899] text-white shadow-sm">
-                      <item.icon className="h-4 w-4" />
+                <InteractiveCard key={item.title} glowColor="rgba(139, 92, 246, 0.15)">
+                  <div className="relative overflow-hidden rounded-xl border border-white/[0.06] bg-[#050814]/80 p-4 text-left group hover:border-white/20 transition-all duration-300 h-full">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-[#8B5CF6] to-[#EC4899] text-white shadow-sm group-hover:scale-105 transition-transform duration-300">
+                        <item.icon className="h-4 w-4" />
+                      </div>
+                      <span className="text-xs font-mono font-bold text-slate-500">0{index + 1}</span>
                     </div>
-                    <span className="text-xs font-mono font-bold text-slate-500">0{index + 1}</span>
+                    <p className="text-sm font-bold text-white font-poppins">{item.title}</p>
+                    <p className="mt-1 text-xs leading-relaxed text-slate-400 font-normal">{item.text}</p>
                   </div>
-                  <p className="text-sm font-bold text-white font-poppins">{item.title}</p>
-                  <p className="mt-1 text-xs leading-relaxed text-slate-400 font-normal">{item.text}</p>
-                </motion.div>
+                </InteractiveCard>
               ))}
             </div>
           </div>
         </div>
-      </section>
+      </AnimatedSection>
 
       {/* 5. Key Metrics / Stats Row Section */}
-      <section className="relative px-6 py-8 sm:px-8 z-10 max-w-7xl mx-auto">
+      <AnimatedSection className="relative px-6 py-8 sm:px-8 z-10 max-w-7xl mx-auto">
         <div className="container mx-auto max-w-5xl grid gap-4 md:grid-cols-3">
-          {stats.map((stat, index) => (
-            <motion.div
-              key={stat.label}
-              initial={{ opacity: 0, y: 10 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.08, duration: 0.4 }}
-              className={`glass-card rounded-xl p-4 border text-center relative overflow-hidden transition-all duration-200 hover:-translate-y-0.5 ${stat.glowClass}`}
-            >
-              <p className="text-2xl font-extrabold text-white mb-0.5 font-poppins">{stat.value}</p>
-              <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">{stat.label}</p>
-            </motion.div>
+          {stats.map((stat) => (
+            <InteractiveCard key={stat.label} glowColor={stat.glowColor}>
+              <div className={`glass-card rounded-xl p-4 border text-center relative overflow-hidden transition-all duration-300 hover:border-white/20 ${stat.glowClass}`}>
+                <p className="text-2xl font-extrabold text-white mb-0.5 font-poppins">{stat.value}</p>
+                <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">{stat.label}</p>
+              </div>
+            </InteractiveCard>
           ))}
         </div>
-      </section>
+      </AnimatedSection>
 
       {/* 6. Premium Call to Action Area */}
-      <section className="relative px-6 py-12 sm:px-8 md:py-16 z-10 max-w-7xl mx-auto">
+      <AnimatedSection className="relative px-6 py-12 sm:px-8 md:py-16 z-10 max-w-7xl mx-auto">
         <div className="container mx-auto max-w-4xl">
-          <div className="overflow-hidden rounded-2xl bg-gradient-to-br from-[#0B1020] via-[#070A18] to-[#050816] border border-white/10 px-6 py-10 text-center shadow-xl relative">
-            <div className="absolute inset-0 bg-grid-soft opacity-30 pointer-events-none" />
-            <motion.div
-              initial={{ opacity: 0, scale: 0.98 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.4 }}
-              className="mx-auto max-w-xl relative z-10"
-            >
-              <div className="mx-auto mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-[#00F2FE]/10 border border-[#00F2FE]/20 text-[#00F2FE] shadow-sm">
-                <Brain className="h-5 w-5" />
+          <InteractiveCard glowColor="rgba(0, 242, 254, 0.2)" enableTilt={false}>
+            <div className="overflow-hidden rounded-2xl bg-gradient-to-br from-[#0B1020] via-[#070A18] to-[#050816] border border-white/10 px-6 py-10 text-center shadow-xl relative">
+              <div className="absolute inset-0 bg-grid-soft opacity-30 pointer-events-none" />
+              <div className="mx-auto max-w-xl relative z-10">
+                <div className="mx-auto mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-[#00F2FE]/10 border border-[#00F2FE]/20 text-[#00F2FE] shadow-sm">
+                  <Brain className="h-5 w-5" />
+                </div>
+                <h2 className="text-xl sm:text-2xl md:text-3xl font-extrabold tracking-tight text-white font-poppins">
+                  Ready to organize your job search?
+                </h2>
+                <p className="mx-auto mt-2 max-w-md text-xs sm:text-sm text-slate-400 leading-relaxed font-normal">
+                  Join thousands of software engineers, product managers, and designers crafting premium careers with HIRE-X.
+                </p>
+                <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
+                  <Link to="/register" className="w-full sm:w-auto">
+                    <Button size="lg" className="btn-premium w-full sm:w-auto px-6 py-2.5 rounded-xl flex items-center justify-center text-xs font-bold">
+                      Create Free Account
+                      <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
+                    </Button>
+                  </Link>
+                  <Link to="/chat" className="w-full sm:w-auto">
+                    <Button size="lg" className="btn-outline-premium w-full sm:w-auto px-5 py-2.5 rounded-xl flex items-center justify-center text-xs font-semibold">
+                      Consult Career Coach
+                    </Button>
+                  </Link>
+                </div>
               </div>
-              <h2 className="text-xl sm:text-2xl md:text-3xl font-extrabold tracking-tight text-white font-poppins">
-                Ready to organize your job search?
-              </h2>
-              <p className="mx-auto mt-2 max-w-md text-xs sm:text-sm text-slate-400 leading-relaxed font-normal">
-                Join thousands of software engineers, product managers, and designers crafting premium careers with HIRE-X.
-              </p>
-              <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
-                <Link to="/register" className="w-full sm:w-auto">
-                  <Button size="lg" className="btn-premium w-full sm:w-auto px-6 py-2.5 rounded-xl flex items-center justify-center text-xs font-bold">
-                    Create Free Account
-                    <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
-                  </Button>
-                </Link>
-                <Link to="/chat" className="w-full sm:w-auto">
-                  <Button size="lg" className="btn-outline-premium w-full sm:w-auto px-5 py-2.5 rounded-xl flex items-center justify-center text-xs font-semibold">
-                    Consult Career Coach
-                  </Button>
-                </Link>
-              </div>
-            </motion.div>
-          </div>
+            </div>
+          </InteractiveCard>
         </div>
-      </section>
+      </AnimatedSection>
     </div>
   );
 };
 
 export default Index;
-

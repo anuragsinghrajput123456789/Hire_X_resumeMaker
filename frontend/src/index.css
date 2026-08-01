@@ -110,6 +110,13 @@
     animation: mesh-morph 22s infinite alternate ease-in-out;
   }
 
+  /* GPU Acceleration Helper */
+  .gpu-layer {
+    transform: translateZ(0);
+    will-change: transform, opacity;
+    backface-visibility: hidden;
+  }
+
   /* Vibrant Subtle Text Gradients */
   .text-gradient-career {
     @apply bg-gradient-to-r from-[#00F2FE] to-[#4FACFE] bg-clip-text text-transparent;
@@ -154,19 +161,19 @@
 
   /* Refined Button Triggers */
   .btn-premium {
-    @apply bg-gradient-to-r from-[#8B5CF6] via-[#D946EF] to-[#EC4899] hover:from-[#7C3AED] hover:via-[#C026D3] hover:to-[#DB2777] text-white font-bold rounded-xl px-6 py-3 transition-all duration-200 ease-out shadow-lg shadow-purple-500/20 hover:shadow-pink-500/30 hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] relative overflow-hidden;
+    @apply bg-gradient-to-r from-[#8B5CF6] via-[#D946EF] to-[#EC4899] hover:from-[#7C3AED] hover:via-[#C026D3] hover:to-[#DB2777] text-white font-bold rounded-xl px-6 py-3 transition-all duration-200 ease-out shadow-lg shadow-purple-500/20 hover:shadow-pink-500/30 hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] relative overflow-hidden select-none;
   }
 
   .btn-outline-premium {
-    @apply border border-white/10 bg-white/[0.04] text-slate-200 hover:text-white hover:bg-white/[0.08] hover:border-white/20 rounded-xl px-5 py-3 transition-all duration-200 ease-out font-bold hover:-translate-y-0.5 active:translate-y-0;
+    @apply border border-white/10 bg-white/[0.04] text-slate-200 hover:text-white hover:bg-white/[0.08] hover:border-white/20 rounded-xl px-5 py-3 transition-all duration-200 ease-out font-bold hover:-translate-y-0.5 active:translate-y-0 select-none;
   }
 
   .input-premium {
-    @apply bg-[#070B18]/90 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-gray-100 placeholder:text-gray-500 focus:border-[#00F2FE]/50 focus:ring-1 focus:ring-[#00F2FE]/25 transition-all duration-200 ease-out outline-none shadow-inner;
+    @apply bg-[#070B18]/90 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-gray-100 placeholder:text-gray-500 focus:border-[#00F2FE]/60 focus:ring-1 focus:ring-[#00F2FE]/30 focus:shadow-[0_0_20px_rgba(0,242,254,0.15)] transition-all duration-200 ease-out outline-none shadow-inner;
   }
 
   .textarea-premium {
-    @apply bg-[#070B18]/90 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-gray-100 placeholder:text-gray-500 focus:border-[#00F2FE]/50 focus:ring-1 focus:ring-[#00F2FE]/25 transition-all duration-200 ease-out outline-none shadow-inner;
+    @apply bg-[#070B18]/90 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-gray-100 placeholder:text-gray-500 focus:border-[#00F2FE]/60 focus:ring-1 focus:ring-[#00F2FE]/30 focus:shadow-[0_0_20px_rgba(0,242,254,0.15)] transition-all duration-200 ease-out outline-none shadow-inner;
   }
 
   .card-enhanced {
@@ -239,6 +246,12 @@
   100% { transform: translateX(300%) skewX(-15deg); }
 }
 
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
 .animate-shimmer {
   animation: shimmer-beam 3.5s infinite ease-in-out;
 }
@@ -253,5 +266,3 @@
     transform: none !important;
   }
 }
-
-
