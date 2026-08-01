@@ -1,6 +1,29 @@
 # Hire-X Deep Dive Guide
 
-This document explores advanced codebase components, prompt engineering layouts, security mechanics, and template sanitization rules implemented in **Hire-X**.
+This document explores advanced codebase components, prompt engineering layouts, security mechanics, UI motion engineering, and template sanitization rules implemented in **Hire-X**.
+
+---
+
+## 🎨 UI Motion System & Micro-Interactions Architecture
+
+Hire-X implements a centralized Framer Motion animation framework in [`frontend/src/lib/animations.ts`](file:///c:/Users/91836/Downloads/Mern-Ai-Projects/Hire-XfinalVerdict/frontend/src/lib/animations.ts) designed for zero layout jank and high perceived performance.
+
+### 1. Motion Physics & Easing System
+All component transitions utilize standardized spring physics and exponential easing tokens:
+*   **`springSmooth`**: `{ type: "spring", stiffness: 350, damping: 30 }` — Used for card hover, modal entry, and interactive popups.
+*   **`springBouncy`**: `{ type: "spring", stiffness: 450, damping: 25 }` — Used for floating toggle triggers and action buttons.
+*   **`springSnappy`**: `{ type: "spring", stiffness: 500, damping: 35 }` — Used for quick button presses (`whileTap: { scale: 0.97 }`).
+*   **`easeOutExpo`**: `[0.16, 1, 0.3, 1]` — Natural exponential deceleration curve for page fade-ups and route transitions.
+
+### 2. Interactive Card Component (`<InteractiveCard>`)
+Wrapped around feature cards across the application ([`frontend/src/components/InteractiveCard.tsx`](file:///c:/Users/91836/Downloads/Mern-Ai-Projects/Hire-XfinalVerdict/frontend/src/components/InteractiveCard.tsx)):
+*   **Desktop Mouse Spotlight**: Calculates local mouse coordinates `(x, y)` relative to card bounds and renders a radial cursor-following spotlight glow (`glowColor`).
+*   **3D Subtle Micro-Tilt**: Rotates `rotateX` and `rotateY` up to 3° on desktop hover without causing reflows.
+*   **Mobile Safety**: Automatically detects touch pointers (`pointer: coarse`) or reduced motion preferences to disable tilt physics for smooth mobile scrolling.
+
+### 3. AI Streaming & Thinking Micro-Interactions
+*   **`<AITypingIndicator>`**: Replaces static spinners with a staggered 3-dot bouncing gradient animation during AI inference.
+*   **Streaming Reveals**: Chat messages animate into view using scale-fade entries (`aiMessageVariants`).
 
 ---
 

@@ -2,7 +2,7 @@
 
 ## Overview
 
-Hire-X is a full-stack AI career intelligence platform built with React, TypeScript, Node.js, Express, MongoDB, and OpenRouter AI.
+Hire-X is an enterprise-grade full-stack AI career intelligence platform built with React 18, TypeScript, Node.js, Express 5, MongoDB Atlas, and OpenRouter AI.
 
 ---
 
@@ -10,11 +10,12 @@ Hire-X is a full-stack AI career intelligence platform built with React, TypeScr
 
 ```
 Hire-XfinalVerdict/
+├── assets/                  # High-resolution visual banners, logos, and UI mockups
 ├── backend/
 │   ├── config/              # Environment & DB connection validation
 │   ├── middleware/          # JWT protection & centralized error handler
 │   ├── models/              # Mongoose schemas with indexed user fields
-│   ├── routes/              # Express API route wrappers (backward compatible)
+│   ├── routes/              # Express API route wrappers
 │   ├── controllers/         # Controller backward-compatibility delegation wrappers
 │   └── src/
 │       ├── ai/              # AI Core (Queue, Manager, Prompting, Parsers, Schema Validation)
@@ -28,9 +29,10 @@ Hire-XfinalVerdict/
 │           └── resume/
 └── frontend/
     ├── src/
-    │   ├── components/      # UI components and feature views
-    │   ├── context/         # AuthContext
+    │   ├── components/      # UI primitives, animated wrappers, and feature views
+    │   ├── context/         # AuthContext state manager
     │   ├── hooks/           # Extracted custom hooks (useCoverLetter, useColdEmail, etc.)
+    │   ├── lib/             # Utilities & Centralized Framer Motion system (animations.ts)
     │   ├── pages/           # Lazy-loaded page routes
     │   ├── services/        # Centralized apiFetch HTTP client & feature services
     │   └── types/           # TypeScript interface definitions
@@ -42,12 +44,21 @@ Hire-XfinalVerdict/
 
 ### 1. Centralized Resilience & Request Pipeline (`apiClient.ts`)
 All frontend HTTP communication routes through `apiFetch()`:
-- **Timeout**: 30s default (60s for AI workloads).
+- **Timeout**: 30s default (60s for heavy AI workloads).
 - **Auto Retry**: 1 automatic retry on network failure or 5xx server responses.
 - **Unified Error Handling**: Extracts JSON/text error payloads and normalizes network drops to user-friendly messages.
 - **Auth Interception**: Automatically clears stale token storage on 401 response status.
 
-### 2. Priority-Queued AI Orchestration (`src/ai/`)
+### 2. Centralized Animation & Motion Engineering System (`src/lib/animations.ts`)
+The entire frontend UI uses a unified, production-ready motion architecture powered by **Framer Motion**:
+- **Standardized Physics Tokens**: Curated spring configurations (`springSmooth`, `springBouncy`, `springSnappy`) and easing curves (`easeOutExpo`, `easeInOutCubic`).
+- **Page Route Transitions**: Seamless route crossfading via `<PageTransition>` and `AnimatePresence` to prevent layout flashes.
+- **Viewport Section Reveal**: Scroll-triggered animations via `<AnimatedSection>` using `whileInView` and single-fire execution (`once: true`).
+- **Desktop 3D Micro-Tilt & Cursor Spotlight**: Interactive card hover elevation with desktop mouse-following spotlight glow via `<InteractiveCard>` and automatic mobile fallback.
+- **AI Streaming & Micro-Interactions**: Custom `<AITypingIndicator>` dot bounces, smooth message entry reveals, shimmering skeleton loaders, and non-blocking GPU-accelerated transforms (`transform`, `opacity`).
+- **Accessibility & Reduced Motion**: Automatically enforces `prefers-reduced-motion` compliance across all animation variants.
+
+### 3. Priority-Queued AI Orchestration (`src/ai/`)
 Every AI feature request flows through the AI Request Engine:
 1. **Pre-flight Input Validation** (`RequestValidator.js`) — screens payload size and prompt injection risks.
 2. **Request Deduplication** (`RequestDeduplicator.js`) — prevents duplicate concurrent AI calls.
@@ -55,7 +66,7 @@ Every AI feature request flows through the AI Request Engine:
 4. **Resilient Provider Execution** (`OpenRouterProvider.js` & `GeminiProvider.js`) — automatically handles model fallbacks, exponential backoff retries, and rate-limit cooldowns.
 5. **JSON Healing & Validation** (`ResponseParser.js` & `SchemaValidator.js`) — auto-repairs missing quotes/brackets and validates schemas before responding.
 
-### 3. Backend Feature Modules (`src/features/`)
+### 4. Backend Feature Modules (`src/features/`)
 Backend features are self-contained:
 - **Routes**: Expose HTTP endpoints.
 - **Controllers**: Thin interface handlers for validating input and delegating to services.
