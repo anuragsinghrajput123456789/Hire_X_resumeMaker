@@ -19,25 +19,25 @@ const JobMatchPage = () => {
         <div className="absolute top-[40%] -right-[10%] h-[45%] w-[45%] rounded-full bg-pink-500/5 blur-[120px]"></div>
       </div>
 
-      <div className="container relative z-10 mx-auto px-4 py-8 sm:px-6 md:py-12">
+      <div className="container relative z-10 mx-auto px-4 sm:px-6 lg:px-8 pt-2 pb-16 max-w-7xl">
         {/* Enhanced Header Section */}
         <motion.div 
            initial={{ opacity: 0, y: -20 }}
            animate={{ opacity: 1, y: 0 }}
            transition={{ duration: 0.6 }}
-           className="mb-10 text-center md:mb-14 flex flex-col items-center"
+           className="mb-6 text-center flex flex-col items-center"
         >
-          <div className="relative mb-6 flex flex-col items-center justify-center gap-4 sm:flex-row">
+          <div className="relative mb-4 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <div className="absolute inset-0 rounded-full bg-pink-500/10 blur-xl"></div>
-            <div className="relative rounded-full bg-gradient-to-br from-pink-500 via-purple-600 to-indigo-600 p-4 shadow-xl shadow-pink-500/10 border border-pink-400/20">
-              <Target className="w-8 h-8 text-white animate-pulse" />
+            <div className="relative rounded-full bg-gradient-to-br from-pink-500 via-purple-600 to-indigo-600 p-3.5 shadow-xl shadow-pink-500/10 border border-pink-400/20">
+              <Target className="w-6 h-6 text-white animate-pulse" />
             </div>
-            <h1 className="text-center text-3xl font-black tracking-tight text-white sm:text-4xl md:text-5xl">
+            <h1 className="text-center text-3xl font-black tracking-tight text-white font-poppins sm:text-4xl md:text-5xl">
               Job Portals & Opportunity Hub
             </h1>
           </div>
           
-          <p className="mx-auto mb-8 max-w-3xl text-sm sm:text-base leading-relaxed text-gray-300">
+          <p className="mx-auto mb-6 max-w-3xl text-xs sm:text-sm leading-relaxed text-slate-300 font-medium">
             Explore top career channels featuring <span className="font-bold text-[#00F2FE]">Instahyre</span>, <span className="font-bold text-rose-400">Remote Work</span>, <span className="font-bold text-amber-400">Y Combinator Startups</span>, <span className="font-bold text-purple-400">Internships</span>, <span className="font-bold text-emerald-400">Freelance Contracts</span>, and <span className="font-bold text-cyan-400">Global Scholarships</span>.
           </p>
           

@@ -1,10 +1,11 @@
 import { lazy, Suspense, useEffect, useState } from "react";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
-import { AnimatePresence, MotionConfig } from "framer-motion";
+import { AnimatePresence } from "framer-motion";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { AnimationProvider } from "@/animations";
 import { AuthProvider } from "./context/AuthContext";
 import Navbar from "./components/Navbar";
 import FloatingChatbot from "./components/FloatingChatbot";
@@ -90,7 +91,7 @@ const App = () => {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <MotionConfig reducedMotion="never">
+      <AnimationProvider reducedMotion="never">
         <AuthProvider>
           <TooltipProvider>
             <Toaster />
@@ -110,7 +111,7 @@ const App = () => {
             </BrowserRouter>
           </TooltipProvider>
         </AuthProvider>
-      </MotionConfig>
+      </AnimationProvider>
     </QueryClientProvider>
   );
 };

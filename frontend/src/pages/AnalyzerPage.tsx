@@ -13,31 +13,31 @@ const AnalyzerPage = () => {
           <div className="absolute top-[40%] -right-[10%] h-[40%] w-[40%] rounded-full bg-purple-500/5 blur-[120px]"></div>
        </div>
 
-      <div className="container relative z-10 mx-auto px-4 py-8 sm:px-6 md:py-12">
+      <div className="container relative z-10 mx-auto px-4 sm:px-6 lg:px-8 pt-2 pb-16 max-w-7xl">
         {/* Enhanced Header Section */}
         <motion.div 
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="text-center mb-12 flex flex-col items-center"
+          className="text-center mb-8 flex flex-col items-center"
         >
-          <div className="relative mb-6 flex flex-col items-center justify-center gap-4 sm:flex-row">
+          <div className="relative mb-4 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <div className="absolute inset-0 rounded-full bg-emerald-500/10 blur-xl"></div>
-            <div className="relative rounded-2xl bg-gradient-to-br from-emerald-400 to-teal-500 p-3.5 shadow-xl shadow-emerald-500/10">
-              <Search className="w-8 h-8 text-white" />
+            <div className="relative rounded-2xl bg-gradient-to-br from-emerald-400 to-teal-500 p-3 shadow-xl shadow-emerald-500/10">
+              <Search className="w-6 h-6 text-white" />
             </div>
-            <h1 className="text-center text-3xl font-black tracking-tight text-white sm:text-4xl md:text-5xl">
+            <h1 className="text-center text-3xl font-black tracking-tight text-white font-poppins sm:text-4xl md:text-5xl">
               Resume Analyzer
             </h1>
           </div>
           
-          <p className="mx-auto mb-10 max-w-2xl text-sm sm:text-base leading-relaxed text-gray-300">
+          <p className="mx-auto mb-6 max-w-2xl text-xs sm:text-sm leading-relaxed text-slate-300 font-medium">
             Get detailed analysis and improvement suggestions for your resume. 
             Boost your <span className="text-emerald-400 font-bold">ATS compatibility</span> and increase your chances of landing interviews.
           </p>
           
           {/* Feature Highlights */}
-          <div className="flex flex-wrap justify-center gap-4 mb-8">
+          <div className="flex flex-wrap justify-center gap-3 mb-4">
             {[
               { icon: Target, text: "ATS Score Check", color: "text-emerald-400" },
               { icon: TrendingUp, text: "Strategic Improvements", color: "text-indigo-400" },
@@ -48,9 +48,9 @@ const AnalyzerPage = () => {
                  initial={{ opacity: 0, y: 10 }}
                  animate={{ opacity: 1, y: 0 }}
                  transition={{ delay: 0.15 + idx * 0.08 }}
-                 className="flex items-center gap-2 rounded-full border border-white/5 bg-[#0F1424]/60 px-4 py-2 shadow-sm backdrop-blur"
+                 className="flex items-center gap-2 rounded-full border border-white/10 bg-[#0F1424]/70 px-3.5 py-1.5 shadow-sm backdrop-blur"
                >
-                 <feature.icon className={`w-4 h-4 ${feature.color}`} />
+                 <feature.icon className={`w-3.5 h-3.5 ${feature.color}`} />
                  <span className="text-xs font-bold text-gray-200">{feature.text}</span>
                </motion.div>
             ))}

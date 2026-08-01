@@ -37,16 +37,16 @@ const CoverLetterPage = () => {
   };
 
   return (
-    <div className="min-h-screen pb-16 px-4 max-w-7xl mx-auto space-y-8">
+    <div className="min-h-screen pb-16 px-4 sm:px-6 lg:px-8 pt-2 max-w-7xl mx-auto space-y-6">
       {/* Header */}
-      <div className="text-center space-y-3 pt-6">
+      <div className="text-center space-y-2 pt-2">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-violet-500/10 border border-violet-500/20 text-violet-400 text-xs font-semibold">
           <Mail className="w-3.5 h-3.5" /> AI Cover Letter Generator
         </div>
-        <h1 className="text-3xl md:text-5xl font-black tracking-tight text-white">
+        <h1 className="text-3xl md:text-5xl font-black tracking-tight text-white font-poppins">
           Tailor Your <span className="bg-clip-text text-transparent bg-gradient-to-r from-violet-400 via-pink-400 to-amber-400">Cover Letter</span>
         </h1>
-        <p className="text-sm text-gray-400 max-w-2xl mx-auto">
+        <p className="text-xs sm:text-sm text-slate-400 max-w-2xl mx-auto font-medium">
           Generate targeted, high-impact cover letters matched specifically to job descriptions and company context.
         </p>
       </div>
@@ -64,7 +64,7 @@ const CoverLetterPage = () => {
         </div>
 
         <TabsContent value="editor" className="space-y-6">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             <div className="lg:col-span-5">
               <CoverLetterForm
                 companyName={coverLetter.companyName}
@@ -93,7 +93,7 @@ const CoverLetterPage = () => {
               />
             </div>
 
-            <div className="lg:col-span-7">
+            <div className="lg:col-span-7 lg:sticky lg:top-28">
               <CoverLetterPreview
                 data={coverLetter.generatedData}
                 isSaving={coverLetter.isSaving}

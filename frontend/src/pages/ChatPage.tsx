@@ -17,13 +17,13 @@ const ChatPage = () => {
           <div className="absolute bottom-[10%] left-[30%] h-[400px] w-[400px] rounded-full bg-pink-500/10 blur-[140px]"></div>
        </div>
 
-      <div className="container relative z-10 mx-auto px-4 py-6 sm:px-6 md:py-10 max-w-7xl">
+      <div className="container relative z-10 mx-auto px-4 sm:px-6 lg:px-8 pt-2 pb-16 max-w-7xl">
         {/* Workspace HUD Stats Banner */}
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="mb-8 p-3.5 sm:p-4 rounded-2xl glass-card bg-[#0B1020]/80 border border-white/10 shadow-2xl flex flex-wrap items-center justify-between gap-4"
+          className="mb-6 p-3 sm:p-4 rounded-2xl glass-card bg-[#0B1020]/80 border border-white/10 shadow-2xl flex flex-wrap items-center justify-between gap-4"
         >
           <div className="flex items-center gap-3">
             <div className="relative rounded-xl bg-gradient-to-br from-cyan-400 via-sky-500 to-purple-600 p-[1.5px] shadow-lg shadow-cyan-500/20">

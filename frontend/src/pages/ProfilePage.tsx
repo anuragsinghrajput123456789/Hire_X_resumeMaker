@@ -18,7 +18,7 @@ const ProfilePage = () => {
         <div className="absolute top-[40%] right-[10%] h-[40%] w-[40%] rounded-full bg-pink-500/10 blur-[140px]"></div>
       </div>
 
-      <div className="container relative z-10 mx-auto px-4 py-8 sm:px-6 md:py-12 max-w-5xl space-y-8">
+      <div className="container relative z-10 mx-auto px-4 sm:px-6 lg:px-8 pt-2 pb-16 max-w-7xl space-y-6">
         {/* Profile User Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
