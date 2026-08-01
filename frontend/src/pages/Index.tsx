@@ -82,11 +82,14 @@ const stats = [
 ];
 
 const conveyorItems = [
-  { name: 'Senior React Architect', match: '98%', status: 'Recruiter Outreach Active', color: 'border-[#00F2FE]/25' },
-  { name: 'Staff Product Manager', match: '95%', status: 'Interviewing at Stripe', color: 'border-[#8B5CF6]/25' },
-  { name: 'Machine Learning Engineer', match: '97%', status: 'Offer Received', color: 'border-[#00F5A0]/25' },
-  { name: 'Director of Engineering', match: '99%', status: 'ATS Score Verified', color: 'border-[#D946EF]/25' },
-  { name: 'Lead Devops Engineer', match: '96%', status: 'Cold Email Dispatched', color: 'border-[#FF0844]/25' }
+  { name: 'Senior React Architect', match: '98%', status: 'Recruiter Outreach Active', color: 'border-[#00F2FE]/30 glow-cyan' },
+  { name: 'Staff Product Lead • Meta', match: '95%', status: 'Interview Scheduled', color: 'border-[#8B5CF6]/30 glow-pink' },
+  { name: 'AI Engineer • OpenAI', match: '99%', status: 'Offer Letter Received', color: 'border-[#00F5A0]/30 glow-emerald' },
+  { name: 'Fullstack Architect • Stripe', match: '97%', status: 'ATS Score Verified', color: 'border-[#D946EF]/30 glow-pink' },
+  { name: 'Principal DevOps Engineer', match: '96%', status: 'Cold Email Dispatched', color: 'border-[#FF0844]/30 glow-rose' },
+  { name: 'Senior Data Scientist • Google', match: '98%', status: 'Technical Round Cleared', color: 'border-[#00F2FE]/30 glow-cyan' },
+  { name: 'Lead UI/UX Architect', match: '94%', status: 'Portfolio Match 98%', color: 'border-[#8B5CF6]/30 glow-pink' },
+  { name: 'Cloud Solutions Lead • AWS', match: '99%', status: 'Direct Recruiter Contact', color: 'border-[#00F5A0]/30 glow-emerald' }
 ];
 
 const Index = () => {
@@ -97,35 +100,68 @@ const Index = () => {
       <HeroSection />
 
       {/* 2. Live Workspace Tracker Ticker Strip */}
-      <section className="relative py-6 z-10 overflow-hidden border-y border-white/[0.05] bg-[#050814]/60 backdrop-blur-md">
-        <div className="max-w-7xl mx-auto px-6 mb-3">
-          <div className="text-[10px] font-bold uppercase tracking-widest text-[#00F2FE] flex items-center gap-1.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#00F2FE] animate-pulse" />
-            Live Candidate Matches Ticker
+      <section className="relative py-8 z-10 overflow-hidden border-y border-white/[0.1] bg-[#050816]/90 backdrop-blur-2xl">
+        {/* Animated Top & Bottom Glowing Border Beams */}
+        <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#00F2FE]/60 to-transparent shadow-[0_0_15px_#00F2FE]" />
+        <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#D946EF]/60 to-transparent shadow-[0_0_15px_#D946EF]" />
+
+        {/* Animated Background Mesh & Floating Orbs */}
+        <div className="absolute inset-0 bg-gradient-to-r from-[#00F2FE]/10 via-[#8B5CF6]/10 to-[#EC4899]/10 animate-pulse pointer-events-none" />
+        <div className="absolute inset-0 bg-grid-soft opacity-40 pointer-events-none" />
+        <div className="ambient-orb w-[500px] h-[180px] top-1/2 -left-20 -translate-y-1/2 bg-gradient-to-r from-[#00F2FE]/20 via-[#8B5CF6]/20 to-transparent blur-3xl pointer-events-none animate-float" />
+        <div className="ambient-orb w-[500px] h-[180px] top-1/2 -right-20 -translate-y-1/2 bg-gradient-to-l from-[#EC4899]/20 via-[#00F5A0]/20 to-transparent blur-3xl pointer-events-none animate-float" />
+
+        {/* Left & Right Edge Vignette Fade Masks for Seamless Motion */}
+        <div className="pointer-events-none absolute inset-y-0 left-0 w-28 sm:w-44 bg-gradient-to-r from-[#030712] via-[#030712]/90 to-transparent z-30" />
+        <div className="pointer-events-none absolute inset-y-0 right-0 w-28 sm:w-44 bg-gradient-to-l from-[#030712] via-[#030712]/90 to-transparent z-30" />
+
+        <div className="max-w-7xl mx-auto px-6 mb-3.5 relative z-20">
+          <div className="text-[11px] font-black uppercase tracking-widest text-[#00F2FE] flex items-center gap-2 drop-shadow-[0_0_10px_rgba(0,242,254,0.4)]">
+            <span className="relative flex h-2.5 w-2.5">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00F2FE] opacity-80"></span>
+              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#00F2FE]"></span>
+            </span>
+            <span>Live Candidate Activity & Recruiter Matches</span>
           </div>
         </div>
         
-        <div className="w-full flex overflow-hidden relative">
-          <div className="animate-conveyor flex gap-4">
-            {conveyorItems.concat(conveyorItems).map((item, idx) => (
+        {/* Guaranteed Framer Motion Infinite Right-to-Left Marquee */}
+        <div className="w-full flex overflow-hidden relative z-20 py-1">
+          <motion.div
+            animate={{ x: ["0%", "-50%"] }}
+            transition={{
+              x: {
+                repeat: Infinity,
+                repeatType: "loop",
+                duration: 22,
+                ease: "linear",
+              },
+            }}
+            className="flex gap-4 w-max shrink-0"
+          >
+            {conveyorItems.concat(conveyorItems, conveyorItems, conveyorItems).map((item, idx) => (
               <div
                 key={idx}
-                className={`glass-card border rounded-xl px-4 py-2.5 flex items-center gap-3 min-w-[260px] ${item.color} transition-all duration-300 hover:scale-[1.02] hover:border-white/20`}
+                className={`glass-card border rounded-2xl px-4 py-3 flex items-center gap-3.5 min-w-[300px] ${item.color} transition-all duration-300 hover:scale-[1.04] hover:border-white/40 cursor-pointer shadow-xl backdrop-blur-2xl group/ticker relative overflow-hidden`}
               >
-                <div className="w-6 h-6 rounded-full bg-[#00F2FE]/10 border border-[#00F2FE]/30 flex items-center justify-center text-[#00F2FE] shrink-0">
-                  <CheckCircle2 className="w-3.5 h-3.5" />
+                {/* Subtle Card Background Glow Highlight */}
+                <div className="absolute inset-0 bg-gradient-to-r from-white/[0.03] to-transparent pointer-events-none" />
+                
+                <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-[#00F2FE]/25 to-[#8B5CF6]/25 border border-[#00F2FE]/50 flex items-center justify-center text-[#00F2FE] shrink-0 group-hover/ticker:scale-110 shadow-[0_0_15px_rgba(0,242,254,0.3)] transition-transform">
+                  <CheckCircle2 className="w-4.5 h-4.5" />
                 </div>
-                <div>
-                  <div className="text-xs font-bold text-white">{item.name}</div>
-                  <div className="flex items-center gap-1.5 text-[10px] text-slate-400 mt-0.5">
-                    <span>Score: <b className="text-white font-semibold">{item.match}</b></span>
-                    <span className="text-slate-600">•</span>
-                    <span>{item.status}</span>
+
+                <div className="relative z-10">
+                  <div className="text-xs font-black text-white tracking-tight group-hover/ticker:text-[#00F2FE] transition-colors">{item.name}</div>
+                  <div className="flex items-center gap-2 text-[10px] text-slate-300 mt-1 font-semibold">
+                    <span className="bg-[#00F5A0]/15 text-[#00F5A0] border border-[#00F5A0]/40 px-2 py-0.5 rounded-md font-extrabold shadow-sm">{item.match} Match</span>
+                    <span className="text-slate-500">•</span>
+                    <span className="text-slate-200 font-medium">{item.status}</span>
                   </div>
                 </div>
               </div>
             ))}
-          </div>
+          </motion.div>
         </div>
       </section>
 
@@ -230,6 +266,73 @@ const Index = () => {
               </div>
             </InteractiveCard>
           ))}
+        </div>
+      </AnimatedSection>
+
+      {/* 5.5 Candidate Success Stories & Social Proof */}
+      <AnimatedSection className="relative px-6 py-12 sm:px-8 z-10 max-w-7xl mx-auto">
+        <div className="container mx-auto max-w-6xl">
+          <div className="text-center mb-10 max-w-xl mx-auto">
+            <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#00F5A0] bg-[#00F5A0]/10 border border-[#00F5A0]/20 px-3 py-1 rounded-full">
+              Loved By Candidates
+            </span>
+            <h2 className="mt-3 text-2xl sm:text-3xl font-extrabold tracking-tight text-white font-poppins">
+              Landed Roles at Top Companies
+            </h2>
+            <p className="mt-2 text-xs sm:text-sm text-slate-400 leading-relaxed font-normal">
+              See how job seekers use Hire-X to accelerate applications and land high-paying roles.
+            </p>
+          </div>
+
+          <div className="grid gap-5 md:grid-cols-3">
+            {[
+              {
+                name: "Sarah Lin",
+                role: "Senior Frontend Engineer @ Stripe",
+                text: "Hire-X flagged 7 critical missing keywords in my resume. After applying the AI fixes, my ATS match score jumped to 96% and I got 3 interview requests in 48 hours!",
+                glow: "rgba(0, 242, 254, 0.15)",
+                gradient: "from-[#00F2FE] to-[#4FACFE]"
+              },
+              {
+                name: "Marcus Vance",
+                role: "Staff Backend Engineer @ Meta",
+                text: "The AI Cover Letter generator and real-time interview prep assistant gave me the exact edge I needed to land my dream offer with full equity transparency.",
+                glow: "rgba(217, 70, 239, 0.15)",
+                gradient: "from-[#D946EF] to-[#EC4899]"
+              },
+              {
+                name: "Elena Rostova",
+                role: "Lead Product Manager @ Google",
+                text: "The curated job portal hub and automated cold outreach tool saved me weeks of manual searching. Received callbacks from top tech leads effortlessly.",
+                glow: "rgba(0, 245, 160, 0.15)",
+                gradient: "from-[#00F5A0] to-[#00D990]"
+              }
+            ].map((story, i) => (
+              <InteractiveCard key={story.name} glowColor={story.glow}>
+                <div className="glass-card border border-white/10 rounded-2xl p-6 h-full flex flex-col justify-between hover:border-white/20 transition-all duration-300">
+                  <div>
+                    <div className="flex items-center gap-1 text-amber-400 mb-3">
+                      {[...Array(5)].map((_, idx) => (
+                        <span key={idx} className="text-xs">★</span>
+                      ))}
+                    </div>
+                    <p className="text-xs leading-relaxed text-slate-300 italic font-medium mb-4">
+                      "{story.text}"
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-3 pt-3 border-t border-white/[0.06]">
+                    <div className={`w-9 h-9 rounded-full bg-gradient-to-br ${story.gradient} flex items-center justify-center text-white text-xs font-black shadow-md`}>
+                      {story.name.charAt(0)}
+                    </div>
+                    <div>
+                      <h4 className="text-xs font-extrabold text-white">{story.name}</h4>
+                      <p className="text-[10px] text-slate-400 font-medium">{story.role}</p>
+                    </div>
+                  </div>
+                </div>
+              </InteractiveCard>
+            ))}
+          </div>
         </div>
       </AnimatedSection>
 

@@ -35,7 +35,6 @@ const userSchema = mongoose.Schema(
 );
 
 // Indexes for database performance
-userSchema.index({ email: 1 });
 userSchema.index({ createdAt: -1 });
 
 // Encrypt password using bcrypt

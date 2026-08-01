@@ -1,6 +1,6 @@
 import { lazy, Suspense, useEffect, useState } from "react";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
-import { AnimatePresence } from "framer-motion";
+import { AnimatePresence, MotionConfig } from "framer-motion";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -90,25 +90,27 @@ const App = () => {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <div className={`min-h-screen bg-mesh transition-opacity duration-500 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}>
-              <Navbar />
-              <main className="relative pt-32">
-                <Suspense fallback={<PageFallback />}>
-                  <AnimatedRoutes />
-                </Suspense>
-              </main>
-              <Footer />
-              <FloatingChatbot />
-              <ScrollToTopButton />
-            </div>
-          </BrowserRouter>
-        </TooltipProvider>
-      </AuthProvider>
+      <MotionConfig reducedMotion="never">
+        <AuthProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <div className={`min-h-screen bg-mesh transition-opacity duration-500 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}>
+                <Navbar />
+                <main className="relative pt-32">
+                  <Suspense fallback={<PageFallback />}>
+                    <AnimatedRoutes />
+                  </Suspense>
+                </main>
+                <Footer />
+                <FloatingChatbot />
+                <ScrollToTopButton />
+              </div>
+            </BrowserRouter>
+          </TooltipProvider>
+        </AuthProvider>
+      </MotionConfig>
     </QueryClientProvider>
   );
 };

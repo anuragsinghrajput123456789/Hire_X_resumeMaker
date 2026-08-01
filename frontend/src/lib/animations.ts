@@ -4,11 +4,13 @@ import { Variants } from "framer-motion";
 export const springSmooth = { type: "spring", stiffness: 350, damping: 30 };
 export const springBouncy = { type: "spring", stiffness: 450, damping: 25 };
 export const springSnappy = { type: "spring", stiffness: 500, damping: 35 };
+export const springGentle = { type: "spring", stiffness: 220, damping: 28 };
 
 // Standard Easing Curves
 export const easeOutExpo = [0.16, 1, 0.3, 1];
 export const easeInOutCubic = [0.65, 0, 0.35, 1];
 export const easeOutBack = [0.34, 1.56, 0.64, 1];
+export const easeFastOutSlowIn = [0.4, 0, 0.2, 1];
 
 // Standard Durations
 export const durationFast = 0.15;
@@ -137,6 +139,20 @@ export const cardMotionProps = {
   transition: springSmooth,
 };
 
+/** Badge Motion Variant */
+export const badgeMotionProps = {
+  whileHover: { scale: 1.05, y: -1 },
+  whileTap: { scale: 0.95 },
+  transition: springSnappy,
+};
+
+/** Icon Motion Variant */
+export const iconMotionProps = {
+  whileHover: { scale: 1.15, rotate: 4 },
+  whileTap: { scale: 0.9 },
+  transition: springBouncy,
+};
+
 /** Modal Backdrop Variant */
 export const modalBackdropVariants: Variants = {
   hidden: { opacity: 0 },
@@ -147,6 +163,23 @@ export const modalBackdropVariants: Variants = {
   exit: {
     opacity: 0,
     transition: { duration: durationFast },
+  },
+};
+
+/** Modal Content Variant */
+export const modalContentVariants: Variants = {
+  hidden: { opacity: 0, scale: 0.95, y: 12 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    y: 0,
+    transition: { duration: durationNormal, ease: easeOutExpo },
+  },
+  exit: {
+    opacity: 0,
+    scale: 0.96,
+    y: 8,
+    transition: { duration: durationFast, ease: "easeIn" },
   },
 };
 
@@ -164,6 +197,33 @@ export const toastVariants: Variants = {
     x: 20,
     scale: 0.96,
     transition: { duration: durationFast },
+  },
+};
+
+/** Dropdown / Popover Variants */
+export const dropdownVariants: Variants = {
+  hidden: { opacity: 0, scale: 0.95, y: -4 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    y: 0,
+    transition: { duration: durationNormal, ease: easeOutExpo },
+  },
+  exit: {
+    opacity: 0,
+    scale: 0.95,
+    y: -4,
+    transition: { duration: durationFast },
+  },
+};
+
+/** Accordion / Collapse Variants */
+export const accordionVariants: Variants = {
+  collapsed: { height: 0, opacity: 0, overflow: "hidden" },
+  expanded: {
+    height: "auto",
+    opacity: 1,
+    transition: { duration: durationNormal, ease: easeOutExpo },
   },
 };
 
@@ -192,6 +252,16 @@ export const aiMessageVariants: Variants = {
   },
 };
 
+/** Success Pop Variant */
+export const successPopVariants: Variants = {
+  hidden: { scale: 0.8, opacity: 0 },
+  visible: {
+    scale: [0.8, 1.12, 1],
+    opacity: 1,
+    transition: { duration: 0.35, ease: easeOutBack },
+  },
+};
+
 /** Error Shake Variant */
 export const errorShakeVariants: Variants = {
   shake: {
@@ -199,3 +269,4 @@ export const errorShakeVariants: Variants = {
     transition: { duration: 0.4, ease: "easeInOut" },
   },
 };
+

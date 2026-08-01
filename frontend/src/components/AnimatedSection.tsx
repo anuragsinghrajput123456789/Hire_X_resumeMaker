@@ -19,12 +19,6 @@ export const AnimatedSection: React.FC<AnimatedSectionProps> = ({
   variants = fadeUpVariants,
   viewportMargin = "-40px"
 }) => {
-  const shouldReduceMotion = useReducedMotion();
-
-  if (shouldReduceMotion) {
-    return <section className={className}>{children}</section>;
-  }
-
   const selectedVariants = stagger ? staggerContainerVariants : variants;
 
   return (

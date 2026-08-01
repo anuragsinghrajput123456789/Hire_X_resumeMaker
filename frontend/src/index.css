@@ -218,7 +218,8 @@
 .animate-conveyor {
   display: flex;
   width: max-content;
-  animation: scroll-infinite 35s linear infinite;
+  animation: scroll-infinite 20s linear infinite;
+  will-change: transform;
 }
 
 .animate-conveyor:hover {
