@@ -40,6 +40,27 @@ const protect = asyncHandler(async (req, res, next) => {
   }
 });
 
+const optionalProtect = asyncHandler(async (req, res, next) => {
+  let token;
+
+  if (
+    req.headers.authorization &&
+    req.headers.authorization.startsWith('Bearer')
+  ) {
+    try {
+      token = req.headers.authorization.split(' ')[1];
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      req.user = await User.findById(decoded.id).select('-password');
+    } catch {
+      req.user = null;
+    }
+  } else {
+    req.user = null;
+  }
+
+  return next();
+});
+
 const adminOnly = (req, res, next) => {
   const adminEmail = process.env.ADMIN_EMAIL || 'anuragsinghj678@gmail.com';
   if (req.user && (req.user.role === 'admin' || req.user.email === adminEmail)) {
@@ -48,4 +69,4 @@ const adminOnly = (req, res, next) => {
   res.status(403).json({ error: 'Access denied: Admin authorization required' });
 };
 
-module.exports = { protect, adminOnly };
+module.exports = { protect, optionalProtect, adminOnly };

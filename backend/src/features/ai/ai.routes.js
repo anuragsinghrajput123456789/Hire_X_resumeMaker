@@ -16,7 +16,7 @@ const {
   getUsage
 } = require('./ai.controller');
 
-const { protect } = require('../../../middleware/authMiddleware');
+const { protect, optionalProtect } = require('../../../middleware/authMiddleware');
 const { 
   aiGlobalLimiter,
   interviewChatLimiter,
@@ -33,18 +33,18 @@ router.get('/test', (req, res) => {
 
 router.get('/health', healthCheck);
 router.get('/metrics', protect, queueMetrics);
-router.get('/usage', protect, getUsage);
+router.get('/usage', optionalProtect, getUsage);
 router.post('/cancel', protect, cancelRequest);
 
 // Granular AI Feature Rate Limiting & Abuse Protection
-router.post('/chat', protect, interviewChatLimiter, botProtection, sanitizeInput, chat);
-router.post('/cold-email', protect, coldEmailLimiter, botProtection, sanitizeInput, coldEmail);
-router.post('/analyze-resume-realtime', protect, resumeOptimizationLimiter, botProtection, sanitizeInput, analyzeResumeRealTime);
-router.post('/analyze-resume', protect, resumeOptimizationLimiter, botProtection, sanitizeInput, analyzeResume);
-router.post('/analyze-job', protect, aiGlobalLimiter, botProtection, sanitizeInput, analyzeJobDescription);
-router.post('/job-suggestions', protect, aiGlobalLimiter, botProtection, sanitizeInput, jobSuggestions);
-router.post('/generate-resume', protect, resumeOptimizationLimiter, botProtection, sanitizeInput, generateResume);
-router.post('/generate-content', protect, coldEmailLimiter, botProtection, sanitizeInput, generateContent);
-router.post('/cover-letter', protect, coverLetterLimiter, botProtection, sanitizeInput, generateCoverLetter);
+router.post('/chat', optionalProtect, interviewChatLimiter, botProtection, sanitizeInput, chat);
+router.post('/cold-email', optionalProtect, coldEmailLimiter, botProtection, sanitizeInput, coldEmail);
+router.post('/analyze-resume-realtime', optionalProtect, resumeOptimizationLimiter, botProtection, sanitizeInput, analyzeResumeRealTime);
+router.post('/analyze-resume', optionalProtect, resumeOptimizationLimiter, botProtection, sanitizeInput, analyzeResume);
+router.post('/analyze-job', optionalProtect, aiGlobalLimiter, botProtection, sanitizeInput, analyzeJobDescription);
+router.post('/job-suggestions', optionalProtect, aiGlobalLimiter, botProtection, sanitizeInput, jobSuggestions);
+router.post('/generate-resume', optionalProtect, resumeOptimizationLimiter, botProtection, sanitizeInput, generateResume);
+router.post('/generate-content', optionalProtect, coldEmailLimiter, botProtection, sanitizeInput, generateContent);
+router.post('/cover-letter', optionalProtect, coverLetterLimiter, botProtection, sanitizeInput, generateCoverLetter);
 
 module.exports = router;

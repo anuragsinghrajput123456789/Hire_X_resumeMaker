@@ -35,7 +35,15 @@ export const AIUsageWidget: React.FC<AIUsageWidgetProps> = ({ compact = false, c
       fetchUsage();
     }, 60000);
 
-    return () => clearInterval(interval);
+    const handleGuestUpdate = () => {
+      fetchUsage();
+    };
+    window.addEventListener('guest_ai_usage_updated', handleGuestUpdate);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('guest_ai_usage_updated', handleGuestUpdate);
+    };
   }, []);
 
   // Live countdown ticker
@@ -68,6 +76,7 @@ export const AIUsageWidget: React.FC<AIUsageWidgetProps> = ({ compact = false, c
   }
 
   const featureLabels: Record<string, { label: string; icon: string }> = {
+    guestAiCredits: { label: 'Guest Free AI Credits', icon: '⚡' },
     coverLetter: { label: 'Cover Letters', icon: '📝' },
     atsAnalysis: { label: 'ATS Resume Scans', icon: '📊' },
     resumeOptimization: { label: 'Resume Optimizations', icon: '⚡' },

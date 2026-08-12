@@ -24,7 +24,9 @@ const sendError = (res, error, fallbackMessage) => {
 
 const chat = async (req, res) => {
   try {
-    await AIService.checkAndIncrementUsage(req.user._id);
+    if (req.user) {
+      await AIService.checkAndIncrementUsage(req.user._id);
+    }
     const message = AIService.requireText(req.body.message, 'Message');
     const history = Array.isArray(req.body.history) ? req.body.history : [];
     const historyContext = history
@@ -50,7 +52,7 @@ const chat = async (req, res) => {
           res.write(`data: ${JSON.stringify({ chunk })}\n\n`);
         },
         abortSignal: abortController.signal,
-        userId: req.user._id
+        userId: req.user ? req.user._id : 'guest'
       });
 
       res.write('data: [DONE]\n\n');
@@ -58,7 +60,7 @@ const chat = async (req, res) => {
       return;
     }
 
-    const result = await AIManager.chat(message, historyContext, { userId: req.user._id });
+    const result = await AIManager.chat(message, historyContext, { userId: req.user ? req.user._id : 'guest' });
     res.json({ result });
   } catch (error) {
     sendError(res, error, 'Failed to generate response');
@@ -67,7 +69,9 @@ const chat = async (req, res) => {
 
 const coldEmail = async (req, res) => {
   try {
-    await AIService.checkAndIncrementUsage(req.user._id);
+    if (req.user) {
+      await AIService.checkAndIncrementUsage(req.user._id);
+    }
     const promptText = AIService.requireText(req.body.prompt, 'Prompt');
 
     if (req.body.stream === true) {
@@ -87,7 +91,7 @@ const coldEmail = async (req, res) => {
           res.write(`data: ${JSON.stringify({ chunk })}\n\n`);
         },
         abortSignal: abortController.signal,
-        userId: req.user._id
+        userId: req.user ? req.user._id : 'guest'
       });
 
       res.write('data: [DONE]\n\n');
@@ -95,7 +99,7 @@ const coldEmail = async (req, res) => {
       return;
     }
 
-    const result = await AIManager.coldEmail(promptText, { userId: req.user._id });
+    const result = await AIManager.coldEmail(promptText, { userId: req.user ? req.user._id : 'guest' });
     res.json({ result });
   } catch (error) {
     sendError(res, error, 'Failed to generate cold email');
@@ -104,7 +108,9 @@ const coldEmail = async (req, res) => {
 
 const analyzeResumeRealTime = async (req, res) => {
   try {
-    await AIService.checkAndIncrementUsage(req.user._id);
+    if (req.user) {
+      await AIService.checkAndIncrementUsage(req.user._id);
+    }
     const cleanedText = AIService.cleanResumeText(req.body.resumeText).substring(0, 15000);
     const jobRole = req.body.jobRole || 'General';
 
@@ -113,7 +119,7 @@ const analyzeResumeRealTime = async (req, res) => {
     }
 
     const expectedKeywords = AIService.getJobRoleKeywords(jobRole);
-    const parsed = await AIManager.analyzeResumeRealTime(cleanedText, jobRole, expectedKeywords, { userId: req.user._id });
+    const parsed = await AIManager.analyzeResumeRealTime(cleanedText, jobRole, expectedKeywords, { userId: req.user ? req.user._id : 'guest' });
     res.json(parsed);
   } catch (error) {
     sendError(res, error, 'Failed to analyze resume');
@@ -122,7 +128,9 @@ const analyzeResumeRealTime = async (req, res) => {
 
 const analyzeResume = async (req, res) => {
   try {
-    await AIService.checkAndIncrementUsage(req.user._id);
+    if (req.user) {
+      await AIService.checkAndIncrementUsage(req.user._id);
+    }
     const cleanedText = AIService.cleanResumeText(req.body.resumeText).substring(0, 30000);
     const jobRole = req.body.jobRole || 'General';
 
@@ -130,7 +138,7 @@ const analyzeResume = async (req, res) => {
       return res.status(400).json({ error: 'Resume text is too short' });
     }
 
-    const parsed = await AIManager.analyzeResume(cleanedText, jobRole, { userId: req.user._id });
+    const parsed = await AIManager.analyzeResume(cleanedText, jobRole, { userId: req.user ? req.user._id : 'guest' });
     res.json(parsed);
   } catch (error) {
     sendError(res, error, 'Failed to analyze resume');
@@ -139,11 +147,13 @@ const analyzeResume = async (req, res) => {
 
 const analyzeJobDescription = async (req, res) => {
   try {
-    await AIService.checkAndIncrementUsage(req.user._id);
+    if (req.user) {
+      await AIService.checkAndIncrementUsage(req.user._id);
+    }
     const resumeText = AIService.requireText(req.body.resumeText, 'Resume text');
     const jobDescription = AIService.requireText(req.body.jobDescription, 'Job description');
 
-    const parsed = await AIManager.analyzeJobDescription(resumeText, jobDescription, { userId: req.user._id });
+    const parsed = await AIManager.analyzeJobDescription(resumeText, jobDescription, { userId: req.user ? req.user._id : 'guest' });
     res.json(parsed);
   } catch (error) {
     sendError(res, error, 'Job analysis failed');
@@ -152,11 +162,13 @@ const analyzeJobDescription = async (req, res) => {
 
 const jobSuggestions = async (req, res) => {
   try {
-    await AIService.checkAndIncrementUsage(req.user._id);
+    if (req.user) {
+      await AIService.checkAndIncrementUsage(req.user._id);
+    }
     const resumeText = AIService.requireText(req.body.resumeText, 'Resume text');
     const targetRole = req.body.targetRole || 'General';
 
-    const result = await AIManager.jobSuggestions(resumeText, targetRole, { userId: req.user._id });
+    const result = await AIManager.jobSuggestions(resumeText, targetRole, { userId: req.user ? req.user._id : 'guest' });
     res.json({ result });
   } catch (error) {
     sendError(res, error, 'Failed to get job suggestions');
@@ -165,12 +177,14 @@ const jobSuggestions = async (req, res) => {
 
 const generateResume = async (req, res) => {
   try {
-    await AIService.checkAndIncrementUsage(req.user._id);
+    if (req.user) {
+      await AIService.checkAndIncrementUsage(req.user._id);
+    }
     if (!req.body.data || typeof req.body.data !== 'object') {
       return res.status(400).json({ error: 'Resume data is required' });
     }
 
-    const parsed = await AIManager.generateResume(req.body.data, { userId: req.user._id });
+    const parsed = await AIManager.generateResume(req.body.data, { userId: req.user ? req.user._id : 'guest' });
     res.json({ 
       success: true,
       result: JSON.stringify(parsed),
@@ -183,7 +197,9 @@ const generateResume = async (req, res) => {
 
 const generateContent = async (req, res) => {
   try {
-    await AIService.checkAndIncrementUsage(req.user._id);
+    if (req.user) {
+      await AIService.checkAndIncrementUsage(req.user._id);
+    }
     const promptText = AIService.requireText(req.body.prompt, 'Prompt');
 
     if (req.body.stream === true) {
@@ -203,7 +219,7 @@ const generateContent = async (req, res) => {
           res.write(`data: ${JSON.stringify({ chunk })}\n\n`);
         },
         abortSignal: abortController.signal,
-        userId: req.user._id
+        userId: req.user ? req.user._id : 'guest'
       });
 
       res.write('data: [DONE]\n\n');
@@ -211,7 +227,7 @@ const generateContent = async (req, res) => {
       return;
     }
 
-    const result = await AIManager.generateContent(promptText, { userId: req.user._id });
+    const result = await AIManager.generateContent(promptText, { userId: req.user ? req.user._id : 'guest' });
     res.json({ result });
   } catch (error) {
     sendError(res, error, 'Failed to generate content');
@@ -220,7 +236,9 @@ const generateContent = async (req, res) => {
 
 const generateCoverLetter = async (req, res) => {
   try {
-    await AIService.checkAndIncrementUsage(req.user._id);
+    if (req.user) {
+      await AIService.checkAndIncrementUsage(req.user._id);
+    }
     const {
       resumeText,
       jobDescription,
@@ -259,7 +277,7 @@ const generateCoverLetter = async (req, res) => {
           res.write(`data: ${JSON.stringify({ chunk })}\n\n`);
         },
         abortSignal: abortController.signal,
-        userId: req.user._id
+        userId: req.user ? req.user._id : 'guest'
       });
 
       res.write('data: [DONE]\n\n');
@@ -275,7 +293,7 @@ const generateCoverLetter = async (req, res) => {
       experienceLevel,
       companyName,
       jobTitle
-    }, { userId: req.user._id });
+    }, { userId: req.user ? req.user._id : 'guest' });
 
     res.json(parsed);
   } catch (error) {

@@ -65,45 +65,6 @@ const ResumeAnalyzer = () => {
   
   const [resumeText, setResumeText] = useState('');
   const [fileName, setFileName] = useState('');
-
-  if (!token) {
-    return (
-      <div className="max-w-md mx-auto py-12 px-4 select-none">
-        <Card className="glass-card bg-[#0F1424]/85 border border-white/5 shadow-2xl overflow-hidden rounded-3xl relative text-center p-8">
-          <div className="absolute inset-0 bg-grid-soft opacity-10 pointer-events-none" />
-          <div className="relative z-10 flex flex-col items-center">
-            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#00F5A0] via-[#00D2FF] to-[#8B5CF6] p-[1.5px] mb-6 shadow-xl shadow-emerald-500/10">
-              <div className="w-full h-full bg-[#0F1424] rounded-2xl flex items-center justify-center">
-                <Brain className="h-8 w-8 text-[#00F5A0]" />
-              </div>
-            </div>
-            
-            <h2 className="text-2xl font-black bg-clip-text text-transparent bg-gradient-to-r from-[#00F5A0] to-[#00D2FF] mb-3">
-              Resume AI Intelligence
-            </h2>
-            <p className="text-sm text-gray-400 font-medium leading-relaxed mb-8 max-w-sm">
-              Unlock complete resume ATS parsing audits, structure scans, custom keyword extraction, and target profile optimization by signing in or registering.
-            </p>
-            
-            <div className="flex flex-col sm:flex-row gap-4 w-full justify-center">
-              <Button 
-                onClick={() => navigate('/login')}
-                className="rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 text-white font-extrabold px-6 h-11 transition-all"
-              >
-                Sign In
-              </Button>
-              <Button 
-                onClick={() => navigate('/register')}
-                className="rounded-xl bg-gradient-to-r from-[#00F5A0] to-[#00D2FF] hover:from-[#00E290] hover:to-[#00C2EF] text-white font-black px-6 h-11 shadow-lg shadow-emerald-500/15 transition-all"
-              >
-                Create Account
-              </Button>
-            </div>
-          </div>
-        </Card>
-      </div>
-    );
-  }
   const [selectedJobRole, setSelectedJobRole] = useState('');
   const [customJobRole, setCustomJobRole] = useState('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
