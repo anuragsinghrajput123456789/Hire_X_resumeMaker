@@ -112,9 +112,8 @@ Click **Deploy**. Vercel will compile the React app and deploy it on global edge
 The included `vercel.json` automatically configures SPA rewrite rules:
 ```json
 {
-  "routes": [
-    { "src": "/assets/(.*)", "headers": { "cache-control": "public, max-age=31536000, immutable" } },
-    { "src": "/(.*)", "dest": "/index.html" }
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
 ```
