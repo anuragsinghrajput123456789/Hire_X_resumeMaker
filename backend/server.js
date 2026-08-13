@@ -16,19 +16,45 @@ const securityLogger = require('./src/utils/securityLogger');
 
 validateEnv();
 
-// Allowed origins
+// Allowed origins helper
 const allowedOrigins = getAllowedOrigins();
 
-app.use(cors({
+const isOriginAllowed = (origin) => {
+  if (!origin) return true; // Allow non-browser (curl, Postman, server-to-server)
+
+  const cleanOrigin = origin.replace(/\/+$/, '');
+
+  // 1. Wildcard allowed origin
+  if (allowedOrigins.includes('*')) return true;
+
+  // 2. Exact match against allowed origins
+  if (allowedOrigins.includes(cleanOrigin)) return true;
+
+  // 3. Match localhost or 127.0.0.1 on any port (HTTP or HTTPS)
+  if (/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/i.test(cleanOrigin)) return true;
+
+  // 4. Match Vercel and Netlify deployment domains (*.vercel.app, *.netlify.app)
+  if (/\.(vercel|netlify)\.app$/i.test(cleanOrigin)) return true;
+
+  return false;
+};
+
+const corsOptions = {
   origin(origin, callback) {
-    if (!origin || allowedOrigins.includes(origin) || /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)) {
+    if (isOriginAllowed(origin)) {
       return callback(null, true);
     }
     securityLogger.logEvent('cors_blocked', { origin });
-    return callback(new Error(`CORS blocked origin: ${origin}`));
+    return callback(null, false);
   },
-  credentials: true
-}));
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
+  optionsSuccessStatus: 200
+};
+
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
 
 app.use(express.json({ limit: '10mb' }));
 
