@@ -6,6 +6,12 @@ export const API_BASE_URL = trimTrailingSlash(
   import.meta.env.VITE_API_URL || defaultApiUrl
 );
 
+if (typeof window !== 'undefined' && window.location.protocol === 'https:' && API_BASE_URL.startsWith('http://localhost')) {
+  console.warn(
+    '[Hire-X API Client] WARNING: Running on HTTPS but VITE_API_URL is pointing to http://localhost. API requests will fail due to Mixed Content / connection restrictions. Set VITE_API_URL in environment settings.'
+  );
+}
+
 export const apiUrl = (path: string) => {
   const normalizedPath = path.startsWith('/') ? path : `/${path}`;
   return `${API_BASE_URL}${normalizedPath}`;
