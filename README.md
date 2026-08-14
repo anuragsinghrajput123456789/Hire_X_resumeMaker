@@ -26,7 +26,7 @@ Hire-X is a full-stack AI-powered career platform that helps job seekers with re
 | AI | OpenRouter API, Gemini API (via OpenAI-compatible SDK) |
 | State | React Query, React Context |
 | Auth | JWT (bcrypt password hashing) |
-| Deployment | Vercel (frontend), Render (backend) |
+| Deployment | Vercel (frontend), Netlify Functions / Render (backend) |
 
 ## Architecture
 
@@ -194,33 +194,40 @@ If you want to use Google Gemini directly (not via OpenRouter):
 
 ## Vercel Deployment (Frontend)
 
-1. Push your repository to GitHub
-2. Import the project in Vercel (https://vercel.com)
-3. Set the **Root Directory** to `frontend`
-4. Set **Framework Preset** to `Vite`
+1. Push your repository to GitHub.
+2. Import the project in [Vercel](https://vercel.com).
+3. Set the **Root Directory** to `frontend`.
+4. Set **Framework Preset** to `Vite`.
 5. Add environment variable:
-   - `VITE_API_URL` = `https://your-render-backend.onrender.com/api`
-6. Deploy
+   - `VITE_API_URL` = `https://your-netlify-backend.netlify.app/api`
+6. Deploy.
 
-The `vercel.json` file handles SPA routing (all routes → `index.html`) and security headers automatically.
+The included `frontend/vercel.json` file handles SPA routing (all routes → `index.html`) and security headers automatically.
 
-## Render Deployment (Backend)
+## Netlify Deployment (Backend API)
 
-1. Create a new **Web Service** on Render (https://render.com)
-2. Connect your GitHub repository
-3. Set the **Root Directory** to `backend`
-4. Set **Build Command**: `npm install`
-5. Set **Start Command**: `npm start`
-6. Add environment variables:
+1. Import your project in [Netlify](https://app.netlify.com).
+2. Configure build settings:
+   - **Base directory**: `backend`
+   - **Build command**: `npm install`
+   - **Publish directory**: `public`
+   - **Functions directory**: `functions`
+3. Add environment variables under **Site configuration** → **Environment variables**:
    - `NODE_ENV` = `production`
    - `MONGO_URI` = your MongoDB Atlas connection string
    - `JWT_SECRET` = a secure 32+ character secret
-   - `OPENROUTER_API_KEY` = your OpenRouter key
-   - `CLIENT_URL` = `https://your-app.vercel.app`
-   - (Optional) `OPENROUTER_MODEL`, `AI_PROVIDER`, etc.
-7. Deploy
+   - `OPENROUTER_API_KEY` = your OpenRouter API key
+   - `CLIENT_URL` = `https://your-app.vercel.app` (No trailing slash)
+4. Deploy site. Netlify uses `backend/functions/api.js` (`serverless-http`) to host your Express server.
 
-> **Note**: Render automatically provides `PORT` — do not set it manually.
+## Render Deployment (Alternative Backend)
+
+1. Create a new **Web Service** on Render (https://render.com).
+2. Connect your repository, set **Root Directory** to `backend`.
+3. Set **Build Command**: `npm install`, **Start Command**: `npm start`.
+4. Add environment variables (`NODE_ENV`, `MONGO_URI`, `JWT_SECRET`, `OPENROUTER_API_KEY`, `CLIENT_URL`).
+5. Deploy.
+
 
 ## API Overview
 
