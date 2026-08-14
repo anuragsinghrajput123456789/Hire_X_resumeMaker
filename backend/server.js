@@ -27,14 +27,13 @@ const isOriginAllowed = (origin) => {
   // 1. Wildcard allowed origin
   if (allowedOrigins.includes('*')) return true;
 
-  // 2. Exact match against allowed origins
+  // 2. Exact match against allowed origins (includes CLIENT_URL + local dev origins)
   if (allowedOrigins.includes(cleanOrigin)) return true;
 
-  // 3. Match localhost or 127.0.0.1 on any port (HTTP or HTTPS)
-  if (/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/i.test(cleanOrigin)) return true;
-
-  // 4. Match Vercel and Netlify deployment domains (*.vercel.app, *.netlify.app)
-  if (/\.(vercel|netlify)\.app$/i.test(cleanOrigin)) return true;
+  // 3. In development, also match localhost / 127.0.0.1 on any port
+  if (process.env.NODE_ENV !== 'production') {
+    if (/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/i.test(cleanOrigin)) return true;
+  }
 
   return false;
 };
@@ -130,6 +129,7 @@ app.get('/api/health', (req, res) => {
   const mongoose = require('mongoose');
   res.json({
     status: 'ok',
+    service: 'hire-x-api',
     uptime: process.uptime(),
     environment: process.env.NODE_ENV || 'development',
     dbState: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',

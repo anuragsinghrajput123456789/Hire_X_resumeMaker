@@ -1,257 +1,312 @@
-<div align="center">
+# Hire-X — AI-Powered Career Platform
 
-  <img src="./assets/hirex_banner.png" alt="Hire-X Banner" width="100%" style="border-radius: 10px; margin-bottom: 20px;" />
+Hire-X is a full-stack AI-powered career platform that helps job seekers with resume creation, ATS optimization, cover letter generation, cold email drafting, interview preparation, and career intelligence — all powered by AI.
 
-  # 🚀 Hire-X — Enterprise AI Career Intelligence Suite
+## Features
 
-  <p align="center">
-    <strong>An end-to-end, full-stack AI Career Intelligence & Job Hunt Operating System.</strong><br/>
-    Accelerate your job search with live ATS resume optimization, tailored cover letters, AI cold outreach, semantic RAG mock interviews, and a real-time Kanban application tracker.
-  </p>
+- **AI Resume Generator** — Generate professional resumes with AI-powered content suggestions
+- **ATS Resume Analyzer** — Score your resume against ATS systems and get actionable improvements
+- **Job Description Analyzer** — Match your resume against specific job descriptions
+- **Cover Letter Generator** — Generate tailored cover letters for any job posting
+- **Cold Email Generator** — Draft professional cold outreach emails
+- **AI Career Chat** — Interactive AI assistant for career questions
+- **Interview Workspace** — Full interview preparation with AI-generated questions, roadmaps, study plans, and performance feedback
+- **RAG Document System** — Upload study materials for context-aware interview preparation
+- **Job Match Suggestions** — AI-powered job role recommendations
+- **Career Intelligence** — Skill gap analysis, salary insights, and career growth advice
+- **AI Usage Tracking** — Per-user daily quotas and usage monitoring
 
-  <p align="center">
-    <img src="https://img.shields.io/badge/React-18.3-61DAFB?style=for-the-badge&logo=react&logoColor=black" alt="React 18" />
-    <img src="https://img.shields.io/badge/TypeScript-5.5-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript 5" />
-    <img src="https://img.shields.io/badge/Vite-5.4-646CFF?style=for-the-badge&logo=vite&logoColor=white" alt="Vite" />
-    <img src="https://img.shields.io/badge/Node.js-18.x-339933?style=for-the-badge&logo=nodedotjs&logoColor=white" alt="Node.js 18" />
-    <img src="https://img.shields.io/badge/Express-5.2-000000?style=for-the-badge&logo=express&logoColor=white" alt="Express 5" />
-    <img src="https://img.shields.io/badge/MongoDB-Atlas-47A248?style=for-the-badge&logo=mongodb&logoColor=white" alt="MongoDB Atlas" />
-    <img src="https://img.shields.io/badge/OpenRouter-AI Gateway-FF6F61?style=for-the-badge&logo=openai&logoColor=white" alt="OpenRouter AI" />
-    <img src="https://img.shields.io/badge/Vercel-Deployed-000000?style=for-the-badge&logo=vercel&logoColor=white" alt="Vercel" />
-    <img src="https://img.shields.io/badge/Render-Backend Live-46E3B7?style=for-the-badge&logo=render&logoColor=black" alt="Render" />
-    <img src="https://img.shields.io/badge/License-MIT-green?style=for-the-badge" alt="MIT License" />
-  </p>
+## Technology Stack
 
-</div>
+| Layer | Technology |
+|-------|-----------|
+| Frontend | React 18, TypeScript, Vite, Tailwind CSS, shadcn/ui, Framer Motion |
+| Backend | Node.js, Express 5, Mongoose |
+| Database | MongoDB (local) / MongoDB Atlas (production) |
+| AI | OpenRouter API, Gemini API (via OpenAI-compatible SDK) |
+| State | React Query, React Context |
+| Auth | JWT (bcrypt password hashing) |
+| Deployment | Vercel (frontend), Render (backend) |
 
----
-
-## ⚡ Overview & Platform Highlights
-
-**Hire-X** is an enterprise-grade AI Career Intelligence Suite designed to give job seekers an unfair advantage in today's competitive market. Built with modern web technologies and Powered by advanced LLMs via OpenRouter, Hire-X streamlines every stage of the recruitment funnel — from crafting high-impact resumes to cracking technical interviews and tracking job offers.
-
-<div align="center">
-  <img src="./assets/hirex_dashboard.png" alt="Hire-X Dashboard Preview" width="100%" style="border-radius: 8px; border: 1px solid #2d3748; margin: 15px 0;" />
-</div>
-
----
-
-## 🌟 Core Modules & Capabilities
-
-<div align="center">
-  <img src="./assets/hirex_ai_suite.png" alt="Hire-X AI Feature Modules" width="100%" style="border-radius: 8px; margin: 15px 0;" />
-</div>
-
-### 📄 1. Live Interactive Resume Builder & PDF Engine
-* **A4 Canvas Live Preview**: Split-pane editor featuring responsive live canvas scaling powered by `ResizeObserver`.
-* **4 Executive Templates**: Modern, Classic, Creative, and Professional layout structures crafted with custom typography.
-* **Pixel-Perfect PDF Export**: Generates print-ready A4 PDFs matching the live canvas identically via `html2pdf.js`.
-* **Smart Content Sanitizer**: Suppresses empty bullet points and unformatted blocks gracefully to prevent layout distortion.
-
-### 🎯 2. ATS & Resume Compatibility Analyzer
-* **Keyword Matcher**: Cross-analyzes candidate experience against job descriptions to spot missing hard/soft skills.
-* **ATS Compatibility Score**: Generates comprehensive ATS readability ratings, formatting recommendations, and actionable score fixes.
-
-### ✉️ 3. Tailored AI Cover Letter Generator
-* **Role & Company Alignment**: Crafts customized, compelling cover letters tuned specifically to target position requirements.
-* **Tone & Depth Controls**: Customize tone (*Professional, Confident, Executive, Creative*) and output length (*Short, Medium, Comprehensive*).
-* **Export & History**: Download letters as polished PDFs or save them directly in your account history dashboard.
-
-### 📩 4. AI Cold Email Outreach Engine
-* **High-Conversion Messaging**: Generates tailored outreach emails for recruiters, engineering hiring managers, and founders.
-* **Stack & Note Customization**: Highlights personal projects and technical stack alignment automatically.
-* **One-Click Actions**: Quick copy to clipboard and saved history management.
-
-### 🎙️ 5. Interview Intelligence & RAG Knowledge Hub
-* **Adaptive AI Mock Interviews**: Dynamic technical and behavioral question sequences tailored by role, company, and difficulty level.
-* **RAG Context Knowledge Base**: Upload custom preparation notes and PDFs for vector-retrieved semantic context during practice sessions.
-* **Real-time Answer Scoring**: Receive instant evaluations, missing technical keywords, model answers, and custom study plans.
-
-### 📊 6. Job Application Kanban Tracker
-* **Visual Pipeline**: Drag-and-drop organize applications across active stages (`Saved`, `Applied`, `Interviewing`, `Offer`, `Rejected`).
-* **Comprehensive Logging**: Track application links, salary expectations, follow-up dates, custom notes, and interview status.
-
----
-
-## 🏗️ System Architecture & AI Pipeline
-
-```mermaid
-graph TD
-    subgraph Client ["Client Layer (React 18 + Vite)"]
-        UI[React Router SPA]
-        API_CLIENT[Centralized apiFetch Client]
-    end
-
-    subgraph Backend ["Server Layer (Node.js + Express 5)"]
-        AUTH[JWT Authentication Middleware]
-        QUEUE[AI Request Queue & Rate Limiter]
-        PARSER[Character-by-Character JSON Healer]
-    end
-
-    subgraph Storage ["Database & Vector Layer"]
-        MONGO[(MongoDB Atlas Database)]
-    end
-
-    subgraph AI Gateway ["OpenRouter AI Pipeline"]
-        GATEWAY[OpenRouter Resilience Router]
-        M1[Google Gemini 2.0 Flash]
-        M2[Meta LLaMA 3.3 70B]
-        M3[Qwen 2.5 72B]
-    end
-
-    UI --> API_CLIENT
-    API_CLIENT --> AUTH
-    AUTH --> QUEUE
-    QUEUE --> MONGO
-    QUEUE --> PARSER
-    PARSER --> GATEWAY
-    GATEWAY --> M1
-    GATEWAY -. Fallback .-> M2
-    GATEWAY -. Fallback .-> M3
-```
-
-### Key Architectural Safeguards
-* **Resilient AI Pipeline**: Features request deduplication (`RequestDeduplicator`), prompt injection filters (`RequestValidator`), priority queueing (`AIRequestQueue`), and character-by-character JSON healing (`JsonExtractor`).
-* **Robust Client Networking**: Centralized HTTP client (`apiClient.ts`) enforcing 30s/60s request timeouts, automatic 1x retries on transient network/5xx drops, and seamless JWT session renewal.
-
----
-
-## 📁 Repository Structure
+## Architecture
 
 ```
-Hire-X/
-├── assets/                    # Graphic banners, logos, and UI screenshots
-├── DEPLOYMENT.md              # Production Cloud Deployment Guide (Vercel & Render)
-├── README.md                  # Comprehensive Repository & Setup Manual
-├── doc/                       # Architecture & Operations Documentation
-│   ├── API_FLOW.md            # End-to-End API Sequence Diagrams
-│   ├── ARCHITECTURE.md        # Technical System & Design Patterns
-│   ├── CASE_STUDY.md          # Project Case Study & Problem Statement
-│   ├── DEPLOYMENT_RENDER.md   # Render Backend Deployment Operations
-│   ├── DEPLOYMENT_VERCEL.md   # Vercel Frontend Deployment Operations
-│   ├── OPERATIONS.md          # Maintenance & Incident Response Playbook
-│   └── PRODUCTION_READINESS.md# SRE Checklist & Health Diagnostics
-├── backend/                   # Express 5 REST API & AI Service Engine
-│   ├── config/                # Environment Validation & DB Connector
-│   ├── middleware/            # JWT Auth & Error Handling Stack
-│   ├── models/                # Mongoose Database Schemas
-│   └── src/
-│       ├── ai/                # AI Queue Engine, Prompts & JSON Parsers
-│       └── features/          # Modular API Feature Route Controllers
-└── frontend/                  # React 18 + TypeScript SPA Client
-    ├── public/                # Favicons & Static Public Web Assets
-    ├── vercel.json            # Vercel SPA Routing & Security Headers
-    └── src/
-        ├── config/            # Frontend Constants & System Configurations
-        ├── features/          # Feature UI Modules & Form Components
-        ├── hooks/             # Custom React Hooks (useResume, useInterview, etc.)
-        ├── pages/             # Lazy-Loaded Route Components
-        ├── services/          # HTTP API Fetch Service Infrastructure
-        └── types/             # Shared TypeScript Data Interfaces
+Frontend (Vercel)          Backend (Render)            External Services
+┌─────────────────┐        ┌─────────────────────┐     ┌──────────────┐
+│  React/Vite SPA │───────>│  Express API Server │────>│  MongoDB     │
+│  apiClient.ts   │  CORS  │  ├── Auth Middleware │     │  Atlas       │
+│  services/*.ts  │<───────│  ├── Rate Limiter    │     └──────────────┘
+└─────────────────┘        │  ├── Bot Protection  │     ┌──────────────┐
+                           │  ├── Input Sanitizer │────>│  OpenRouter  │
+                           │  └── Routes          │     │  / Gemini    │
+                           │      └── Controllers │     └──────────────┘
+                           │          └── Services│
+                           │              └── AI  │
+                           │  ┌───────────────────┤
+                           │  │ AIManager         │
+                           │  │ ├── AIRequestQueue│
+                           │  │ ├── QueueWorker   │
+                           │  │ ├── QuotaManager  │
+                           │  │ ├── ResponseParser│
+                           │  │ ├── SchemaValid.  │
+                           │  │ ├── RetryManager  │
+                           │  │ ├── AICache       │
+                           │  │ └── Providers     │
+                           │  │     ├── OpenRouter │
+                           │  │     └── Gemini    │
+                           │  └───────────────────┤
+                           └─────────────────────┘
 ```
 
----
+## Project Structure
 
-## ⚡ Quick Start & Development Setup
+```
+Hire-XfinalVerdict/
+├── frontend/
+│   ├── src/
+│   │   ├── animations/       # Framer Motion animation configs
+│   │   ├── components/       # UI components (Navbar, Footer, ResumeGenerator, etc.)
+│   │   ├── config/           # App constants
+│   │   ├── context/          # React contexts (AuthContext)
+│   │   ├── features/         # Feature-specific components (coldEmail, coverLetter)
+│   │   ├── hooks/            # Custom React hooks
+│   │   ├── lib/              # Utility libraries
+│   │   ├── pages/            # Route pages
+│   │   ├── services/         # API service layer (apiClient, aiService, authService, etc.)
+│   │   └── types/            # TypeScript type definitions
+│   ├── vercel.json           # Vercel SPA routing & headers
+│   ├── vite.config.mjs       # Vite build configuration
+│   └── .env.example          # Frontend env template
+│
+├── backend/
+│   ├── config/               # Database & environment configuration
+│   ├── controllers/          # Route controller re-exports (backward compat)
+│   ├── middleware/            # Auth, error, rate limiting, bot protection, sanitizer
+│   ├── models/               # Mongoose schemas (User, Resume, InterviewSession, etc.)
+│   ├── routes/               # Express route re-exports
+│   ├── src/
+│   │   ├── ai/               # AI pipeline (AIManager, Queue, Providers, Prompts, Schemas)
+│   │   ├── features/         # Feature modules (ai, auth, resume, interview, etc.)
+│   │   └── utils/            # Security logger
+│   ├── server.js             # Express app entry point
+│   └── .env.example          # Backend env template
+│
+└── README.md
+```
+
+## Local Development Setup
 
 ### Prerequisites
-- **Node.js**: `v18.x` or higher
-- **npm**: `v9.x` or higher
-- **MongoDB**: Local MongoDB instance or [MongoDB Atlas](https://www.mongodb.com/cloud/atlas) account URI
-- **OpenRouter API Key**: Obtain from [OpenRouter.ai](https://openrouter.ai/)
 
----
+- Node.js >= 18.0.0
+- MongoDB (local instance or Atlas)
+- OpenRouter API key (get one at https://openrouter.ai)
 
-### 1. Backend API Setup
+### 1. Clone the Repository
 
 ```bash
-# Navigate to the backend directory
+git clone <your-repo-url>
+cd Hire-XfinalVerdict
+```
+
+### 2. Backend Setup
+
+```bash
 cd backend
-
-# Install dependencies
-npm install
-
-# Create environment file from template
 cp .env.example .env
+# Edit .env with your actual values (see Environment Variables below)
+npm install
+npm run dev    # Starts with nodemon on port 5000
 ```
 
-Configure your **`backend/.env`**:
-```env
-NODE_ENV=development
-PORT=5000
-MONGO_URI=mongodb://127.0.0.1:27017/hirex
-JWT_SECRET=your_super_secure_random_jwt_secret_key_min_32_chars
-OPENROUTER_API_KEY=sk-or-v1-your-openrouter-api-key
-OPENROUTER_MODEL=google/gemini-2.0-flash-001
-CLIENT_URL=http://localhost:5173
-```
-
-Run backend in development mode:
-```bash
-npm run dev
-```
-*(Backend server runs at `http://localhost:5000`. Health check endpoint: `http://localhost:5000/api/health`)*
-
----
-
-### 2. Frontend Client Setup
+### 3. Frontend Setup
 
 ```bash
-# Open a new terminal and navigate to frontend directory
 cd frontend
-
-# Install dependencies
-npm install
-
-# Create environment file from template
 cp .env.example .env
+# Edit .env — for local dev: VITE_API_URL=http://localhost:5000/api
+npm install
+npm run dev    # Starts Vite dev server on port 8080
 ```
 
-Configure your **`frontend/.env`**:
-```env
-VITE_API_URL=http://localhost:5000/api
-```
+### 4. Verify
 
-Run frontend in development mode:
-```bash
-npm run dev
-```
-*(Client application launches at `http://localhost:5173` or `http://localhost:8080`)*
+- Frontend: http://localhost:8080
+- Backend health: http://localhost:5000/api/health
+- Backend readiness: http://localhost:5000/api/ready
 
----
+## Environment Variables
 
-## 🌐 Production Deployment
+### Backend (`backend/.env`)
 
-Hire-X is fully configured for automated cloud deployment:
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `NODE_ENV` | No | `development` or `production` (default: `development`) |
+| `PORT` | No | Server port (default: `5000`, Render supplies this automatically) |
+| `MONGO_URI` | **Yes** | MongoDB connection string |
+| `JWT_SECRET` | **Yes** | JWT signing secret (minimum 32 characters) |
+| `AI_PROVIDER` | No | `openrouter` or `gemini` (default: auto-detect from keys) |
+| `OPENROUTER_API_KEY` | **Yes*** | OpenRouter API key |
+| `OPENROUTER_MODEL` | No | Default model (default: `inclusionai/ling-3.0-flash:free`) |
+| `GEMINI_API_KEY` | No | Native Gemini API key (if not using OpenRouter) |
+| `GEMINI_MODEL` | No | Gemini model (default: `gemini-2.5-flash`) |
+| `CLIENT_URL` | **Yes** | Frontend origin for CORS (e.g., `https://your-app.vercel.app`) |
+| `AI_USAGE_LIMIT` | No | Global AI usage limit per user (default: `500`) |
+| `AI_MAX_CONCURRENCY` | No | Max concurrent AI requests (default: `3`) |
+| `AI_USAGE_WHITELIST` | No | Comma-separated admin emails (bypass AI limits) |
+| `ADMIN_EMAIL` | No | Admin email for admin-only routes |
+| `OPENROUTER_REFERER` | No | HTTP Referer for OpenRouter tracking |
+| `TURNSTILE_SECRET_KEY` | No | Cloudflare Turnstile bot protection secret |
 
-- **Frontend (Vercel)**: Follow the guide in [DEPLOYMENT.md](DEPLOYMENT.md#%-part-2-deploying-frontend-to-vercel).
-- **Backend API (Render)**: Follow the guide in [DEPLOYMENT.md](DEPLOYMENT.md#%-part-1-deploying-backend-to-render).
-- **Production Checklist**: Review [doc/PRODUCTION_READINESS.md](doc/PRODUCTION_READINESS.md) for health probe monitoring and SRE guidelines.
+*At least one of `OPENROUTER_API_KEY`, `GEMINI_API_KEY` is required for AI features.
 
-```bash
-# Verify local production build of frontend
-cd frontend && npm run build
+### Frontend (`frontend/.env`)
 
-# Verify local production server execution of backend
-cd backend && npm start
-```
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `VITE_API_URL` | **Yes** | Backend API URL (e.g., `http://localhost:5000/api`) |
 
----
+> **Security**: Never place API keys, database credentials, or JWT secrets in the frontend `.env`. Only `VITE_`-prefixed variables are exposed to the browser.
 
-## 📘 Project Documentation Index
+## MongoDB Atlas Setup
 
-| Document | Focus Area |
-| :--- | :--- |
-| 🚀 **[DEPLOYMENT.md](DEPLOYMENT.md)** | Step-by-Step Production Cloud Deployment Guide |
-| 🏛️ **[doc/ARCHITECTURE.md](doc/ARCHITECTURE.md)** | System Design, AI Queue & Reliability Engine |
-| 📊 **[doc/API_FLOW.md](doc/API_FLOW.md)** | End-to-End API Sequence Flows & Payload Schemas |
-| 🛡️ **[doc/PRODUCTION_READINESS.md](doc/PRODUCTION_READINESS.md)** | SRE Monitoring, Health Probes & Operational Audit |
-| 💼 **[doc/CASE_STUDY.md](doc/CASE_STUDY.md)** | Product Strategy, Business Value & Tech Stack Case Study |
+1. Create a free cluster at https://cloud.mongodb.com
+2. Create a database user with read/write access
+3. Whitelist your IP (or `0.0.0.0/0` for Render)
+4. Get the connection string and set `MONGO_URI` in your backend `.env`
+5. Replace `<password>` with your database user's password
 
----
+## OpenRouter Setup
 
-## 📜 License & Acknowledgments
+1. Sign up at https://openrouter.ai
+2. Add credits or use free-tier models
+3. Generate an API key at https://openrouter.ai/settings/keys
+4. Set `OPENROUTER_API_KEY` in your backend `.env`
+5. Optionally set `OPENROUTER_MODEL` (default uses free models with fallback chain)
 
-Distributed under the **MIT License**. See [`LICENSE`](LICENSE) for details.
+## Gemini Setup (Optional)
 
-Built with ❤️ by the Hire-X Engineering Team.
+If you want to use Google Gemini directly (not via OpenRouter):
+
+1. Get an API key at https://aistudio.google.com/apikey
+2. Set `GEMINI_API_KEY` in your backend `.env`
+3. Set `AI_PROVIDER=gemini`
+
+## Vercel Deployment (Frontend)
+
+1. Push your repository to GitHub
+2. Import the project in Vercel (https://vercel.com)
+3. Set the **Root Directory** to `frontend`
+4. Set **Framework Preset** to `Vite`
+5. Add environment variable:
+   - `VITE_API_URL` = `https://your-render-backend.onrender.com/api`
+6. Deploy
+
+The `vercel.json` file handles SPA routing (all routes → `index.html`) and security headers automatically.
+
+## Render Deployment (Backend)
+
+1. Create a new **Web Service** on Render (https://render.com)
+2. Connect your GitHub repository
+3. Set the **Root Directory** to `backend`
+4. Set **Build Command**: `npm install`
+5. Set **Start Command**: `npm start`
+6. Add environment variables:
+   - `NODE_ENV` = `production`
+   - `MONGO_URI` = your MongoDB Atlas connection string
+   - `JWT_SECRET` = a secure 32+ character secret
+   - `OPENROUTER_API_KEY` = your OpenRouter key
+   - `CLIENT_URL` = `https://your-app.vercel.app`
+   - (Optional) `OPENROUTER_MODEL`, `AI_PROVIDER`, etc.
+7. Deploy
+
+> **Note**: Render automatically provides `PORT` — do not set it manually.
+
+## API Overview
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| GET | `/api/health` | Public | Health check |
+| GET | `/api/ready` | Public | Readiness probe (DB check) |
+| POST | `/api/auth/register` | Public | User registration |
+| POST | `/api/auth/login` | Public | User login |
+| GET | `/api/auth/me` | Protected | Get current user |
+| POST | `/api/ai/analyze-resume` | Optional | ATS resume analysis |
+| POST | `/api/ai/analyze-resume-realtime` | Optional | Real-time resume analysis |
+| POST | `/api/ai/analyze-job` | Optional | Job description analysis |
+| POST | `/api/ai/generate-resume` | Optional | AI resume generation |
+| POST | `/api/ai/generate-content` | Optional | General AI content |
+| POST | `/api/ai/chat` | Optional | AI career chat |
+| POST | `/api/ai/cold-email` | Optional | Cold email generation |
+| POST | `/api/ai/cover-letter` | Optional | Cover letter generation |
+| POST | `/api/ai/job-suggestions` | Optional | Job role suggestions |
+| GET | `/api/ai/usage` | Optional | AI usage statistics |
+| POST | `/api/resumes` | Protected | Save resume |
+| GET | `/api/resumes` | Protected | List user resumes |
+| DELETE | `/api/resumes/:id` | Protected | Delete resume |
+| POST | `/api/interviews/session/start` | Protected | Start interview session |
+| POST | `/api/interviews/session/answer` | Protected | Submit interview answer |
+| POST | `/api/interviews/session/finalize` | Protected | Finalize interview |
+| POST | `/api/interviews/documents/upload` | Protected | Upload study document |
+| GET | `/api/interviews/documents` | Protected | List documents |
+
+## Security
+
+- **Authentication**: JWT-based with bcrypt password hashing (salt rounds: 10)
+- **CORS**: Strict origin checking — production only allows `CLIENT_URL`
+- **Rate Limiting**: Per-endpoint rate limits (login: 5/15min, AI: 20/hr, general: 200/15min)
+- **Input Sanitization**: XSS/prototype pollution protection
+- **Bot Protection**: Honeypot fields, user-agent screening, optional Turnstile CAPTCHA
+- **Headers**: Helmet security headers (HSTS, CSP, X-Frame-Options, etc.)
+- **MongoDB Sanitization**: NoSQL injection protection via express-mongo-sanitize
+- **Error Handling**: Stack traces hidden in production responses
+- **Secrets**: All API keys and credentials via environment variables only
+
+## AI Request Protection
+
+- **Per-user daily quotas** — Feature-specific daily limits (e.g., 10 resume optimizations, 20 ATS analyses)
+- **Request queue** — Concurrency-limited (default: 3 concurrent requests)
+- **Request deduplication** — Identical in-flight requests are collapsed
+- **Response caching** — Successful AI responses are cached to reduce API costs
+- **Retry with backoff** — Transient failures (429, 5xx, JSON parse) are retried with exponential backoff
+- **Timeout enforcement** — 45s execution timeout per request
+- **429 cooldown** — Queue pauses on rate limit hits to prevent thundering herd
+- **Schema validation** — Structured AI responses are validated before returning to the client
+- **Cancellation** — Requests can be cancelled via API
+
+## Troubleshooting
+
+### Frontend shows "Cannot connect to the server"
+- Verify `VITE_API_URL` is set correctly in your `.env`
+- Check if the backend is running (`/api/health`)
+- Check browser console for CORS errors
+
+### CORS errors in production
+- Ensure `CLIENT_URL` in backend env matches your exact Vercel domain
+- Include the protocol (`https://your-app.vercel.app`, not just `your-app.vercel.app`)
+- Do NOT include a trailing slash
+
+### AI features return errors
+- Verify `OPENROUTER_API_KEY` is set and valid
+- Check the AI health endpoint: `GET /api/health/ai`
+- Check OpenRouter dashboard for credits/rate limits
+- Review backend logs for specific provider errors
+
+### MongoDB connection fails
+- Verify `MONGO_URI` is correct
+- For Atlas: whitelist your server IP (or `0.0.0.0/0`)
+- Check the readiness probe: `GET /api/ready`
+
+### Build fails on Vercel
+- Ensure root directory is set to `frontend`
+- Check that all TypeScript errors are resolved
+- Verify `VITE_API_URL` is set in Vercel environment variables
+
+### 429 Too Many Requests
+- AI features have per-user daily quotas
+- Rate limiting applies per IP/user
+- Wait for the cooldown period shown in the error message
+
+## License
+
+ISC

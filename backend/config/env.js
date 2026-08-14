@@ -39,6 +39,12 @@ const getAllowedOrigins = () => {
     .map((origin) => origin.trim().replace(/\/+$/, ''))
     .filter(Boolean);
 
+  // In production, only allow explicitly configured origins (CLIENT_URL).
+  // In development, also allow common localhost ports for convenience.
+  if (process.env.NODE_ENV === 'production') {
+    return configuredOrigins;
+  }
+
   return [...new Set([...configuredOrigins, ...localClientOrigins])];
 };
 
