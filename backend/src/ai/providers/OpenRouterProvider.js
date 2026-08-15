@@ -20,6 +20,9 @@ class OpenRouterProvider extends AIProvider {
     const isOpenRouter = !!process.env.OPENROUTER_API_KEY || this.apiKey.startsWith('sk-or-');
     const baseURL = isOpenRouter ? 'https://openrouter.ai/api/v1' : undefined;
     const referer = process.env.OPENROUTER_REFERER || process.env.CLIENT_URL || 'http://localhost:3000';
+    if (process.env.NODE_ENV === 'production' && referer.includes('localhost')) {
+      console.warn('[OpenRouterProvider] WARNING: HTTP-Referer is set to a localhost URL in production. Set OPENROUTER_REFERER or CLIENT_URL to your production frontend domain.');
+    }
 
     this.client = new OpenAI({
       apiKey: this.apiKey,

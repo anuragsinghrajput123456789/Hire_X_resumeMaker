@@ -40,11 +40,16 @@ class GeminiProvider extends AIProvider {
       ];
     }
 
+    const referer = process.env.CLIENT_URL || 'http://localhost:3000';
+    if (process.env.NODE_ENV === 'production' && referer.includes('localhost')) {
+      console.warn('[GeminiProvider] WARNING: HTTP-Referer is set to a localhost URL in production. Set CLIENT_URL to your production frontend domain.');
+    }
+
     this.client = new OpenAI({
       apiKey: this.apiKey,
       baseURL,
       defaultHeaders: isOpenRouter ? {
-        "HTTP-Referer": process.env.CLIENT_URL || "http://localhost:3000",
+        "HTTP-Referer": referer,
         "X-Title": "Hire-X"
       } : undefined
     });

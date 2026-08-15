@@ -1,0 +1,37 @@
+# ============================================================
+# Hire-X — Render Blueprint
+# ============================================================
+# This file defines the backend web service for Render deployment.
+# Secrets (API keys, DB URI, JWT_SECRET) must be set manually
+# in Render's Environment settings — NEVER put real values here.
+# ============================================================
+
+services:
+  - type: web
+    name: hirex-backend
+    runtime: node
+    region: oregon
+    plan: free
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: AI_PROVIDER
+        value: openrouter
+      - key: AI_USAGE_LIMIT
+        value: 500
+      - key: AI_MAX_CONCURRENCY
+        value: 3
+      # --- Set these secrets manually in Render Dashboard ---
+      # MONGO_URI          → MongoDB Atlas connection string
+      # JWT_SECRET         → Random 64+ character string
+      # OPENROUTER_API_KEY → Your OpenRouter API key
+      # CLIENT_URL         → Your Vercel frontend URL (e.g. https://your-app.vercel.app)
+      # OPENROUTER_REFERER → Same as CLIENT_URL
+      # GEMINI_API_KEY     → (Optional) Only if using native Gemini API
+      # ADMIN_EMAIL        → (Optional) Admin user email

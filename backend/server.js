@@ -53,7 +53,7 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-app.options('*', cors(corsOptions));
+app.options('{*path}', cors(corsOptions));
 
 app.use(express.json({ limit: '10mb' }));
 
@@ -123,6 +123,24 @@ app.use('/api/', generalLimiter);
 
 app.get('/', (req, res) => {
   res.send('Hire-X Security Hardened API is running...');
+});
+
+// Root-level health check for Render (Render health check probes hit this path)
+app.get('/health', (req, res) => {
+  const mongoose = require('mongoose');
+  const dbReady = mongoose.connection.readyState === 1;
+  const envReady = !!(process.env.MONGO_URI && process.env.JWT_SECRET);
+  const status = dbReady && envReady ? 'ok' : 'degraded';
+
+  res.status(dbReady ? 200 : 503).json({
+    status,
+    service: 'hirex-backend',
+    uptime: process.uptime(),
+    environment: process.env.NODE_ENV || 'development',
+    dbState: dbReady ? 'connected' : 'disconnected',
+    configValid: envReady,
+    timestamp: new Date().toISOString()
+  });
 });
 
 app.get('/api/health', (req, res) => {
