@@ -169,31 +169,8 @@ const InterviewWorkspace = () => {
 
   // Timer states
   const [secondsElapsed, setSecondsElapsed] = useState(0);
-  const [timerIntervalId, setTimerIntervalId] = useState<any>(null);
 
-  // Fetch initial documents and resumes
-  useEffect(() => {
-    fetchDocs();
-    fetchResumes();
-  }, []);
-
-  // Timer hook
-  useEffect(() => {
-    if (sessionStage === 'active' && !answerResult) {
-      const interval = setInterval(() => {
-        setSecondsElapsed(prev => prev + 1);
-      }, 1000);
-      setTimerIntervalId(interval);
-      return () => clearInterval(interval);
-    } else {
-      if (timerIntervalId) {
-        clearInterval(timerIntervalId);
-        setTimerIntervalId(null);
-      }
-    }
-  }, [sessionStage, answerResult]);
-
-  const fetchDocs = async (query = '') => {
+  const fetchDocs = useCallback(async (query = '') => {
     setLoadingDocs(true);
     try {
       const categoryFilter = selectedDocCategory === 'All' ? undefined : selectedDocCategory;
@@ -202,15 +179,15 @@ const InterviewWorkspace = () => {
         type: searchType,
         category: categoryFilter
       });
-      setDocuments(res.data || []);
+      setDocuments(res.data as RAGDocument[] || []);
     } catch (err) {
       console.error(err);
     } finally {
       setLoadingDocs(false);
     }
-  };
+  }, [selectedDocCategory, searchType]);
 
-  const fetchResumes = async () => {
+  const fetchResumes = useCallback(async () => {
     setLoadingResumes(true);
     try {
       const data = await resumeService.getResumes();
@@ -223,7 +200,23 @@ const InterviewWorkspace = () => {
     } finally {
       setLoadingResumes(false);
     }
-  };
+  }, []);
+
+  // Fetch initial documents and resumes
+  useEffect(() => {
+    fetchDocs();
+    fetchResumes();
+  }, [fetchDocs, fetchResumes]);
+
+  // Timer hook
+  useEffect(() => {
+    if (sessionStage === 'active' && !answerResult) {
+      const interval = setInterval(() => {
+        setSecondsElapsed(prev => prev + 1);
+      }, 1000);
+      return () => clearInterval(interval);
+    }
+  }, [sessionStage, answerResult]);
 
   // Drag and drop text extraction for RAG materials upload
   const onDrop = useCallback(async (acceptedFiles: File[]) => {
@@ -267,16 +260,16 @@ const InterviewWorkspace = () => {
 
       setUploadTags('');
       fetchDocs();
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         title: 'Upload Failed',
-        description: error.message || 'Could not upload document',
+        description: error instanceof Error ? error.message : 'Could not upload document',
         variant: 'destructive'
       });
     } finally {
       setIsUploading(false);
     }
-  }, [uploadCategory, uploadTags, toast]);
+  }, [uploadCategory, uploadTags, toast, fetchDocs]);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
@@ -406,10 +399,11 @@ const InterviewWorkspace = () => {
         title: 'Session Started',
         description: `RAG Roadmap generated for ${interviewRound} stage.`
       });
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const errorMsg = err instanceof Error ? err.message : 'Failed to start interview prep session.';
       toast({
         title: 'Setup Failed',
-        description: err.message || 'Failed to start interview prep session.',
+        description: errorMsg,
         variant: 'destructive'
       });
     } finally {
@@ -446,10 +440,11 @@ const InterviewWorkspace = () => {
       } else if (res.completed) {
         setCurrentQuestion(null);
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const errorMsg = err instanceof Error ? err.message : 'Could not evaluate answer.';
       toast({
         title: 'Submission Failed',
-        description: err.message || 'Could not evaluate answer.',
+        description: errorMsg,
         variant: 'destructive'
       });
     } finally {
@@ -479,10 +474,11 @@ const InterviewWorkspace = () => {
       setStudyPlan(res.studyPlan);
       setCareerIntelligence(res.careerIntelligence);
       setSessionStage('feedback');
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const errorMsg = err instanceof Error ? err.message : 'Could not compile final feedback reports.';
       toast({
         title: 'Feedback Failed',
-        description: err.message || 'Could not compile final feedback reports.',
+        description: errorMsg,
         variant: 'destructive'
       });
     } finally {
@@ -1436,7 +1432,7 @@ const InterviewWorkspace = () => {
                     </div>
                   ) : (
                     <div className="space-y-3">
-                      {documents.map((doc: any) => (
+                      {documents.map((doc: RAGDocument) => (
                         <div
                           key={doc._id}
                           className="p-3.5 rounded-xl border border-white/[0.05] bg-[#050814] hover:bg-white/[0.02] transition-all flex items-center justify-between gap-4 group"

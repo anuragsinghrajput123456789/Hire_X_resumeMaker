@@ -125,10 +125,10 @@ export const useCoverLetter = (token?: string) => {
         title: 'Cover Letter Tailored!',
         description: 'Your premium cover letter has been generated successfully.',
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         title: 'Generation Failed',
-        description: error.message || 'Failed to communicate with AI model.',
+        description: error instanceof Error ? error.message : 'Failed to communicate with AI model.',
         variant: 'destructive',
       });
     } finally {
@@ -157,10 +157,10 @@ export const useCoverLetter = (token?: string) => {
         title: 'Cover Letter Saved!',
         description: 'Saved to your dashboard history.',
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         title: 'Failed to Save',
-        description: error.message || 'Could not save cover letter.',
+        description: error instanceof Error ? error.message : 'Could not save cover letter.',
         variant: 'destructive',
       });
     } finally {
@@ -176,10 +176,10 @@ export const useCoverLetter = (token?: string) => {
         title: 'Deleted',
         description: 'Cover letter removed from history.',
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         title: 'Delete Failed',
-        description: error.message || 'Could not delete item.',
+        description: error instanceof Error ? error.message : 'Could not delete item.',
         variant: 'destructive',
       });
     }

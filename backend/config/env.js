@@ -1,14 +1,26 @@
-const requiredEnv = ['MONGO_URI', 'JWT_SECRET'];
-
 const validateEnv = () => {
-  const missing = requiredEnv.filter((key) => !process.env[key]);
+  // Normalize MongoDB URI (Atlas and Render commonly provide MONGODB_URI)
+  if (!process.env.MONGO_URI && process.env.MONGODB_URI) {
+    process.env.MONGO_URI = process.env.MONGODB_URI;
+  }
+  if (!process.env.MONGODB_URI && process.env.MONGO_URI) {
+    process.env.MONGODB_URI = process.env.MONGO_URI;
+  }
+
+  const missing = [];
+  if (!process.env.MONGO_URI && !process.env.MONGODB_URI) {
+    missing.push('MONGODB_URI (or MONGO_URI)');
+  }
+  if (!process.env.JWT_SECRET) {
+    missing.push('JWT_SECRET');
+  }
 
   if (missing.length > 0) {
     throw new Error(`Missing required environment variables: ${missing.join(', ')}`);
   }
 
   if (process.env.JWT_SECRET && process.env.JWT_SECRET.length < 32) {
-    throw new Error('JWT_SECRET must be at least 32 characters long');
+    throw new Error('JWT_SECRET must be at least 32 characters long for production security.');
   }
 
   // Default NODE_ENV
@@ -29,7 +41,7 @@ const validateEnv = () => {
   }
 
   // Production: Validate that the primary AI provider key is present
-  if (isProduction && process.env.AI_PROVIDER === 'openrouter' && !process.env.OPENROUTER_API_KEY) {
+  if (isProduction && (process.env.AI_PROVIDER || 'openrouter') === 'openrouter' && !process.env.OPENROUTER_API_KEY) {
     console.warn('[env] WARNING: AI_PROVIDER is "openrouter" but OPENROUTER_API_KEY is not set. All AI features will fail.');
   }
 

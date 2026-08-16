@@ -45,8 +45,8 @@ export function parseBulletPoints(text?: string): string[] {
   return items
     .map(item => {
       let cleaned = item.trim();
-      cleaned = cleaned.replace(/^[\u2022\u25AA\u25E6\u25A0*+\-]\s*/, '');
-      cleaned = cleaned.replace(/^([0-9]+|[a-zA-Z])[\.)]\s*/, '');
+      cleaned = cleaned.replace(/^[\u2022\u25AA\u25E6\u25A0*+-]\s*/, '');
+      cleaned = cleaned.replace(/^([0-9]+|[a-zA-Z])[.)]\s*/, '');
       return cleaned.trim();
     })
     .filter(item => item.length > 0);

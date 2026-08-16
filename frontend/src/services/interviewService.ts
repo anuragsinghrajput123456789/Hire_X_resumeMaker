@@ -140,7 +140,7 @@ export const getDocuments = async (params?: {
   category?: string;
   favorite?: boolean;
   tag?: string;
-}): Promise<{ success: boolean; type: string; data: any[] }> => {
+}): Promise<{ success: boolean; type: string; data: (RAGDocument | RAGChunk)[] }> => {
   const queryParams = new URLSearchParams();
   if (params?.search) queryParams.append('search', params.search);
   if (params?.type) queryParams.append('type', params.type);

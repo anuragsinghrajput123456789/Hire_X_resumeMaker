@@ -129,7 +129,9 @@ app.get('/', (req, res) => {
 app.get('/health', (req, res) => {
   const mongoose = require('mongoose');
   const dbReady = mongoose.connection.readyState === 1;
-  const envReady = !!(process.env.MONGO_URI && process.env.JWT_SECRET);
+  const mongoUriExists = !!(process.env.MONGODB_URI || process.env.MONGO_URI);
+  const jwtExists = !!process.env.JWT_SECRET;
+  const envReady = mongoUriExists && jwtExists;
   const status = dbReady && envReady ? 'ok' : 'degraded';
 
   res.status(dbReady ? 200 : 503).json({
@@ -217,9 +219,7 @@ module.exports = app;
 const gracefulShutdown = (signal) => {
   console.log(`${signal} received. Shutting down gracefully...`);
 
-  server.close(() => {
-    console.log('HTTP server closed.');
-
+  const closeDatabaseAndExit = () => {
     try {
       const QueueManager = require('./src/ai/QueueManager');
       if (QueueManager.shutdown) {
@@ -234,7 +234,16 @@ const gracefulShutdown = (signal) => {
     }).catch(() => {
       process.exit(0);
     });
-  });
+  };
+
+  if (server) {
+    server.close(() => {
+      console.log('HTTP server closed.');
+      closeDatabaseAndExit();
+    });
+  } else {
+    closeDatabaseAndExit();
+  }
 
   setTimeout(() => {
     console.error('Forced shutdown after timeout.');
@@ -247,7 +256,7 @@ process.on('SIGINT', () => gracefulShutdown('SIGINT'));
 
 process.on('unhandledRejection', (error) => {
   console.error(`Unhandled rejection: ${error.message}`);
-  if (process.env.NODE_ENV !== 'production') {
+  if (process.env.NODE_ENV !== 'production' && server) {
     server.close(() => process.exit(1));
   }
 });

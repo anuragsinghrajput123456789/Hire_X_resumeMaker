@@ -66,5 +66,7 @@ export const incrementGuestAiUsage = (): GuestAiUsageStatus => {
 export const resetGuestAiUsage = () => {
   try {
     localStorage.removeItem(GUEST_AI_COUNT_KEY);
-  } catch {}
+  } catch (_err) {
+    // Ignore localStorage access errors
+  }
 };

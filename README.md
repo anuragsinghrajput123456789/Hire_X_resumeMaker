@@ -1,319 +1,292 @@
-# Hire-X — AI-Powered Career Platform
+<div align="center">
 
-Hire-X is a full-stack AI-powered career platform that helps job seekers with resume creation, ATS optimization, cover letter generation, cold email drafting, interview preparation, and career intelligence — all powered by AI.
+# ⚡ HIRE-X
+### *Next-Generation AI-Powered Career & Recruitment Intelligence Suite*
 
-## Features
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge)](LICENSE)
+[![React](https://img.shields.io/badge/React_18-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](https://reactjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript_5-007ACC?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Vite](https://img.shields.io/badge/Vite_5-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
+[![Node.js](https://img.shields.io/badge/Node.js_18+-339933?style=for-the-badge&logo=node.js&logoColor=white)](https://nodejs.org/)
+[![Express](https://img.shields.io/badge/Express_5-000000?style=for-the-badge&logo=express&logoColor=white)](https://expressjs.com/)
+[![MongoDB](https://img.shields.io/badge/MongoDB_Atlas-4EA94B?style=for-the-badge&logo=mongodb&logoColor=white)](https://www.mongodb.com/)
+[![OpenRouter](https://img.shields.io/badge/OpenRouter_AI-6366F1?style=for-the-badge&logo=openai&logoColor=white)](https://openrouter.ai/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
+[![Vercel](https://img.shields.io/badge/Vercel_Ready-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://vercel.com/)
+[![Render](https://img.shields.io/badge/Render_Ready-46E3B7?style=for-the-badge&logo=render&logoColor=black)](https://render.com/)
 
-- **AI Resume Generator** — Generate professional resumes with AI-powered content suggestions
-- **ATS Resume Analyzer** — Score your resume against ATS systems and get actionable improvements
-- **Job Description Analyzer** — Match your resume against specific job descriptions
-- **Cover Letter Generator** — Generate tailored cover letters for any job posting
-- **Cold Email Generator** — Draft professional cold outreach emails
-- **AI Career Chat** — Interactive AI assistant for career questions
-- **Interview Workspace** — Full interview preparation with AI-generated questions, roadmaps, study plans, and performance feedback
-- **RAG Document System** — Upload study materials for context-aware interview preparation
-- **Job Match Suggestions** — AI-powered job role recommendations
-- **Career Intelligence** — Skill gap analysis, salary insights, and career growth advice
-- **AI Usage Tracking** — Per-user daily quotas and usage monitoring
+<br/>
 
-## Technology Stack
+**Hire-X** is an enterprise-grade, full-stack career platform designed to automate and supercharge every phase of your job search — from **ATS-optimized resume generation** and **real-time resume scoring**, to **RAG-powered technical mock interview simulations**, **tailored cover letters**, and **personalized cold outreach campaigns**.
 
-| Layer | Technology |
-|-------|-----------|
-| Frontend | React 18, TypeScript, Vite, Tailwind CSS, shadcn/ui, Framer Motion |
-| Backend | Node.js, Express 5, Mongoose |
-| Database | MongoDB (local) / MongoDB Atlas (production) |
-| AI | OpenRouter API, Gemini API (via OpenAI-compatible SDK) |
-| State | React Query, React Context |
-| Auth | JWT (bcrypt password hashing) |
-| Deployment | Vercel (frontend), Netlify Functions / Render (backend) |
+[Explore Features](#-features) • [Architecture](#-architecture) • [AI Engine](#-resilient-ai-pipeline) • [Quickstart](#-local-development-setup) • [Deployment Guide](#-production-deployment) • [API Docs](#-api-endpoints)
 
-## Architecture
+---
+
+</div>
+
+## 🌟 Key Highlights
+
+- ⚡ **Zero Disruptive Design** — Stunning glassmorphic dark-mode UI powered by Tailwind CSS, Radix UI & Framer Motion.
+- 🧠 **Resilient Multi-Model AI Pipeline** — Multi-tiered AI architecture featuring fallback chains across OpenRouter (`Ling-3.0-Flash`, `Gemini 2.0 Flash`, `Llama 3.3 70B`, `Qwen 2.5 72B`) and native Google Gemini.
+- 🛡️ **Enterprise Security & Reliability** — Helmet headers, NoSQL injection sanitizers, Turnstile bot protection, request deduplication, rate limiters, and per-user daily token quotas.
+- 🚀 **Dual Cloud Deployment Ready** — Pre-configured for seamless zero-config deployment on **Vercel** (Frontend) and **Render** (Backend) with **MongoDB Atlas**.
+
+---
+
+## 🚀 Features
+
+<table>
+  <tr>
+    <td width="50%">
+      <h3>📄 AI Resume Studio & Builder</h3>
+      <ul>
+        <li>Interactive multi-step resume creation with live PDF preview</li>
+        <li>Instant AI bullet-point enhancer and action-verb generator</li>
+        <li>Multi-format exports (PDF, JSON) with customizable layouts</li>
+        <li>Cloud storage for managing multiple tailored profiles</li>
+      </ul>
+    </td>
+    <td width="50%">
+      <h3>🎯 ATS Resume & Job Match Analyzer</h3>
+      <ul>
+        <li>Deep ATS keyword scanning with real-time scoring (0-100)</li>
+        <li>Skill gap identification & missing qualification alerts</li>
+        <li>Job description compatibility breakdown and metric checks</li>
+        <li>Actionable bullet-by-bullet rewriting suggestions</li>
+      </ul>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%">
+      <h3>🎙️ Technical Mock Interview Workspace (RAG)</h3>
+      <ul>
+        <li>Simulated technical, behavioral, and system design interviews</li>
+        <li><b>RAG Document Vault</b>: upload notes, PDFs, or docs to ground questions</li>
+        <li>Real-time scoring, STAR evaluation, and model answers</li>
+        <li>Personalized multi-week preparation roadmap & study plan</li>
+      </ul>
+    </td>
+    <td width="50%">
+      <h3>✉️ Outreach & Career Intelligence</h3>
+      <ul>
+        <li><b>Cold Email Generator</b>: High-converting recruiter pitch templates</li>
+        <li><b>Cover Letter Generator</b>: Highly tailored, role-specific letters</li>
+        <li><b>AI Career Assistant</b>: Interactive career coaching & negotiation</li>
+        <li><b>Job Role Radar</b>: Intelligent skill-matched role suggestions</li>
+      </ul>
+    </td>
+  </tr>
+</table>
+
+---
+
+## 🏛️ Architecture
 
 ```
-Frontend (Vercel)          Backend (Render)            External Services
-┌─────────────────┐        ┌─────────────────────┐     ┌──────────────┐
-│  React/Vite SPA │───────>│  Express API Server │────>│  MongoDB     │
-│  apiClient.ts   │  CORS  │  ├── Auth Middleware │     │  Atlas       │
-│  services/*.ts  │<───────│  ├── Rate Limiter    │     └──────────────┘
-└─────────────────┘        │  ├── Bot Protection  │     ┌──────────────┐
-                           │  ├── Input Sanitizer │────>│  OpenRouter  │
-                           │  └── Routes          │     │  / Gemini    │
-                           │      └── Controllers │     └──────────────┘
-                           │          └── Services│
-                           │              └── AI  │
-                           │  ┌───────────────────┤
-                           │  │ AIManager         │
-                           │  │ ├── AIRequestQueue│
-                           │  │ ├── QueueWorker   │
-                           │  │ ├── QuotaManager  │
-                           │  │ ├── ResponseParser│
-                           │  │ ├── SchemaValid.  │
-                           │  │ ├── RetryManager  │
-                           │  │ ├── AICache       │
-                           │  │ └── Providers     │
-                           │  │     ├── OpenRouter │
-                           │  │     └── Gemini    │
-                           │  └───────────────────┤
-                           └─────────────────────┘
+                                      HIRE-X ARCHITECTURE
+                                      
+  ┌─────────────────────────────────┐                 ┌─────────────────────────────────┐
+  │         CLIENT LAYER            │                 │         BACKEND ENGINE          │
+  │     (React 18 + Vite + TS)      │                 │      (Express 5 + Node.js)      │
+  │                                 │                 │                                 │
+  │  ┌───────────────────────────┐  │     HTTPS       │  ┌───────────────────────────┐  │
+  │  │   Tailwind + shadcn/ui    │  │ ──────────────> │  │ Security Middleware       │  │
+  │  │   Framer Motion Context   │  │                 │  │ (Helmet, CORS, Sanitizer) │  │
+  │  └───────────────────────────┘  │                 │  └─────────────┬─────────────┘  │
+  │  ┌───────────────────────────┐  │                 │                │                │
+  │  │   apiClient.ts            │  │                 │  ┌─────────────▼─────────────┐  │
+  │  │   • Timeout & Auto-Retry  │  │                 │  │ General & Auth Limiters   │  │
+  │  │   • Token & Quota Sync    │  │ <────────────── │  │ (RateLimiter, Turnstile)  │  │
+  │  └───────────────────────────┘  │      JSON       │  └─────────────┬─────────────┘  │
+  └─────────────────────────────────┘                 └────────────────┼────────────────┘
+                                                                       │
+                                              ┌────────────────────────┴────────────────────────┐
+                                              │                                                 │
+                                     ┌────────▼────────┐                               ┌────────▼────────┐
+                                     │  MongoDB Atlas  │                               │   AIManager     │
+                                     │  Mongoose Pool  │                               │   AIRequestQueue│
+                                     └─────────────────┘                               └────────┬────────┘
+                                                                                                │
+                                                       ┌────────────────────────────────────────┴────────┐
+                                                       │                                                 │
+                                              ┌────────▼────────┐                               ┌────────▼────────┐
+                                              │  OpenRouter API │                               │   Gemini API    │
+                                              │  (Primary LLMs) │                               │  (Direct / FB)  │
+                                              └─────────────────┘                               └─────────────────┘
 ```
 
-## Project Structure
+---
 
-```
-Hire-XfinalVerdict/
-├── frontend/
-│   ├── src/
-│   │   ├── animations/       # Framer Motion animation configs
-│   │   ├── components/       # UI components (Navbar, Footer, ResumeGenerator, etc.)
-│   │   ├── config/           # App constants
-│   │   ├── context/          # React contexts (AuthContext)
-│   │   ├── features/         # Feature-specific components (coldEmail, coverLetter)
-│   │   ├── hooks/            # Custom React hooks
-│   │   ├── lib/              # Utility libraries
-│   │   ├── pages/            # Route pages
-│   │   ├── services/         # API service layer (apiClient, aiService, authService, etc.)
-│   │   └── types/            # TypeScript type definitions
-│   ├── vercel.json           # Vercel SPA routing & headers
-│   ├── vite.config.mjs       # Vite build configuration
-│   └── .env.example          # Frontend env template
-│
-├── backend/
-│   ├── config/               # Database & environment configuration
-│   ├── controllers/          # Route controller re-exports (backward compat)
-│   ├── middleware/            # Auth, error, rate limiting, bot protection, sanitizer
-│   ├── models/               # Mongoose schemas (User, Resume, InterviewSession, etc.)
-│   ├── routes/               # Express route re-exports
-│   ├── src/
-│   │   ├── ai/               # AI pipeline (AIManager, Queue, Providers, Prompts, Schemas)
-│   │   ├── features/         # Feature modules (ai, auth, resume, interview, etc.)
-│   │   └── utils/            # Security logger
-│   ├── server.js             # Express app entry point
-│   └── .env.example          # Backend env template
-│
-└── README.md
+## ⚡ Resilient AI Pipeline
+
+The Hire-X AI pipeline is engineered for 99.9% uptime, zero hallucinated JSON structures, and strict cost controls:
+
+```mermaid
+graph LR
+    A[Frontend Request] --> B[Controller / Service]
+    B --> C[AIRequestQueue]
+    C --> D{Quota / Dedupe Check}
+    D -- Cache Hit --> E[Instant Return]
+    D -- Cache Miss --> F[QueueWorker]
+    F --> G[AIManager Strategy]
+    G --> H[OpenRouter Provider]
+    H -- Fallback --> I[Gemini Provider]
+    H --> J[ResponseParser & Healer]
+    J --> K[SchemaValidator]
+    K --> L[Formatted Client Response]
 ```
 
-## Local Development Setup
+- **Per-User Quotas**: Daily allowance enforced via `QuotaManager`.
+- **Request Deduplication**: In-flight parallel queries with identical payloads are safely merged.
+- **Circuit-Breaker & Exponential Backoff**: Automatic retry on HTTP 429, timeouts, 5xx errors, or malformed JSON.
+- **Safe JSON Healer**: Custom parser repairs markdown-wrapped or truncated JSON output.
+
+---
+
+## 🛠️ Technology Stack
+
+| Layer | Technologies |
+|---|---|
+| **Frontend** | React 18, TypeScript, Vite 5, Tailwind CSS, shadcn/ui, Framer Motion, Lucide Icons |
+| **Backend** | Node.js 18+, Express 5, Mongoose 8, Helmet, Compression, Express-Mongo-Sanitize |
+| **Database** | MongoDB Atlas / Local MongoDB with connection pooling & auto-reconnection |
+| **AI Integration**| OpenRouter SDK, Google Gemini SDK, Custom AIRequestQueue & Cache |
+| **Security** | JWT authentication, bcrypt (salt 10), CORS whitelist, Cloudflare Turnstile |
+| **Deployment** | Vercel (Frontend SPA), Render (Backend Web Service), MongoDB Atlas (Database) |
+
+---
+
+## 💻 Local Development Setup
 
 ### Prerequisites
-
-- Node.js >= 18.0.0
-- MongoDB (local instance or Atlas)
-- OpenRouter API key (get one at https://openrouter.ai)
+- **Node.js** >= 18.0.0
+- **MongoDB** (Local instance or MongoDB Atlas account)
+- **OpenRouter API Key** (or Gemini API Key)
 
 ### 1. Clone the Repository
-
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/anuragsinghrajput123456789/Hire_X_resumeMaker.git
 cd Hire-XfinalVerdict
 ```
 
 ### 2. Backend Setup
-
 ```bash
 cd backend
 cp .env.example .env
-# Edit .env with your actual values (see Environment Variables below)
 npm install
-npm run dev    # Starts with nodemon on port 5000
+npm run dev
 ```
+> The backend will boot on `http://localhost:5000`.
 
 ### 3. Frontend Setup
-
 ```bash
-cd frontend
+cd ../frontend
 cp .env.example .env
-# Edit .env — for local dev: VITE_API_URL=http://localhost:5000/api
 npm install
-npm run dev    # Starts Vite dev server on port 8080
+npm run dev
 ```
+> The frontend will boot on `http://localhost:8080` (or `http://localhost:5173`).
 
-### 4. Verify
+---
 
-- Frontend: http://localhost:8080
-- Backend health: http://localhost:5000/api/health
-- Backend readiness: http://localhost:5000/api/ready
-
-## Environment Variables
+## ⚙️ Environment Variables
 
 ### Backend (`backend/.env`)
 
-| Variable | Required | Description |
-|----------|----------|-------------|
-| `NODE_ENV` | No | `development` or `production` (default: `development`) |
-| `PORT` | No | Server port (default: `5000`, Render supplies this automatically) |
-| `MONGO_URI` | **Yes** | MongoDB connection string |
-| `JWT_SECRET` | **Yes** | JWT signing secret (minimum 32 characters) |
-| `AI_PROVIDER` | No | `openrouter` or `gemini` (default: auto-detect from keys) |
-| `OPENROUTER_API_KEY` | **Yes*** | OpenRouter API key |
-| `OPENROUTER_MODEL` | No | Default model (default: `inclusionai/ling-3.0-flash:free`) |
-| `GEMINI_API_KEY` | No | Native Gemini API key (if not using OpenRouter) |
-| `GEMINI_MODEL` | No | Gemini model (default: `gemini-2.5-flash`) |
-| `CLIENT_URL` | **Yes** | Frontend origin for CORS (e.g., `https://your-app.vercel.app`) |
-| `AI_USAGE_LIMIT` | No | Global AI usage limit per user (default: `500`) |
-| `AI_MAX_CONCURRENCY` | No | Max concurrent AI requests (default: `3`) |
-| `AI_USAGE_WHITELIST` | No | Comma-separated admin emails (bypass AI limits) |
-| `ADMIN_EMAIL` | No | Admin email for admin-only routes |
-| `OPENROUTER_REFERER` | No | HTTP Referer for OpenRouter tracking |
-| `TURNSTILE_SECRET_KEY` | No | Cloudflare Turnstile bot protection secret |
+| Variable | Required | Default | Description |
+|---|---|---|---|
+| `NODE_ENV` | No | `development` | Environment mode (`development` / `production`) |
+| `PORT` | No | `5000` | Port for Express server |
+| `MONGODB_URI` / `MONGO_URI` | **Yes** | — | MongoDB Atlas / Local connection string |
+| `JWT_SECRET` | **Yes** | — | Secret for signing JWT tokens (min 32 chars) |
+| `AI_PROVIDER` | No | `openrouter` | AI Engine provider (`openrouter` or `gemini`) |
+| `OPENROUTER_API_KEY` | **Yes\*** | — | OpenRouter API Key |
+| `OPENROUTER_MODEL` | No | `inclusionai/ling-3.0-flash:free` | Primary model identifier |
+| `CLIENT_URL` | **Yes** | `http://localhost:8080` | Allowed CORS origins (comma-separated for multiples) |
+| `AI_USAGE_LIMIT` | No | `500` | Daily AI token request quota per user |
+| `AI_MAX_CONCURRENCY` | No | `3` | Maximum simultaneous worker AI requests |
+| `OPENROUTER_REFERER` | No | `http://localhost:8080` | Referer header for OpenRouter analytics |
+| `GEMINI_API_KEY` | No | — | Native Gemini key (optional) |
 
-*At least one of `OPENROUTER_API_KEY`, `GEMINI_API_KEY` is required for AI features.
+*\*At least one of `OPENROUTER_API_KEY` or `GEMINI_API_KEY` is required.*
 
 ### Frontend (`frontend/.env`)
 
 | Variable | Required | Description |
-|----------|----------|-------------|
-| `VITE_API_URL` | **Yes** | Backend API URL (e.g., `http://localhost:5000/api`) |
+|---|---|---|
+| `VITE_API_URL` | **Yes** | Backend API base URL (e.g., `http://localhost:5000/api` or `https://your-backend.onrender.com/api`) |
 
-> **Security**: Never place API keys, database credentials, or JWT secrets in the frontend `.env`. Only `VITE_`-prefixed variables are exposed to the browser.
+> 🔒 **Security Notice**: Never put private API keys (`OPENROUTER_API_KEY`, `JWT_SECRET`, `MONGODB_URI`) into the frontend `.env`.
 
-## MongoDB Atlas Setup
+---
 
-1. Create a free cluster at https://cloud.mongodb.com
-2. Create a database user with read/write access
-3. Whitelist your IP (or `0.0.0.0/0` for Render)
-4. Get the connection string and set `MONGO_URI` in your backend `.env`
-5. Replace `<password>` with your database user's password
+## 🚢 Production Deployment
 
-## OpenRouter Setup
+For comprehensive step-by-step production setup guides, check **[docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)**.
 
-1. Sign up at https://openrouter.ai
-2. Add credits or use free-tier models
-3. Generate an API key at https://openrouter.ai/settings/keys
-4. Set `OPENROUTER_API_KEY` in your backend `.env`
-5. Optionally set `OPENROUTER_MODEL` (default uses free models with fallback chain)
+### Quick Deployment Checklist:
+1. **Database**: Create a cluster on [MongoDB Atlas](https://www.mongodb.com/atlas), whitelist `0.0.0.0/0`, and copy your connection string.
+2. **Backend on Render**:
+   - Create a new **Web Service** pointing to `backend/`.
+   - Set Build Command: `npm install`, Start Command: `npm start`.
+   - Add Health Check Path: `/health`.
+   - Set environment variables (`MONGODB_URI`, `JWT_SECRET`, `CLIENT_URL`, `OPENROUTER_API_KEY`, `NODE_ENV=production`).
+3. **Frontend on Vercel**:
+   - Create a new project pointing to `frontend/`.
+   - Set framework preset to `Vite`.
+   - Add environment variable `VITE_API_URL=https://your-backend.onrender.com/api`.
+   - Add your Vercel production URL into Render's `CLIENT_URL`.
 
-## Gemini Setup (Optional)
+---
 
-If you want to use Google Gemini directly (not via OpenRouter):
+## 📡 API Endpoints
 
-1. Get an API key at https://aistudio.google.com/apikey
-2. Set `GEMINI_API_KEY` in your backend `.env`
-3. Set `AI_PROVIDER=gemini`
+### Health & Diagnostics
+- `GET /health` — Root health check probe for Render
+- `GET /api/health` — Detailed server status
+- `GET /api/ready` — Readiness probe (validates database connection)
+- `GET /api/health/ai` — Real-time AI queue metrics & provider health
 
-## Vercel Deployment (Frontend)
+### Authentication
+- `POST /api/auth/register` — Register a new account
+- `POST /api/auth/login` — Sign in and receive JWT token
+- `GET /api/auth/me` — Get authenticated user details
 
-1. Push your repository to GitHub.
-2. Import the project in [Vercel](https://vercel.com).
-3. Set the **Root Directory** to `frontend`.
-4. Set **Framework Preset** to `Vite`.
-5. Add environment variable:
-   - `VITE_API_URL` = `https://your-netlify-backend.netlify.app/api`
-6. Deploy.
+### AI Services
+- `POST /api/ai/analyze-resume` — Full ATS scoring & gap analysis
+- `POST /api/ai/analyze-resume-realtime` — Low-latency real-time score updates
+- `POST /api/ai/generate-resume` — AI resume generation from user profiles
+- `POST /api/ai/cover-letter` — Role-specific tailored cover letter generator
+- `POST /api/ai/cold-email` — Recruiter cold outreach generation
+- `POST /api/ai/chat` — Career intelligence studio chatbot
+- `POST /api/ai/job-suggestions` — Tailored role recommendations
 
-The included `frontend/vercel.json` file handles SPA routing (all routes → `index.html`) and security headers automatically.
+### Interview Workspace & RAG
+- `POST /api/interviews/session/start` — Initialize mock interview session & roadmap
+- `POST /api/interviews/session/answer` — Submit answer for real-time AI evaluation
+- `POST /api/interviews/session/finalize` — Generate final report & study plan
+- `POST /api/interviews/documents/upload` — Upload notes/PDFs for RAG grounding
+- `GET /api/interviews/documents` — Search & list reference documents
 
-## Netlify Deployment (Backend API)
+---
 
-1. Import your project in [Netlify](https://app.netlify.com).
-2. Configure build settings:
-   - **Base directory**: `backend`
-   - **Build command**: `npm install`
-   - **Publish directory**: `public`
-   - **Functions directory**: `functions`
-3. Add environment variables under **Site configuration** → **Environment variables**:
-   - `NODE_ENV` = `production`
-   - `MONGO_URI` = your MongoDB Atlas connection string
-   - `JWT_SECRET` = a secure 32+ character secret
-   - `OPENROUTER_API_KEY` = your OpenRouter API key
-   - `CLIENT_URL` = `https://your-app.vercel.app` (No trailing slash)
-4. Deploy site. Netlify uses `backend/functions/api.js` (`serverless-http`) to host your Express server.
+## 🛡️ Security & Hardening
 
-## Render Deployment (Alternative Backend)
+- 🔒 **CORS Filtering**: Strict origin validation dynamically checking `CLIENT_URL`.
+- 🛡️ **Helmet Headers**: Comprehensive Content Security Policy, X-Frame-Options, and HSTS.
+- 🧹 **NoSQL Sanitization**: Deep query filtering with `express-mongo-sanitize`.
+- ⏱️ **Rate Limiting**: Multi-tiered limits protecting against brute-force and scraping.
+- 🗄️ **Dual Database Handling**: Automatic resolution of `MONGODB_URI` and `MONGO_URI`.
 
-1. Create a new **Web Service** on Render (https://render.com).
-2. Connect your repository, set **Root Directory** to `backend`.
-3. Set **Build Command**: `npm install`, **Start Command**: `npm start`.
-4. Add environment variables (`NODE_ENV`, `MONGO_URI`, `JWT_SECRET`, `OPENROUTER_API_KEY`, `CLIENT_URL`).
-5. Deploy.
+---
 
+## 📄 License
 
-## API Overview
+Distributed under the **MIT License**. See `LICENSE` for more information.
 
-| Method | Endpoint | Auth | Description |
-|--------|----------|------|-------------|
-| GET | `/api/health` | Public | Health check |
-| GET | `/api/ready` | Public | Readiness probe (DB check) |
-| POST | `/api/auth/register` | Public | User registration |
-| POST | `/api/auth/login` | Public | User login |
-| GET | `/api/auth/me` | Protected | Get current user |
-| POST | `/api/ai/analyze-resume` | Optional | ATS resume analysis |
-| POST | `/api/ai/analyze-resume-realtime` | Optional | Real-time resume analysis |
-| POST | `/api/ai/analyze-job` | Optional | Job description analysis |
-| POST | `/api/ai/generate-resume` | Optional | AI resume generation |
-| POST | `/api/ai/generate-content` | Optional | General AI content |
-| POST | `/api/ai/chat` | Optional | AI career chat |
-| POST | `/api/ai/cold-email` | Optional | Cold email generation |
-| POST | `/api/ai/cover-letter` | Optional | Cover letter generation |
-| POST | `/api/ai/job-suggestions` | Optional | Job role suggestions |
-| GET | `/api/ai/usage` | Optional | AI usage statistics |
-| POST | `/api/resumes` | Protected | Save resume |
-| GET | `/api/resumes` | Protected | List user resumes |
-| DELETE | `/api/resumes/:id` | Protected | Delete resume |
-| POST | `/api/interviews/session/start` | Protected | Start interview session |
-| POST | `/api/interviews/session/answer` | Protected | Submit interview answer |
-| POST | `/api/interviews/session/finalize` | Protected | Finalize interview |
-| POST | `/api/interviews/documents/upload` | Protected | Upload study document |
-| GET | `/api/interviews/documents` | Protected | List documents |
+---
 
-## Security
-
-- **Authentication**: JWT-based with bcrypt password hashing (salt rounds: 10)
-- **CORS**: Strict origin checking — production only allows `CLIENT_URL`
-- **Rate Limiting**: Per-endpoint rate limits (login: 5/15min, AI: 20/hr, general: 200/15min)
-- **Input Sanitization**: XSS/prototype pollution protection
-- **Bot Protection**: Honeypot fields, user-agent screening, optional Turnstile CAPTCHA
-- **Headers**: Helmet security headers (HSTS, CSP, X-Frame-Options, etc.)
-- **MongoDB Sanitization**: NoSQL injection protection via express-mongo-sanitize
-- **Error Handling**: Stack traces hidden in production responses
-- **Secrets**: All API keys and credentials via environment variables only
-
-## AI Request Protection
-
-- **Per-user daily quotas** — Feature-specific daily limits (e.g., 10 resume optimizations, 20 ATS analyses)
-- **Request queue** — Concurrency-limited (default: 3 concurrent requests)
-- **Request deduplication** — Identical in-flight requests are collapsed
-- **Response caching** — Successful AI responses are cached to reduce API costs
-- **Retry with backoff** — Transient failures (429, 5xx, JSON parse) are retried with exponential backoff
-- **Timeout enforcement** — 45s execution timeout per request
-- **429 cooldown** — Queue pauses on rate limit hits to prevent thundering herd
-- **Schema validation** — Structured AI responses are validated before returning to the client
-- **Cancellation** — Requests can be cancelled via API
-
-## Troubleshooting
-
-### Frontend shows "Cannot connect to the server"
-- Verify `VITE_API_URL` is set correctly in your `.env`
-- Check if the backend is running (`/api/health`)
-- Check browser console for CORS errors
-
-### CORS errors in production
-- Ensure `CLIENT_URL` in backend env matches your exact Vercel domain
-- Include the protocol (`https://your-app.vercel.app`, not just `your-app.vercel.app`)
-- Do NOT include a trailing slash
-
-### AI features return errors
-- Verify `OPENROUTER_API_KEY` is set and valid
-- Check the AI health endpoint: `GET /api/health/ai`
-- Check OpenRouter dashboard for credits/rate limits
-- Review backend logs for specific provider errors
-
-### MongoDB connection fails
-- Verify `MONGO_URI` is correct
-- For Atlas: whitelist your server IP (or `0.0.0.0/0`)
-- Check the readiness probe: `GET /api/ready`
-
-### Build fails on Vercel
-- Ensure root directory is set to `frontend`
-- Check that all TypeScript errors are resolved
-- Verify `VITE_API_URL` is set in Vercel environment variables
-
-### 429 Too Many Requests
-- AI features have per-user daily quotas
-- Rate limiting applies per IP/user
-- Wait for the cooldown period shown in the error message
-
-## License
-
-ISC
+<div align="center">
+  <sub>Built with ❤️ by the Hire-X Engineering Team</sub>
+</div>

@@ -67,10 +67,10 @@ export const useInterviewSession = () => {
         title: 'Session Started!',
         description: 'Your tailored preparation roadmap and first question are ready.',
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         title: 'Session Failed',
-        description: error.message || 'Could not initialize interview session.',
+        description: error instanceof Error ? error.message : 'Could not initialize interview session.',
         variant: 'destructive',
       });
     } finally {
@@ -104,10 +104,10 @@ export const useInterviewSession = () => {
         setCurrentQuestion(res.nextQuestion);
         setUserAnswer('');
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         title: 'Submission Failed',
-        description: error.message || 'Could not submit answer.',
+        description: error instanceof Error ? error.message : 'Could not submit answer.',
         variant: 'destructive',
       });
     } finally {
@@ -129,10 +129,10 @@ export const useInterviewSession = () => {
         title: 'Report Ready!',
         description: 'Full performance analytics and study plan generated.',
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         title: 'Finalization Failed',
-        description: error.message || 'Could not finalize session.',
+        description: error instanceof Error ? error.message : 'Could not finalize session.',
         variant: 'destructive',
       });
     } finally {

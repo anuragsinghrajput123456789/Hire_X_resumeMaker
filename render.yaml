@@ -28,7 +28,7 @@ services:
       - key: AI_MAX_CONCURRENCY
         value: 3
       # --- Set these secrets manually in Render Dashboard ---
-      # MONGO_URI          → MongoDB Atlas connection string
+      # MONGODB_URI (or MONGO_URI) → MongoDB Atlas connection string
       # JWT_SECRET         → Random 64+ character string
       # OPENROUTER_API_KEY → Your OpenRouter API key
       # CLIENT_URL         → Your Vercel frontend URL (e.g. https://your-app.vercel.app)

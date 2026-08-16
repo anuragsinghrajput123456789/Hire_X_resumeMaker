@@ -137,6 +137,32 @@ export const Chatbot = () => {
     }
   }, [token]);
 
+  const fetchChatHistory = useCallback(async () => {
+    if (!token) return;
+    try {
+      const response = await fetch(apiUrl('/chats'), {
+        headers: authHeaders(false)
+      });
+      if (response.status === 401) {
+        clearAuthStorage();
+        window.location.reload();
+        return;
+      }
+      if (response.ok) {
+        const data = await response.json();
+        setChatHistory(Array.isArray(data) ? data : []);
+      }
+    } catch (error) {
+      console.error('Failed to fetch chat history:', error);
+    }
+  }, [token]);
+
+  useEffect(() => {
+    if (token) {
+      fetchChatHistory();
+    }
+  }, [fetchChatHistory, token]);
+
   if (!token) {
     return (
       <div className="max-w-md mx-auto py-12 px-4">
@@ -175,32 +201,6 @@ export const Chatbot = () => {
       </div>
     );
   }
-
-  const fetchChatHistory = useCallback(async () => {
-    if (!token) return;
-    try {
-      const response = await fetch(apiUrl('/chats'), {
-        headers: authHeaders(false)
-      });
-      if (response.status === 401) {
-        clearAuthStorage();
-        window.location.reload();
-        return;
-      }
-      if (response.ok) {
-        const data = await response.json();
-        setChatHistory(Array.isArray(data) ? data : []);
-      }
-    } catch (error) {
-      console.error('Failed to fetch chat history:', error);
-    }
-  }, [token]);
-
-  useEffect(() => {
-    if (token) {
-      fetchChatHistory();
-    }
-  }, [fetchChatHistory, token]);
 
   const loadChat = (chat: ChatSession) => {
     setMessages(chat.messages || []);

@@ -1,6 +1,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import { generateColdEmail } from '../services/aiService';
 import { saveColdEmail, getColdEmailHistory, deleteColdEmail } from '../services/coldEmailService';
+import { SavedColdEmail } from '../types/coldEmail.types';
 import { useToast } from '../components/ui/use-toast';
 
 export const TONE_OPTIONS = [
@@ -51,7 +52,7 @@ export const useColdEmail = (token?: string) => {
   const [subjectLine, setSubjectLine] = useState('');
   const [emailBody, setEmailBody] = useState('');
   const [isSaving, setIsSaving] = useState(false);
-  const [history, setHistory] = useState<any[]>([]);
+  const [history, setHistory] = useState<SavedColdEmail[]>([]);
 
   // Parse subject line and body from raw AI generated content
   const parseGeneratedEmail = (content: string) => {
@@ -161,10 +162,10 @@ CRITICAL FORMATTING INSTRUCTIONS:
         title: 'Cold Email Crafted!',
         description: 'Your personalized outreach message is ready to send.',
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         title: 'Generation Failed',
-        description: error.message || 'Failed to generate email.',
+        description: error instanceof Error ? error.message : 'Failed to generate email.',
         variant: 'destructive',
       });
     } finally {
@@ -195,10 +196,10 @@ CRITICAL FORMATTING INSTRUCTIONS:
         title: 'Email Saved to History!',
         description: 'You can revisit or re-copy this outreach draft anytime.',
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         title: 'Save Failed',
-        description: error.message || 'Could not save email.',
+        description: error instanceof Error ? error.message : 'Could not save email.',
         variant: 'destructive',
       });
     } finally {
@@ -214,10 +215,10 @@ CRITICAL FORMATTING INSTRUCTIONS:
         title: 'Email Removed',
         description: 'Removed from history.',
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         title: 'Delete Failed',
-        description: error.message || 'Could not delete email.',
+        description: error instanceof Error ? error.message : 'Could not delete email.',
         variant: 'destructive',
       });
     }

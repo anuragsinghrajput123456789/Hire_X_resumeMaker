@@ -1,149 +1,170 @@
-# Hire-X — Detailed Deployment Steps
+# Hire-X Production Deployment Guide
 
-> See [DEPLOYMENT.md](../DEPLOYMENT.md) for the overview and environment variable reference.
-
-## Step-by-Step: First Deployment
-
-### 1. Prepare MongoDB Atlas
-
-```
-1. Sign up at https://cloud.mongodb.com
-2. Create a free M0 cluster (any region close to your Render region)
-3. Security → Database Access → Add New Database User
-   - Username: hirexuser
-   - Password: (generate a strong one, copy it)
-   - Role: Atlas Admin
-4. Security → Network Access → Add IP Address → 0.0.0.0/0
-   (This allows Render's dynamic IPs to connect)
-5. Database → Connect → Drivers → Node.js
-   Copy the connection string
-6. Replace <password> with your DB user password
-7. Replace <dbname> with: hirex
-```
-
-### 2. Deploy Backend to Render
-
-```
-1. Push your code to GitHub
-2. Go to https://dashboard.render.com
-3. New → Web Service
-4. Connect your GitHub repo
-5. Settings:
-   - Name: hirex-backend
-   - Root Directory: backend
-   - Runtime: Node
-   - Build Command: npm install
-   - Start Command: npm start
-   - Plan: Free (or Starter for always-on)
-6. Environment → Add environment variables:
-   NODE_ENV=production
-   MONGO_URI=<your MongoDB Atlas connection string>
-   JWT_SECRET=<random 64+ character string>
-   OPENROUTER_API_KEY=<your OpenRouter API key>
-   AI_PROVIDER=openrouter
-   CLIENT_URL=<your Vercel URL — add after step 3>
-   OPENROUTER_REFERER=<same as CLIENT_URL>
-7. Advanced → Health Check Path: /health
-8. Deploy
-```
-
-### 3. Deploy Frontend to Vercel
-
-```
-1. Go to https://vercel.com → New Project
-2. Import your GitHub repo
-3. Settings:
-   - Framework Preset: Vite
-   - Root Directory: frontend
-   - Build Command: npm run build
-   - Output Directory: dist
-4. Environment Variables:
-   VITE_API_URL=https://hirex-backend.onrender.com/api
-   (Use your actual Render URL)
-5. Deploy
-6. Copy the Vercel URL (e.g. https://hire-x.vercel.app)
-```
-
-### 4. Complete CORS Setup
-
-```
-1. Go back to Render Dashboard → hirex-backend → Environment
-2. Set CLIENT_URL to your Vercel URL:
-   CLIENT_URL=https://hire-x.vercel.app
-3. Set OPENROUTER_REFERER to the same:
-   OPENROUTER_REFERER=https://hire-x.vercel.app
-4. Render will auto-redeploy with the new config
-```
-
-### 5. Verify Deployment
-
-```bash
-# Backend health
-curl https://hirex-backend.onrender.com/health
-
-# API health
-curl https://hirex-backend.onrender.com/api/health
-
-# AI health
-curl https://hirex-backend.onrender.com/api/health/ai
-
-# Frontend
-Open https://hire-x.vercel.app in browser
-```
-
-### 6. Smoke Test Checklist
-
-- [ ] Landing page loads
-- [ ] Register a new user
-- [ ] Login with the new user
-- [ ] Generate/optimize a resume (tests OpenRouter)
-- [ ] Analyze resume ATS score
-- [ ] Generate a cover letter
-- [ ] Generate a cold email
-- [ ] Start an interview session
-- [ ] Chat with the AI assistant
-- [ ] Save and retrieve history (tests MongoDB)
-- [ ] Logout and verify protected routes redirect
+This guide provides end-to-end instructions for deploying the **Hire-X** AI-Powered Career Platform to production.
 
 ---
 
-## Updating After Deployment
+## Architecture Overview
 
-### Frontend Changes
-Push to GitHub → Vercel auto-deploys from the connected branch.
-
-### Backend Changes
-Push to GitHub → Render auto-deploys from the connected branch.
-
-### Environment Variable Changes
-- **Vercel**: Project Settings → Environment Variables → Update → **Redeploy** (required)
-- **Render**: Environment → Update → auto-redeploys
-
----
-
-## Generate a Secure JWT Secret
-
-```bash
-# Linux/Mac
-openssl rand -base64 48
-
-# Node.js
-node -e "console.log(require('crypto').randomBytes(48).toString('base64'))"
-
-# PowerShell
-[Convert]::ToBase64String((1..48 | ForEach-Object { Get-Random -Maximum 256 }) -as [byte[]])
+```
+Frontend (Vercel)                 Backend (Render)              Databases & AI
+┌─────────────────────┐          ┌──────────────────────┐      ┌─────────────────┐
+│ React 18 + Vite SPA │  HTTPS   │ Express API Server   │ ───> │ MongoDB Atlas   │
+│ Tailwind + shadcn/ui│ ───────> │ Dynamic PORT Binding │      └─────────────────┘
+│ VITE_API_URL        │   CORS   │ Helmet + Sanitizers  │      ┌─────────────────┐
+│                     │ <─────── │ AI Request Queue     │ ───> │ OpenRouter /    │
+└─────────────────────┘          └──────────────────────┘      │ Gemini API      │
+                                                               └─────────────────┘
 ```
 
 ---
 
-## Custom Domain Setup
+## 1. Database Setup: MongoDB Atlas
 
-### Vercel
-Project Settings → Domains → Add your custom domain
+1. **Create an Account / Cluster**:
+   - Sign in at [MongoDB Atlas](https://www.mongodb.com/atlas).
+   - Create a free **M0 Shared Cluster** or a dedicated cluster in your preferred region.
 
-### Render
-Settings → Custom Domains → Add your API domain
+2. **Configure Database User**:
+   - Go to **Security > Database Access**.
+   - Click **Add New Database User**.
+   - Choose **Password Authentication**, create a username (e.g. `hirex_admin`) and a strong password.
+   - Set Database User Privileges to **Read and write to any database**.
 
-After adding custom domains, update:
-- `CLIENT_URL` in Render to include the custom frontend domain
-- `VITE_API_URL` in Vercel to point to the custom backend domain
+3. **Configure Network Access**:
+   - Go to **Security > Network Access**.
+   - Click **Add IP Address**.
+   - Choose **Allow Access from Anywhere (`0.0.0.0/0`)** so Render backend instances can connect.
+
+4. **Get Connection String**:
+   - Go to **Deployments > Database**.
+   - Click **Connect** > **Drivers** > **Node.js**.
+   - Copy the URI:
+     ```
+     mongodb+srv://<username>:<password>@cluster0.xxxxx.mongodb.net/hirex?retryWrites=true&w=majority
+     ```
+
+---
+
+## 2. AI Provider Setup: OpenRouter
+
+1. **Create OpenRouter Account**:
+   - Sign up at [OpenRouter](https://openrouter.ai/).
+2. **Generate API Key**:
+   - Go to **Keys** > **Create Key**.
+   - Name your key (e.g. `hirex-production`).
+   - Copy the key: `sk-or-v1-...`.
+3. **Credit Balance**:
+   - Top up credits or use OpenRouter free-tier models (e.g., `inclusionai/ling-3.0-flash:free`, `google/gemini-2.0-flash-001`, `meta-llama/llama-3.3-70b-instruct:free`).
+
+---
+
+## 3. Backend Deployment: Render
+
+1. **Create Web Service on Render**:
+   - Sign in to [Render](https://render.com/).
+   - Click **New +** > **Web Service**.
+   - Connect your GitHub / GitLab repository containing the Hire-X codebase.
+
+2. **Configure Service Settings**:
+   - **Name**: `hirex-backend`
+   - **Root Directory**: `backend`
+   - **Environment**: `Node`
+   - **Region**: Choose the closest region to your users / Atlas cluster.
+   - **Branch**: `main`
+   - **Build Command**: `npm install`
+   - **Start Command**: `npm start`
+   - **Health Check Path**: `/health`
+
+3. **Set Environment Variables in Render Dashboard**:
+   Go to **Environment** tab and add the following variables:
+
+   | Variable Name | Value | Description |
+   |---|---|---|
+   | `NODE_ENV` | `production` | Production mode |
+   | `PORT` | `10000` | Port assigned by Render |
+   | `MONGODB_URI` | `mongodb+srv://<user>:<password>@...` | Atlas connection string (or `MONGO_URI`) |
+   | `JWT_SECRET` | *(64+ character random string)* | Used for signing tokens (`openssl rand -hex 32`) |
+   | `CLIENT_URL` | `https://your-hirex-frontend.vercel.app` | Vercel frontend URL (comma-separated for multiples) |
+   | `AI_PROVIDER` | `openrouter` | AI Engine provider (`openrouter` or `gemini`) |
+   | `OPENROUTER_API_KEY` | `sk-or-v1-...` | Your OpenRouter API key |
+   | `OPENROUTER_MODEL` | `inclusionai/ling-3.0-flash:free` | Default model (or `google/gemini-2.0-flash-001`) |
+   | `OPENROUTER_REFERER` | `https://your-hirex-frontend.vercel.app` | Frontend origin for tracking |
+   | `AI_USAGE_LIMIT` | `500` | Maximum daily requests per user |
+   | `AI_MAX_CONCURRENCY` | `3` | Max simultaneous AI requests worker handles |
+   | `ADMIN_EMAIL` | `admin@yourdomain.com` | (Optional) Admin dashboard access email |
+   | `GEMINI_API_KEY` | *(optional)* | Native Gemini key if using `AI_PROVIDER=gemini` |
+
+4. **Deploy**:
+   - Click **Create Web Service**.
+   - Monitor deploy logs. Once live, verify `https://your-backend.onrender.com/health` returns HTTP 200:
+     ```json
+     {
+       "status": "ok",
+       "service": "hirex-backend",
+       "dbState": "connected",
+       "configValid": true
+     }
+     ```
+
+---
+
+## 4. Frontend Deployment: Vercel
+
+1. **Import Project into Vercel**:
+   - Sign in to [Vercel](https://vercel.com/).
+   - Click **Add New...** > **Project**.
+   - Select your Hire-X repository.
+
+2. **Configure Build Settings**:
+   - **Framework Preset**: `Vite`
+   - **Root Directory**: `frontend`
+   - **Build Command**: `npm run build`
+   - **Output Directory**: `dist`
+   - **Install Command**: `npm install`
+
+3. **Configure Environment Variables**:
+   Add the following environment variable in the Vercel project configuration:
+
+   | Variable Name | Value |
+   |---|---|
+   | `VITE_API_URL` | `https://your-hirex-backend.onrender.com/api` |
+
+   > **Security Note**: Never add `OPENROUTER_API_KEY`, `JWT_SECRET`, or `MONGODB_URI` to Vercel. All AI calls and database interactions occur exclusively on the backend.
+
+4. **Deploy**:
+   - Click **Deploy**.
+   - Once deployed, copy your production Vercel URL (e.g., `https://hire-x.vercel.app`).
+
+5. **Update Backend CORS (`CLIENT_URL`)**:
+   - Go back to Render > `hirex-backend` > **Environment**.
+   - Ensure `CLIENT_URL` matches your exact Vercel URL (without trailing slash):
+     ```
+     CLIENT_URL=https://hire-x.vercel.app
+     ```
+   - Render will auto-redeploy with the updated CORS whitelist.
+
+---
+
+## 5. Verification & Health Monitoring
+
+### Health Probes
+- **Backend Service Health**:
+  ```bash
+  curl https://your-hirex-backend.onrender.com/health
+  ```
+- **API Readiness**:
+  ```bash
+  curl https://your-hirex-backend.onrender.com/api/ready
+  ```
+- **AI Engine Health & Metrics**:
+  ```bash
+  curl https://your-hirex-backend.onrender.com/api/health/ai
+  ```
+
+### Smoke Test Checklist
+1. **User Authentication**: Register a new user, log in, verify JWT cookie/header retention.
+2. **Resume Generator**: Create, edit, and export a resume to PDF.
+3. **ATS Scoring & Job Match**: Analyze resume content against sample job description.
+4. **Interview Simulation & RAG**: Upload study notes, initiate an interview session, submit answers, check AI evaluation.
+5. **Cold Email & Cover Letter**: Generate drafts, test clipboard copy, verify database history saving.
