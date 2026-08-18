@@ -22,20 +22,20 @@ const createRateLimitHandler = (message) => (req, res, next, options) => {
   });
 };
 
-// 1. Auth Login: 5 attempts per 15 minutes
+// 1. Auth Login: 20 attempts per 15 minutes in production (100 in dev)
 const authLoginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  limit: 5,
+  limit: process.env.NODE_ENV === 'production' ? 20 : 100,
   standardHeaders: 'draft-7',
   legacyHeaders: false,
   validate: false,
   handler: createRateLimitHandler('Too many login attempts. Please try again after 15 minutes.')
 });
 
-// 2. Auth Registration: 5 accounts per IP per hour
+// 2. Auth Registration: 20 accounts per IP per hour in production (100 in dev)
 const authRegisterLimiter = rateLimit({
   windowMs: 60 * 60 * 1000,
-  limit: 5,
+  limit: process.env.NODE_ENV === 'production' ? 20 : 100,
   standardHeaders: 'draft-7',
   legacyHeaders: false,
   validate: false,

@@ -6,21 +6,21 @@ const connectDB = async () => {
   }
   try {
     const mongoUri = process.env.MONGODB_URI || process.env.MONGO_URI;
+    const isLocal = mongoUri && (mongoUri.includes('127.0.0.1') || mongoUri.includes('localhost'));
     const conn = await mongoose.connect(mongoUri, {
       maxPoolSize: 10,
       minPoolSize: 2,
-      serverSelectionTimeoutMS: 5000,
+      serverSelectionTimeoutMS: 10000,
       socketTimeoutMS: 45000,
+      directConnection: isLocal ? true : undefined,
     });
     console.log(`MongoDB Connected: ${conn.connection.host}`);
   } catch (error) {
     console.error(`MongoDB connection error: ${error.message}`);
-    // In production, don't crash — let the readiness probe report the issue.
-    // In development, exit so the developer knows immediately.
     if (process.env.NODE_ENV === 'production') {
       console.error('MongoDB connection failed. The server will continue running but /api/ready will return 503.');
     } else {
-      process.exit(1);
+      console.warn('MongoDB connection failed in dev. Mongoose will attempt reconnection when queries execute.');
     }
   }
 

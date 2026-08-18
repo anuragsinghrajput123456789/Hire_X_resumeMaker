@@ -54,10 +54,16 @@ const validateEnv = () => {
 const localClientOrigins = [
   'http://localhost:5173',
   'http://127.0.0.1:5173',
+  'http://localhost:5174',
+  'http://127.0.0.1:5174',
   'http://localhost:3000',
   'http://127.0.0.1:3000',
   'http://localhost:8080',
   'http://127.0.0.1:8080',
+  'http://localhost:8081',
+  'http://127.0.0.1:8081',
+  'http://localhost:4173',
+  'http://127.0.0.1:4173',
   'http://localhost:5000',
   'http://127.0.0.1:5000'
 ];
@@ -68,13 +74,12 @@ const getAllowedOrigins = () => {
     .map((origin) => origin.trim().replace(/\/+$/, ''))
     .filter(Boolean);
 
-  // In production, only allow explicitly configured origins (CLIENT_URL).
-  // In development, also allow common localhost ports for convenience.
-  if (process.env.NODE_ENV === 'production') {
-    return configuredOrigins;
+  // In production, combine configured origins with local client origins if none set, or return configured
+  if (configuredOrigins.length > 0) {
+    return [...new Set([...configuredOrigins, ...localClientOrigins])];
   }
 
-  return [...new Set([...configuredOrigins, ...localClientOrigins])];
+  return localClientOrigins;
 };
 
 module.exports = {

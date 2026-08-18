@@ -1,13 +1,17 @@
+const path = require('path');
+require('dotenv').config({ path: path.resolve(__dirname, '.env') });
+
 const express = require('express');
 const cors = require('cors');
 const compression = require('compression');
 const connectDB = require('./config/db');
 const { getAllowedOrigins, validateEnv } = require('./config/env');
-const path = require('path');
-require('dotenv').config({ path: path.resolve(__dirname, '.env') });
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+
+// Trust proxy headers behind Render, Vercel, Cloudflare, Nginx
+app.set('trust proxy', 1);
 
 const helmet = require('helmet');
 const mongoSanitize = require('express-mongo-sanitize');
@@ -16,23 +20,33 @@ const securityLogger = require('./src/utils/securityLogger');
 
 validateEnv();
 
-// Allowed origins helper
-const allowedOrigins = getAllowedOrigins();
-
 const isOriginAllowed = (origin) => {
   if (!origin) return true; // Allow non-browser (curl, Postman, server-to-server)
 
-  const cleanOrigin = origin.replace(/\/+$/, '');
+  // In development, allow all origins so local testing / network dev never gets blocked
+  if (process.env.NODE_ENV !== 'production') {
+    return true;
+  }
+
+  const cleanOrigin = origin.trim().replace(/\/+$/, '').toLowerCase();
+  const currentAllowed = getAllowedOrigins().map(o => o.trim().replace(/\/+$/, '').toLowerCase());
 
   // 1. Wildcard allowed origin
-  if (allowedOrigins.includes('*')) return true;
+  if (currentAllowed.includes('*')) return true;
 
   // 2. Exact match against allowed origins (includes CLIENT_URL + local dev origins)
-  if (allowedOrigins.includes(cleanOrigin)) return true;
+  if (currentAllowed.includes(cleanOrigin)) return true;
 
-  // 3. In development, also match localhost / 127.0.0.1 on any port
-  if (process.env.NODE_ENV !== 'production') {
-    if (/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/i.test(cleanOrigin)) return true;
+  // 3. Match localhost / 127.0.0.1 / [::1] / local network IPs on any port
+  if (/^https?:\/\/(localhost|127\.0\.0\.1|\[::1\]|0\.0\.0\.0|192\.168\.\d+\.\d+|10\.\d+\.\d+\.\d+|172\.(1[6-9]|2\d|3[0-1])\.\d+\.\d+)(:\d+)?$/i.test(cleanOrigin)) {
+    return true;
+  }
+
+  // 4. Match common frontend hosting preview domains (Vercel, Render, Netlify)
+  if (/^https:\/\/([a-z0-9-_.]+\.)?vercel\.app$/i.test(cleanOrigin) ||
+      /^https:\/\/([a-z0-9-_.]+\.)?onrender\.com$/i.test(cleanOrigin) ||
+      /^https:\/\/([a-z0-9-_.]+\.)?netlify\.app$/i.test(cleanOrigin)) {
+    return true;
   }
 
   return false;
@@ -48,27 +62,21 @@ const corsOptions = {
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin', 'x-turnstile-token'],
+  exposedHeaders: ['Content-Range', 'X-Content-Range'],
+  maxAge: 86400,
   optionsSuccessStatus: 200
 };
 
 app.use(cors(corsOptions));
-app.options('{*path}', cors(corsOptions));
 
 app.use(express.json({ limit: '10mb' }));
 
-// Helmet security headers (Phase 7)
+// Helmet security headers
 app.use(helmet({
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc: ["'self'"],
-      scriptSrc: ["'self'", "'unsafe-inline'", "https://challenges.cloudflare.com"],
-      frameSrc: ["'self'", "https://challenges.cloudflare.com"],
-      imgSrc: ["'self'", "data:", "blob:", "https:"],
-      connectSrc: ["'self'", "https://openrouter.ai", "https://api.openai.com"]
-    }
-  },
+  contentSecurityPolicy: false,
   crossOriginEmbedderPolicy: false,
+  crossOriginResourcePolicy: { policy: 'cross-origin' },
   hsts: {
     maxAge: 31536000,
     includeSubDomains: true,
