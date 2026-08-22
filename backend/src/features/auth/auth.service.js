@@ -23,8 +23,8 @@ class AuthService {
       throw error;
     }
 
-    if (password.length < 8) {
-      const error = new Error('Password must be at least 8 characters');
+    if (password.length < 6) {
+      const error = new Error('Password must be at least 6 characters');
       error.statusCode = 400;
       throw error;
     }
