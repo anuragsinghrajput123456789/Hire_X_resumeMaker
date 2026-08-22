@@ -4,7 +4,7 @@ const notFound = (req, res, next) => {
 };
 
 const errorHandler = (err, req, res, next) => {
-  let statusCode = res.statusCode && res.statusCode !== 200 ? res.statusCode : 500;
+  let statusCode = (res.statusCode && res.statusCode >= 400) ? res.statusCode : (err.statusCode || err.status || 500);
   let message = err.message || 'Server error';
 
   if (err.name === 'CastError') {
@@ -19,12 +19,18 @@ const errorHandler = (err, req, res, next) => {
 
   if (err.code === 11000) {
     statusCode = 409;
-    message = 'Duplicate resource already exists';
+    message = 'An account with this email already exists';
   }
 
   if (err.type === 'entity.parse.failed') {
     statusCode = 400;
     message = 'Invalid JSON request body';
+  }
+
+  // Handle Mongoose connection timeout / server selection errors
+  if (err.name === 'MongooseServerSelectionError' || err.name === 'MongoServerSelectionError' || err.name === 'MongoNetworkError') {
+    statusCode = 503;
+    message = 'Database connection failed. Please check MongoDB Atlas IP Access (ensure 0.0.0.0/0 is whitelisted) and MONGO_URI in Render environment variables.';
   }
 
   // Prevent double-send if headers already flushed (e.g. streaming)

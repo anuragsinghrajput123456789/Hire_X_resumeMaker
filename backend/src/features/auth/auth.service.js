@@ -31,7 +31,7 @@ class AuthService {
 
     const userExists = await User.findOne({ email: normalizedEmail });
     if (userExists) {
-      const error = new Error('User already exists');
+      const error = new Error('An account with this email already exists');
       error.statusCode = 400;
       throw error;
     }
@@ -47,6 +47,7 @@ class AuthService {
         _id: user.id,
         name: user.name,
         email: user.email,
+        role: user.role || 'user',
         token: generateToken(user._id),
       };
     } else {
@@ -72,11 +73,12 @@ class AuthService {
         _id: user.id,
         name: user.name,
         email: user.email,
+        role: user.role || 'user',
         token: generateToken(user._id),
       };
     } else {
-      const error = new Error('Invalid credentials');
-      error.statusCode = 400;
+      const error = new Error('Invalid email or password');
+      error.statusCode = 401;
       throw error;
     }
   }

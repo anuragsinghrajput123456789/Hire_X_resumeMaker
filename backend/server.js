@@ -42,10 +42,17 @@ const isOriginAllowed = (origin) => {
     return true;
   }
 
-  // 4. Match common frontend hosting preview domains (Vercel, Render, Netlify)
-  if (/^https:\/\/([a-z0-9-_.]+\.)?vercel\.app$/i.test(cleanOrigin) ||
-      /^https:\/\/([a-z0-9-_.]+\.)?onrender\.com$/i.test(cleanOrigin) ||
-      /^https:\/\/([a-z0-9-_.]+\.)?netlify\.app$/i.test(cleanOrigin)) {
+  // 4. Match common frontend hosting preview domains (Vercel, Render, Netlify, Cloudflare Pages)
+  if (
+    cleanOrigin.endsWith('.vercel.app') ||
+    cleanOrigin === 'https://vercel.app' ||
+    cleanOrigin.endsWith('.onrender.com') ||
+    cleanOrigin === 'https://onrender.com' ||
+    cleanOrigin.endsWith('.netlify.app') ||
+    cleanOrigin === 'https://netlify.app' ||
+    cleanOrigin.endsWith('.pages.dev') ||
+    cleanOrigin === 'https://pages.dev'
+  ) {
     return true;
   }
 
@@ -69,6 +76,7 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
 
 app.use(express.json({ limit: '10mb' }));
 
