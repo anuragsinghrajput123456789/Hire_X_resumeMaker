@@ -5,7 +5,11 @@ const connectDB = async () => {
     return;
   }
   try {
-    const mongoUri = process.env.MONGODB_URI || process.env.MONGO_URI;
+    let mongoUri = process.env.MONGODB_URI || process.env.MONGO_URI || '';
+    if (mongoUri && !mongoUri.includes('127.0.0.1') && !mongoUri.includes('localhost')) {
+      // Normalize casing to match existing Atlas database HireX
+      mongoUri = mongoUri.replace(/\/(?:hirex|Hirex)([\/?]|$)/i, '/HireX$1');
+    }
     const isLocal = mongoUri && (mongoUri.includes('127.0.0.1') || mongoUri.includes('localhost'));
     const conn = await mongoose.connect(mongoUri, {
       maxPoolSize: 10,
@@ -14,7 +18,7 @@ const connectDB = async () => {
       socketTimeoutMS: 45000,
       directConnection: isLocal ? true : undefined,
     });
-    console.log(`MongoDB Connected: ${conn.connection.host}`);
+    console.log(`MongoDB Connected: ${conn.connection.host} (Database: ${conn.connection.name})`);
   } catch (error) {
     console.error(`MongoDB connection error: ${error.message}`);
     if (process.env.NODE_ENV === 'production') {
